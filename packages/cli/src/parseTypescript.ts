@@ -1,4 +1,4 @@
-import ts from 'typescript';
+const ts: any = {};
 
 interface INode {
   queryName: string;
@@ -9,14 +9,14 @@ import { parseTSQuery, TSQueryAST, ParseEvent } from '@pgtyped/parser';
 
 export type TSParseResult = { queries: TSQueryAST[]; events: ParseEvent[] };
 
-export function parseFile(sourceFile: ts.SourceFile): TSParseResult {
+export function parseFile(sourceFile: any): TSParseResult {
   const foundNodes: INode[] = [];
   parseNode(sourceFile);
 
-  function parseNode(node: ts.Node) {
+  function parseNode(node: any) {
     if (node.kind === ts.SyntaxKind.TaggedTemplateExpression) {
       const queryName = node.parent.getChildren()[0].getText();
-      const taggedTemplateNode = node as ts.TaggedTemplateExpression;
+      const taggedTemplateNode = node as any;
       const tagName = taggedTemplateNode.tag.getText();
       const queryText = taggedTemplateNode.template
         .getText()
