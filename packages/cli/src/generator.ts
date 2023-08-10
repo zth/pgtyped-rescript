@@ -35,7 +35,7 @@ export interface IField {
 }
 
 const interfaceGen = (interfaceName: string, contents: string) =>
-  `export interface ${interfaceName} {
+  `type ${interfaceName} = {
 ${contents}
 }\n\n`;
 
@@ -51,14 +51,14 @@ export const generateInterface = (interfaceName: string, fields: IField[]) => {
     .map(
       ({ fieldName, fieldType, comment, optional }) =>
         (comment ? `  /** ${escapeComment(comment)} */\n` : '') +
-        `  ${fieldName}${optional ? '?' : ''}: ${fieldType};`,
+        `  ${getFieldName(fieldName)}${optional ? '?' : ''}: ${fieldType},`,
     )
     .join('\n');
   return interfaceGen(interfaceName, contents);
 };
 
 export const generateTypeAlias = (typeName: string, alias: string) =>
-  `export type ${typeName} = ${alias};\n\n`;
+  `type ${typeName} = ${alias}\n\n`;
 
 type ParsedQuery =
   | {
@@ -87,8 +87,8 @@ export async function queryToTypeDeclarations(
   }
 
   const typeData = await typeSource(queryData);
-  const interfaceName = pascalCase(queryName);
-  const interfacePrefix = config.hungarianNotation ? 'I' : '';
+  const interfaceName = toRescriptName(pascalCase(queryName));
+  const interfacePrefix = '';
 
   const typeError = 'errorCode' in typeData;
   const hasAnonymousColumns =
@@ -118,14 +118,14 @@ export async function queryToTypeDeclarations(
 
     const returnInterface = generateTypeAlias(
       `${interfacePrefix}${interfaceName}Result`,
-      'never',
+      'unit',
     );
     const paramInterface = generateTypeAlias(
       `${interfacePrefix}${interfaceName}Params`,
-      'never',
+      'unit',
     );
-    const resultErrorComment = `/** Query '${queryName}' is invalid, so its result is assigned type 'never'.\n * ${explanation} */\n`;
-    const paramErrorComment = `/** Query '${queryName}' is invalid, so its parameters are assigned type 'never'.\n * ${explanation} */\n`;
+    const resultErrorComment = `/** Query '${queryName}' is invalid, so its result is assigned type 'unit'.\n * ${explanation} */\n`;
+    const paramErrorComment = `/** Query '${queryName}' is invalid, so its parameters are assigned type 'unit'.\n * ${explanation} */\n`;
     return `${resultErrorComment}${returnInterface}${paramErrorComment}${paramInterface}`;
   }
 
@@ -133,6 +133,7 @@ export async function queryToTypeDeclarations(
 
   const returnFieldTypes: IField[] = [];
   const paramFieldTypes: IField[] = [];
+  const records: string[] = [];
 
   returnTypes.forEach(({ returnName, type, nullable, comment }) => {
     let tsTypeName = types.use(type, TypeScope.Return);
@@ -144,7 +145,7 @@ export async function queryToTypeDeclarations(
       (addNullability || nullable || nullable == null) &&
       !removeNullability
     ) {
-      tsTypeName += ' | null';
+      tsTypeName = 'Null.t<' + tsTypeName + '>';
     }
 
     if (addNullability || removeNullability) {
@@ -175,7 +176,7 @@ export async function queryToTypeDeclarations(
       let tsTypeName = types.use(pgTypeName, TypeScope.Parameter);
 
       if (!param.required) {
-        tsTypeName += ' | null | void';
+        tsTypeName = 'Null.t<' + tsTypeName + '>';
       }
 
       // Allow optional scalar parameters to be missing from parameters object
@@ -185,7 +186,7 @@ export async function queryToTypeDeclarations(
       paramFieldTypes.push({
         optional,
         fieldName: param.name,
-        fieldType: isArray ? `readonly (${tsTypeName})[]` : tsTypeName,
+        fieldType: isArray ? `array<${tsTypeName}>` : tsTypeName,
       });
     } else {
       const isArray = param.type === ParameterTransform.PickSpread;
@@ -196,13 +197,16 @@ export async function queryToTypeDeclarations(
             TypeScope.Parameter,
           );
           return p.required
-            ? `    ${p.name}: ${paramType}`
-            : `    ${p.name}: ${paramType} | null | void`;
+            ? `  ${getFieldName(p.name)}: ${paramType}`
+            : `  ${getFieldName(p.name)}?: ${paramType}`;
         })
         .join(',\n');
-      fieldType = `{\n${fieldType}\n  }`;
+      fieldType = `{\n${fieldType}\n}\n`;
+      let name = `${interfacePrefix}${interfaceName}Params_${param.name}`;
+      records.push(`type ${name} = ${fieldType}`);
+      fieldType = name;
       if (isArray) {
-        fieldType = `readonly (${fieldType})[]`;
+        fieldType = `array<${fieldType}>`;
       }
       paramFieldTypes.push({
         fieldName: param.name,
@@ -225,17 +229,17 @@ export async function queryToTypeDeclarations(
           `${interfacePrefix}${interfaceName}Result`,
           returnFieldTypes,
         )
-      : generateTypeAlias(resultInterfaceName, 'void'));
+      : generateTypeAlias(resultInterfaceName, 'unit'));
 
   const paramInterfaceName = `${interfacePrefix}${interfaceName}Params`;
   const paramTypesInterface =
-    `/** '${queryName}' parameters type */\n` +
+    `${records.join('\n')}/** '${queryName}' parameters type */\n` +
     (paramFieldTypes.length > 0
       ? generateInterface(
           `${interfacePrefix}${interfaceName}Params`,
           paramFieldTypes,
         )
-      : generateTypeAlias(paramInterfaceName, 'void'));
+      : generateTypeAlias(paramInterfaceName, 'unit'));
 
   const typePairInterface =
     `/** '${queryName}' query type */\n` +
@@ -281,7 +285,7 @@ async function generateTypedecsFromFile(
   config: ParsedConfig,
 ): Promise<ITypedQuery[]> {
   const results: ITypedQuery[] = [];
-  const interfacePrefix = config.hungarianNotation ? 'I' : '';
+  const interfacePrefix = '';
   const typeSource: TypeSource = (query) => getTypes(query, connection);
 
   const { queries, events } =
@@ -310,12 +314,12 @@ async function generateTypedecsFromFile(
           name: camelCase(sqlQueryAST.name),
           ast: sqlQueryAST,
           ir: queryASTToIR(sqlQueryAST),
-          paramTypeAlias: `${interfacePrefix}${pascalCase(
-            sqlQueryAST.name,
-          )}Params`,
-          returnTypeAlias: `${interfacePrefix}${pascalCase(
-            sqlQueryAST.name,
-          )}Result`,
+          paramTypeAlias: toRescriptName(
+            `${interfacePrefix}${pascalCase(sqlQueryAST.name)}Params`,
+          ),
+          returnTypeAlias: toRescriptName(
+            `${interfacePrefix}${pascalCase(sqlQueryAST.name)}Result`,
+          ),
         },
         fileName,
         typeDeclaration: result,
@@ -393,9 +397,9 @@ export async function generateDeclarationFile(
       .split('\n')
       .map((s: string) => ' * ' + s)
       .join('\n');
-    declarationFileContents += `const ${
+    declarationFileContents += `%%private(let ${
       typeDec.query.name
-    }IR: any = ${JSON.stringify(typeDec.query.ir)};\n\n`;
+    }IR: IR.t = %raw(\`${JSON.stringify(typeDec.query.ir)}\`))\n\n`;
     declarationFileContents +=
       `/**\n` +
       ` * Query generated from SQL:\n` +
@@ -404,9 +408,28 @@ export async function generateDeclarationFile(
       ` * \`\`\`\n` +
       ` */\n`;
     declarationFileContents +=
-      `export const ${typeDec.query.name} = ` +
-      `new PreparedQuery<${typeDec.query.paramTypeAlias},${typeDec.query.returnTypeAlias}>` +
-      `(${typeDec.query.name}IR);\n\n\n`;
+      `@module("@pgtyped/runtime") @new external ${typeDec.query.name}: IR.t => PreparedStatement.t<${typeDec.query.paramTypeAlias}, ${typeDec.query.returnTypeAlias}> = "PreparedQuery";\n` +
+      `let ${typeDec.query.name} = ${typeDec.query.name}(${typeDec.query.name}IR)\n` +
+      `let ${typeDec.query.name} = (params, ~client) => ${typeDec.query.name}->PreparedStatement.run(params, ~client)` +
+      `\n\n\n`;
   }
   return { declarationFileContents, typeDecs };
+}
+
+function toRescriptName(name: string): string {
+  if (name == null || name.length === 0) {
+    return name;
+  }
+
+  return `${name[0]?.toLowerCase() ?? ''}${name.slice(1)}`;
+}
+
+const reservedReScriptWords = ['type'];
+
+function getFieldName(fieldName: string): string {
+  if (reservedReScriptWords.includes(fieldName)) {
+    return `@as("${fieldName}") ${fieldName}_`;
+  }
+
+  return fieldName;
 }

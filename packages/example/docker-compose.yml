@@ -42,7 +42,7 @@ services:
     <<: *build
     depends_on:
       - build
-    command: npx jest index.test.ts
+    command: npx jest rescript.test.js
 
   test-cjs:
     <<: *build

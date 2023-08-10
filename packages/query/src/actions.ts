@@ -348,7 +348,7 @@ OR pt.oid IN (SELECT typelem FROM pg_type ptn WHERE ptn.oid IN (${concatenatedTy
   return rows.map(
     ([oid, typeName, typeKind, enumLabel, elementTypeOid, typeCategory]) => ({
       oid,
-      typeName,
+      typeName: toRescriptName(typeName),
       typeKind,
       enumLabel,
       elementTypeOid,
@@ -463,4 +463,12 @@ export async function getTypes(
   };
 
   return { paramMetadata, returnTypes };
+}
+
+function toRescriptName(name: string): string {
+  if (name == null || name.length === 0) {
+    return name;
+  }
+
+  return `${name[0]?.toLowerCase() ?? ''}${name.slice(1)}`;
 }

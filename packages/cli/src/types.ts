@@ -12,43 +12,40 @@ import os from 'os';
 import path from 'path';
 
 const String: Type = { name: 'string' };
-const Number: Type = { name: 'number' };
-const NumberOrString: Type = { name: 'number | string' };
-const Boolean: Type = { name: 'boolean' };
-const Date: Type = { name: 'Date' };
-const DateOrString: Type = { name: 'Date | string' };
-const Bytes: Type = { name: 'Buffer' };
-const Void: Type = { name: 'undefined' };
-const Json: Type = {
-  name: 'Json',
-  definition:
-    'null | boolean | number | string | Json[] | { [key: string]: Json }',
-};
+const Int: Type = { name: 'int' };
+const Float: Type = { name: 'float' };
+const NumberOrString: Type = { name: 'numberOrString' };
+const Boolean: Type = { name: 'bool' };
+const Date: Type = { name: 'Date.t' };
+const DateOrString: Type = { name: 'dateOrString' };
+const Bytes: Type = { name: 'Buffer.t' };
+const Void: Type = { name: 'unit' };
+const Json: Type = { name: 'Js.Json.t' };
 const getArray = (baseType: Type): Type => ({
   name: `${baseType.name}Array`,
-  definition: `(${baseType.definition ?? baseType.name})[]`,
+  definition: `array<${baseType.definition ?? baseType.name}>`,
 });
 
 export const DefaultTypeMapping = Object.freeze({
   // Integer types
-  int2: { parameter: Number, return: Number },
-  int4: { parameter: Number, return: Number },
+  int2: { parameter: Int, return: Int },
+  int4: { parameter: Int, return: Int },
   int8: { parameter: NumberOrString, return: String },
-  smallint: { parameter: Number, return: Number },
-  int: { parameter: Number, return: Number },
+  smallint: { parameter: Int, return: Int },
+  int: { parameter: Int, return: Int },
   bigint: { parameter: NumberOrString, return: String },
 
   // Precision types
-  real: { parameter: Number, return: Number },
-  float4: { parameter: Number, return: Number },
-  float: { parameter: Number, return: Number },
-  float8: { parameter: Number, return: Number },
+  real: { parameter: Float, return: Float },
+  float4: { parameter: Float, return: Float },
+  float: { parameter: Float, return: Float },
+  float8: { parameter: Float, return: Float },
   numeric: { parameter: NumberOrString, return: String },
   decimal: { parameter: NumberOrString, return: String },
 
   // Serial types
-  smallserial: { parameter: Number, return: Number },
-  serial: { parameter: Number, return: Number },
+  smallserial: { parameter: Int, return: Int },
+  serial: { parameter: Int, return: Int },
   bigserial: { parameter: NumberOrString, return: String },
 
   // Common string types
@@ -92,7 +89,7 @@ export const DefaultTypeMapping = Object.freeze({
   bytea: { parameter: Bytes, return: Bytes },
 
   // Postgis types
-  point: { parameter: getArray(Number), return: getArray(Number) },
+  point: { parameter: getArray(Float), return: getArray(Float) },
 });
 
 export type BuiltinTypes = keyof typeof DefaultTypeMapping;
@@ -161,7 +158,7 @@ export function declareImport(
 
   if (from.startsWith('.')) {
     from = path.relative(path.dirname(decsFileName), imports[0].from);
-    if (os.platform() === "win32") {
+    if (os.platform() === 'win32') {
       // make sure we use posix separators in TS import declarations (see #533)
       from = from.split(path.sep).join(path.posix.sep);
     }
@@ -193,16 +190,16 @@ export function declareImport(
 }
 
 function declareAlias(name: string, definition: string): string {
-  return `export type ${name} = ${definition};\n`;
+  return `type ${name} = ${definition}\n`;
 }
 
 function declareStringUnion(name: string, values: string[]) {
   return declareAlias(
     name,
-    values
+    `[${values
       .sort()
-      .map((v) => `'${v}'`)
-      .join(' | '),
+      .map((v) => `#"${v}"`)
+      .join(' | ')}]`,
   );
 }
 
@@ -287,11 +284,8 @@ export class TypeAllocator {
   }
 
   /** Emit a typescript definition for all types that have been used */
-  declaration(decsFileName: string): string {
-    const imports = Object.values(this.imports)
-      .map((imports) => declareImport(imports, decsFileName))
-      .sort()
-      .join('\n');
+  declaration(_decsFileName: string): string {
+    const imports = 'open PgTyped\n\n';
 
     // Declare database enums as string unions to maintain assignability of their values between query files
     const enums = Object.values(this.types)

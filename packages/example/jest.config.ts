@@ -18,7 +18,7 @@ const config: Config = {
     ],
   },
   preset: 'ts-jest/presets/default-esm',
-  testRegex: '\\.test\\.tsx?$',
+  testRegex: '\\.test\\.js?$',
 };
 
 export default config;

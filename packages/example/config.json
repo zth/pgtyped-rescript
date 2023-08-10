@@ -3,20 +3,14 @@
     {
       "mode": "sql",
       "include": "**/*.sql",
-      "emitTemplate": "{{dir}}/{{name}}.queries.ts"
-    },
-    {
-      "mode": "ts",
-      "include": "**/*.ts",
-      "emitTemplate": "{{dir}}/{{name}}.types.ts"
-    }
+      "emitTemplate": "{{dir}}/{{name}}__sql.res"
+    }    
   ],
   "typesOverrides": {
     "date": {
       "return": "string"
     },
-    "int8": "BigInt",
-    "category": { "return": "./src/customTypes#Category" }
+    "int8": "BigInt.t"    
   },
   "srcDir": "./src/",
   "dbUrl": "postgres://postgres:password@localhost/postgres"
