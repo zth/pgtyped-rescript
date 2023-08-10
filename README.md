@@ -7,7 +7,7 @@
 
 ## ReScript fork of PgTyped
 
-> This is a fork PgTyped that outputs ReScript instead of TS. Most things work the same as the TS version. [Here's a dedicated ReScript readme](./README.md) detailing the differences, and how to get started in ReScript.
+> This is a fork PgTyped that outputs ReScript instead of TS. Most things work the same as the TS version. [Here's a dedicated ReScript readme](./RESCRIPT.md) detailing the differences, and how to get started in ReScript.
 
 PgTyped makes it possible to use raw SQL in TypeScript with guaranteed type-safety.  
 No need to map or translate your DB schema to TypeScript, PgTyped automatically generates types and interfaces for your SQL queries by using your running Postgres database as the source of type information.
