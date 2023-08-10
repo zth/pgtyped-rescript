@@ -202,7 +202,7 @@ export async function queryToTypeDeclarations(
         })
         .join(',\n');
       fieldType = `{\n${fieldType}\n}\n`;
-      let name = `${interfacePrefix}${interfaceName}Params_${param.name}`;
+      const name = `${interfacePrefix}${interfaceName}Params_${param.name}`;
       records.push(`type ${name} = ${fieldType}`);
       fieldType = name;
       if (isArray) {
