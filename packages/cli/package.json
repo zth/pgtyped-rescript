@@ -33,7 +33,7 @@
     "watch": "tsc --watch --preserveWatchOutput"
   },
   "bin": {
-    "pgtyped": "lib/index.js"
+    "pgtyped-rescript": "lib/index.js"
   },
   "dependencies": {
     "@pgtyped/parser": "^2.1.0",
