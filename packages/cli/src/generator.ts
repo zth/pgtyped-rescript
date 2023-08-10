@@ -13,14 +13,14 @@ import {
   TSQueryAST,
 } from '@pgtyped/parser';
 
-import { getTypes, TypeSource } from '@pgtyped/query';
+import { getTypes, TypeSource } from 'pgtyped-rescript-query';
 import { camelCase } from 'camel-case';
 import { pascalCase } from 'pascal-case';
 import path from 'path';
 import { ParsedConfig } from './config.js';
 import { TypeAllocator, TypeMapping, TypeScope } from './types.js';
 import { parseCode as parseTypescriptFile } from './parseTypescript.js';
-import { IQueryTypes } from '@pgtyped/query/lib/actions';
+import { IQueryTypes } from 'pgtyped-rescript-query/lib/actions';
 
 export enum ProcessingMode {
   SQL = 'sql-file',

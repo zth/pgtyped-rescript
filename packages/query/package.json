@@ -1,5 +1,5 @@
 {
-  "name": "@pgtyped/query",
+  "name": "pgtyped-rescript-query",
   "version": "2.2.0",
   "type": "module",
   "exports": {

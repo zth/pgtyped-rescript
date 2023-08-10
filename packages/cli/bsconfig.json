@@ -1,0 +1,13 @@
+{
+  "name": "pgtyped-rescript",
+  "sources": {
+    "dir": "src/res"
+  },
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "suffix": ".js",
+  "bs-dependencies": ["@rescript/core"],
+  "bsc-flags": ["-open RescriptCore"]
+}

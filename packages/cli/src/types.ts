@@ -7,7 +7,7 @@ import {
   MappableType,
   Type,
   ImportedType,
-} from '@pgtyped/query';
+} from 'pgtyped-rescript-query';
 import os from 'os';
 import path from 'path';
 

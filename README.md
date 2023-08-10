@@ -5,6 +5,10 @@
 ![Version](https://img.shields.io/github/v/release/adelsz/pgtyped)
 [![Actions Status](https://github.com/adelsz/pgtyped/workflows/CI/badge.svg)](https://github.com/adelsz/pgtyped/actions) [![Join the chat at https://gitter.im/pgtyped/community](https://badges.gitter.im/pgtyped/community.svg)](https://gitter.im/pgtyped/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+## ReScript fork of PgTyped
+
+> This is a fork PgTyped that outputs ReScript instead of TS.
+
 PgTyped makes it possible to use raw SQL in TypeScript with guaranteed type-safety.  
 No need to map or translate your DB schema to TypeScript, PgTyped automatically generates types and interfaces for your SQL queries by using your running Postgres database as the source of type information.
 

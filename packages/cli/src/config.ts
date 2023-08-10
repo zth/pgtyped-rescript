@@ -8,7 +8,7 @@ import { reporter } from 'io-ts-reporters';
 import tls from 'tls';
 import { default as dbUrlModule, DatabaseConfig } from 'ts-parse-database-url';
 import { TypeDefinition } from './types.js';
-import { Type } from '@pgtyped/query';
+import { Type } from 'pgtyped-rescript-query';
 
 // module import hack
 const { default: parseDatabaseUri } = dbUrlModule as any;

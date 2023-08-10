@@ -2,7 +2,7 @@ import nun from 'nunjucks';
 import path from 'path';
 import fs from 'fs-extra';
 import { generateDeclarationFile } from './generator.js';
-import { startup } from '@pgtyped/query';
+import { startup } from 'pgtyped-rescript-query';
 import { ParsedConfig, TransformConfig } from './config.js';
 import { AsyncQueue } from '@pgtyped/wire';
 import worker from 'piscina';
