@@ -48,7 +48,7 @@ services:
     <<: *build
     depends_on:
       - build
-    command: npx jest -c jest-cjs.config.ts index.test.ts
+    command: npx jest -c jest-cjs.config.ts rescript.test.js
 
   test-update-snapshots:
     <<: *build
