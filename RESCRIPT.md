@@ -11,10 +11,10 @@ Everything else should work pretty much the same as stock `pgtyped`.
 
 ## Getting started
 
-Make sure you have the latest beta of ReScript `v11`, and [ReScript Core](https://github.com/rescript-association/rescript-core) (plus `RescriptCore` opened globally).
+Make sure you have ReScript `v11.1`, and [ReScript Core](https://github.com/rescript-association/rescript-core) (plus `RescriptCore` opened globally).
 
 1. `npm install -D pgtyped-rescript`
-2. `npm install @pgtyped/runtime pg rescript@11.0.0-beta.4 @rescript/core` (`@pgtyped/runtime` and `pg` are the only required runtime dependencies of pgtyped)
+2. `npm install @pgtyped/runtime pg rescript @rescript/core` (`@pgtyped/runtime` and `pg` are the only required runtime dependencies of pgtyped)
 3. Create a PgTyped `pgtyped.config.json` file.
 4. Run `npx pgtyped-rescript -w -c pgtyped.config.json` to start PgTyped in watch mode.
 
@@ -47,7 +47,7 @@ Now we can create a SQL file in `src/sql`. We call this one `books.sql`:
 SELECT * FROM books WHERE id = :id!;
 ```
 
-After running `npx pgtyped-rescript -c pgtyped.config.json` we should get a `books__sql.res` file, with an exported function `findBookById`. Here's a full example of how we can connect to a database, and use that generated function to query it:
+After running `npx pgtyped-rescript -c pgtyped.config.json` we should get a `books__sql.res` file, with a module `FindBookById` with various functions for executing the query. Here's a full example of how we can connect to a database, and use that generated function to query it:
 
 ```rescript
 open PgTyped
@@ -67,7 +67,7 @@ let client = Pg.Client.make(dbConfig)
 let main = async () => {
   await client->Pg.Client.connect
 
-  let res = await Books__sql.findBookById({id: 1}, ~client)
+  let res = await client->Books__sql.FindBookById.one({id: 1})
   Console.log(res)
 
   await client->Pg.Client.end
@@ -77,32 +77,6 @@ main()->Promise.done
 ```
 
 ## API
-
-### Generated files
-
-For each separate SQL query in each `sql` file, a function to execute that query is generated, just like above. Everything is fully typed. Taking the example above again:
-
-```sql
-/* @name findBookById */
-SELECT * FROM books WHERE id = :id!;
-```
-
-Generates:
-
-```rescript
-/** 'FindBookById' parameters type */
-type findBookByIdParams = {
-  id: int,
-}
-
-/** 'FindBookById' return type */
-type findBookByIdResult = {
-  id: int,
-  name: Null.t<string>,
-}
-
-let findBookById: (findBookByIdParams, ~client: PgTyped.Pg.Client.t) => promise<array<findBookByIdResult>>
-```
 
 ### `PgTyped`
 
@@ -124,32 +98,10 @@ Here are a few loose thoughts around what we could do to improve things even mor
 Co-locate SQL directly in ReScript files. This could look something like:
 
 ```rescript
-let findBookById = %sql(`
-  /* @name findBookById */
-  SELECT * FROM books WHERE id = :id!;
-`)
-
-let res = await findBookById({id: 1}, ~client)
-```
-
-### Expect specific shapes
-
-Right now nothing special is done for the query results - they're brought back as a list of rows, just like with regular `pg`. We could however consider having a few helpers, like:
-
-- Expect a single row (+ optional single row)
-- Expect no rows
-- Expect a list of rows
-
-It's not clear exactly what the best API would be for this. But here's an example, tied to the SQL-in-ReScript approach above:
-
-```rescript
 let findBookById = %sql.one(`
   /* @name findBookById */
   SELECT * FROM books WHERE id = :id!;
 `)
 
-switch await findBookById({id: 1}, ~client) {
-| Ok(book) => Console.log(book)
-| Error() => Console.error("Did not get 1 book")
-}
+let res = await client->findBookById({id: 1})
 ```
