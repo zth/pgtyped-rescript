@@ -2,24 +2,32 @@
 open PgTyped
 
 
+@gentype
 type category = [#"novel" | #"science-fiction" | #"thriller"]
 
+@gentype
 type iso31661Alpha2 = [#"AD" | #"AE" | #"AF" | #"AG" | #"AI" | #"AL" | #"AM" | #"AO" | #"AQ" | #"AR" | #"AS" | #"AT" | #"AU" | #"AW" | #"AX" | #"AZ" | #"BA" | #"BB" | #"BD" | #"BE" | #"BF" | #"BG" | #"BH" | #"BI" | #"BJ" | #"BL" | #"BM" | #"BN" | #"BO" | #"BQ" | #"BR" | #"BS" | #"BT" | #"BV" | #"BW" | #"BY" | #"BZ" | #"CA" | #"CC" | #"CD" | #"CF" | #"CG" | #"CH" | #"CI" | #"CK" | #"CL" | #"CM" | #"CN" | #"CO" | #"CR" | #"CU" | #"CV" | #"CW" | #"CX" | #"CY" | #"CZ" | #"DE" | #"DJ" | #"DK" | #"DM" | #"DO" | #"DZ" | #"EC" | #"EE" | #"EG" | #"EH" | #"ER" | #"ES" | #"ET" | #"FI" | #"FJ" | #"FK" | #"FM" | #"FO" | #"FR" | #"GA" | #"GB" | #"GD" | #"GE" | #"GF" | #"GG" | #"GH" | #"GI" | #"GL" | #"GM" | #"GN" | #"GP" | #"GQ" | #"GR" | #"GS" | #"GT" | #"GU" | #"GW" | #"GY" | #"HK" | #"HM" | #"HN" | #"HR" | #"HT" | #"HU" | #"ID" | #"IE" | #"IL" | #"IM" | #"IN" | #"IO" | #"IQ" | #"IR" | #"IS" | #"IT" | #"JE" | #"JM" | #"JO" | #"JP" | #"KE" | #"KG" | #"KH" | #"KI" | #"KM" | #"KN" | #"KP" | #"KR" | #"KW" | #"KY" | #"KZ" | #"LA" | #"LB" | #"LC" | #"LI" | #"LK" | #"LR" | #"LS" | #"LT" | #"LU" | #"LV" | #"LY" | #"MA" | #"MC" | #"MD" | #"ME" | #"MF" | #"MG" | #"MH" | #"MK" | #"ML" | #"MM" | #"MN" | #"MO" | #"MP" | #"MQ" | #"MR" | #"MS" | #"MT" | #"MU" | #"MV" | #"MW" | #"MX" | #"MY" | #"MZ" | #"NA" | #"NC" | #"NE" | #"NF" | #"NG" | #"NI" | #"NL" | #"NO" | #"NP" | #"NR" | #"NU" | #"NZ" | #"OM" | #"PA" | #"PE" | #"PF" | #"PG" | #"PH" | #"PK" | #"PL" | #"PM" | #"PN" | #"PR" | #"PS" | #"PT" | #"PW" | #"PY" | #"QA" | #"RE" | #"RO" | #"RS" | #"RU" | #"RW" | #"SA" | #"SB" | #"SC" | #"SD" | #"SE" | #"SG" | #"SH" | #"SI" | #"SJ" | #"SK" | #"SL" | #"SM" | #"SN" | #"SO" | #"SR" | #"SS" | #"ST" | #"SV" | #"SX" | #"SY" | #"SZ" | #"TC" | #"TD" | #"TF" | #"TG" | #"TH" | #"TJ" | #"TK" | #"TL" | #"TM"]
 
+@gentype
 type arrayJSON_t = array<JSON.t>
 
+@gentype
 type categoryArray = array<category>
 
+@gentype
 type intArray = array<int>
 
+@gentype
 type stringArray = array<string>
 
 /** 'FindBookById' parameters type */
+@gentype
 type findBookByIdParams = {
   id?: Null.t<int>,
 }
 
 /** 'FindBookById' return type */
+@gentype
 type findBookByIdResult = {
   author_id: Null.t<int>,
   big_int: Null.t<bigint>,
@@ -31,6 +39,7 @@ type findBookByIdResult = {
 }
 
 /** 'FindBookById' query type */
+@gentype
 type findBookByIdQuery = {
   params: findBookByIdParams,
   result: findBookByIdResult,
@@ -46,15 +55,19 @@ type findBookByIdQuery = {
  */
 @module("@pgtyped/runtime") @new external findBookById: IR.t => PreparedStatement.t<findBookByIdParams, findBookByIdResult> = "PreparedQuery";
 let findBookById = findBookById(findBookByIdIR)
+
+@gentype
 let findBookById = (params, ~client) => findBookById->PreparedStatement.run(params, ~client)
 
 
 /** 'FindBookByCategory' parameters type */
+@gentype
 type findBookByCategoryParams = {
   category?: Null.t<category>,
 }
 
 /** 'FindBookByCategory' return type */
+@gentype
 type findBookByCategoryResult = {
   author_id: Null.t<int>,
   big_int: Null.t<bigint>,
@@ -66,6 +79,7 @@ type findBookByCategoryResult = {
 }
 
 /** 'FindBookByCategory' query type */
+@gentype
 type findBookByCategoryQuery = {
   params: findBookByCategoryParams,
   result: findBookByCategoryResult,
@@ -81,22 +95,27 @@ type findBookByCategoryQuery = {
  */
 @module("@pgtyped/runtime") @new external findBookByCategory: IR.t => PreparedStatement.t<findBookByCategoryParams, findBookByCategoryResult> = "PreparedQuery";
 let findBookByCategory = findBookByCategory(findBookByCategoryIR)
+
+@gentype
 let findBookByCategory = (params, ~client) => findBookByCategory->PreparedStatement.run(params, ~client)
 
 
 /** 'FindBookNameOrRank' parameters type */
+@gentype
 type findBookNameOrRankParams = {
   name?: Null.t<string>,
   rank?: Null.t<int>,
 }
 
 /** 'FindBookNameOrRank' return type */
+@gentype
 type findBookNameOrRankResult = {
   id: int,
   name: Null.t<string>,
 }
 
 /** 'FindBookNameOrRank' query type */
+@gentype
 type findBookNameOrRankQuery = {
   params: findBookNameOrRankParams,
   result: findBookNameOrRankResult,
@@ -114,13 +133,17 @@ type findBookNameOrRankQuery = {
  */
 @module("@pgtyped/runtime") @new external findBookNameOrRank: IR.t => PreparedStatement.t<findBookNameOrRankParams, findBookNameOrRankResult> = "PreparedQuery";
 let findBookNameOrRank = findBookNameOrRank(findBookNameOrRankIR)
+
+@gentype
 let findBookNameOrRank = (params, ~client) => findBookNameOrRank->PreparedStatement.run(params, ~client)
 
 
 /** 'FindBookUnicode' parameters type */
+@gentype
 type findBookUnicodeParams = unit
 
 /** 'FindBookUnicode' return type */
+@gentype
 type findBookUnicodeResult = {
   author_id: Null.t<int>,
   big_int: Null.t<bigint>,
@@ -132,6 +155,7 @@ type findBookUnicodeResult = {
 }
 
 /** 'FindBookUnicode' query type */
+@gentype
 type findBookUnicodeQuery = {
   params: findBookUnicodeParams,
   result: findBookUnicodeResult,
@@ -147,9 +171,12 @@ type findBookUnicodeQuery = {
  */
 @module("@pgtyped/runtime") @new external findBookUnicode: IR.t => PreparedStatement.t<findBookUnicodeParams, findBookUnicodeResult> = "PreparedQuery";
 let findBookUnicode = findBookUnicode(findBookUnicodeIR)
+
+@gentype
 let findBookUnicode = (params, ~client) => findBookUnicode->PreparedStatement.run(params, ~client)
 
 
+@gentype
 type insertBooksParams_books = {
   rank: int,
   name: string,
@@ -157,16 +184,19 @@ type insertBooksParams_books = {
   categories?: categoryArray
 }
 /** 'InsertBooks' parameters type */
+@gentype
 type insertBooksParams = {
   books: array<insertBooksParams_books>,
 }
 
 /** 'InsertBooks' return type */
+@gentype
 type insertBooksResult = {
   book_id: int,
 }
 
 /** 'InsertBooks' query type */
+@gentype
 type insertBooksQuery = {
   params: insertBooksParams,
   result: insertBooksResult,
@@ -183,19 +213,24 @@ type insertBooksQuery = {
  */
 @module("@pgtyped/runtime") @new external insertBooks: IR.t => PreparedStatement.t<insertBooksParams, insertBooksResult> = "PreparedQuery";
 let insertBooks = insertBooks(insertBooksIR)
+
+@gentype
 let insertBooks = (params, ~client) => insertBooks->PreparedStatement.run(params, ~client)
 
 
 /** 'UpdateBooksCustom' parameters type */
+@gentype
 type updateBooksCustomParams = {
   id: int,
   rank?: Null.t<int>,
 }
 
 /** 'UpdateBooksCustom' return type */
+@gentype
 type updateBooksCustomResult = unit
 
 /** 'UpdateBooksCustom' query type */
+@gentype
 type updateBooksCustomQuery = {
   params: updateBooksCustomParams,
   result: updateBooksCustomResult,
@@ -219,10 +254,13 @@ type updateBooksCustomQuery = {
  */
 @module("@pgtyped/runtime") @new external updateBooksCustom: IR.t => PreparedStatement.t<updateBooksCustomParams, updateBooksCustomResult> = "PreparedQuery";
 let updateBooksCustom = updateBooksCustom(updateBooksCustomIR)
+
+@gentype
 let updateBooksCustom = (params, ~client) => updateBooksCustom->PreparedStatement.run(params, ~client)
 
 
 /** 'UpdateBooks' parameters type */
+@gentype
 type updateBooksParams = {
   id: int,
   name?: Null.t<string>,
@@ -230,9 +268,11 @@ type updateBooksParams = {
 }
 
 /** 'UpdateBooks' return type */
+@gentype
 type updateBooksResult = unit
 
 /** 'UpdateBooks' query type */
+@gentype
 type updateBooksQuery = {
   params: updateBooksParams,
   result: updateBooksResult,
@@ -253,10 +293,13 @@ type updateBooksQuery = {
  */
 @module("@pgtyped/runtime") @new external updateBooks: IR.t => PreparedStatement.t<updateBooksParams, updateBooksResult> = "PreparedQuery";
 let updateBooks = updateBooks(updateBooksIR)
+
+@gentype
 let updateBooks = (params, ~client) => updateBooks->PreparedStatement.run(params, ~client)
 
 
 /** 'UpdateBooksRankNotNull' parameters type */
+@gentype
 type updateBooksRankNotNullParams = {
   id: int,
   name?: Null.t<string>,
@@ -264,9 +307,11 @@ type updateBooksRankNotNullParams = {
 }
 
 /** 'UpdateBooksRankNotNull' return type */
+@gentype
 type updateBooksRankNotNullResult = unit
 
 /** 'UpdateBooksRankNotNull' query type */
+@gentype
 type updateBooksRankNotNullQuery = {
   params: updateBooksRankNotNullParams,
   result: updateBooksRankNotNullResult,
@@ -286,15 +331,19 @@ type updateBooksRankNotNullQuery = {
  */
 @module("@pgtyped/runtime") @new external updateBooksRankNotNull: IR.t => PreparedStatement.t<updateBooksRankNotNullParams, updateBooksRankNotNullResult> = "PreparedQuery";
 let updateBooksRankNotNull = updateBooksRankNotNull(updateBooksRankNotNullIR)
+
+@gentype
 let updateBooksRankNotNull = (params, ~client) => updateBooksRankNotNull->PreparedStatement.run(params, ~client)
 
 
 /** 'GetBooksByAuthorName' parameters type */
+@gentype
 type getBooksByAuthorNameParams = {
   authorName: string,
 }
 
 /** 'GetBooksByAuthorName' return type */
+@gentype
 type getBooksByAuthorNameResult = {
   author_id: Null.t<int>,
   big_int: Null.t<bigint>,
@@ -306,6 +355,7 @@ type getBooksByAuthorNameResult = {
 }
 
 /** 'GetBooksByAuthorName' query type */
+@gentype
 type getBooksByAuthorNameQuery = {
   params: getBooksByAuthorNameParams,
   result: getBooksByAuthorNameResult,
@@ -323,21 +373,26 @@ type getBooksByAuthorNameQuery = {
  */
 @module("@pgtyped/runtime") @new external getBooksByAuthorName: IR.t => PreparedStatement.t<getBooksByAuthorNameParams, getBooksByAuthorNameResult> = "PreparedQuery";
 let getBooksByAuthorName = getBooksByAuthorName(getBooksByAuthorNameIR)
+
+@gentype
 let getBooksByAuthorName = (params, ~client) => getBooksByAuthorName->PreparedStatement.run(params, ~client)
 
 
 /** 'AggregateEmailsAndTest' parameters type */
+@gentype
 type aggregateEmailsAndTestParams = {
   testAges?: Null.t<intArray>,
 }
 
 /** 'AggregateEmailsAndTest' return type */
+@gentype
 type aggregateEmailsAndTestResult = {
   agetest: Null.t<bool>,
   emails: stringArray,
 }
 
 /** 'AggregateEmailsAndTest' query type */
+@gentype
 type aggregateEmailsAndTestQuery = {
   params: aggregateEmailsAndTestParams,
   result: aggregateEmailsAndTestResult,
@@ -353,19 +408,24 @@ type aggregateEmailsAndTestQuery = {
  */
 @module("@pgtyped/runtime") @new external aggregateEmailsAndTest: IR.t => PreparedStatement.t<aggregateEmailsAndTestParams, aggregateEmailsAndTestResult> = "PreparedQuery";
 let aggregateEmailsAndTest = aggregateEmailsAndTest(aggregateEmailsAndTestIR)
+
+@gentype
 let aggregateEmailsAndTest = (params, ~client) => aggregateEmailsAndTest->PreparedStatement.run(params, ~client)
 
 
 /** 'GetBooks' parameters type */
+@gentype
 type getBooksParams = unit
 
 /** 'GetBooks' return type */
+@gentype
 type getBooksResult = {
   id: int,
   name: string,
 }
 
 /** 'GetBooks' query type */
+@gentype
 type getBooksQuery = {
   params: getBooksParams,
   result: getBooksResult,
@@ -381,18 +441,23 @@ type getBooksQuery = {
  */
 @module("@pgtyped/runtime") @new external getBooks: IR.t => PreparedStatement.t<getBooksParams, getBooksResult> = "PreparedQuery";
 let getBooks = getBooks(getBooksIR)
+
+@gentype
 let getBooks = (params, ~client) => getBooks->PreparedStatement.run(params, ~client)
 
 
 /** 'CountBooks' parameters type */
+@gentype
 type countBooksParams = unit
 
 /** 'CountBooks' return type */
+@gentype
 type countBooksResult = {
   book_count: Null.t<bigint>,
 }
 
 /** 'CountBooks' query type */
+@gentype
 type countBooksQuery = {
   params: countBooksParams,
   result: countBooksResult,
@@ -408,19 +473,24 @@ type countBooksQuery = {
  */
 @module("@pgtyped/runtime") @new external countBooks: IR.t => PreparedStatement.t<countBooksParams, countBooksResult> = "PreparedQuery";
 let countBooks = countBooks(countBooksIR)
+
+@gentype
 let countBooks = (params, ~client) => countBooks->PreparedStatement.run(params, ~client)
 
 
 /** 'GetBookCountries' parameters type */
+@gentype
 type getBookCountriesParams = unit
 
 /** 'GetBookCountries' return type */
+@gentype
 type getBookCountriesResult = {
   country: iso31661Alpha2,
   id: int,
 }
 
 /** 'GetBookCountries' query type */
+@gentype
 type getBookCountriesQuery = {
   params: getBookCountriesParams,
   result: getBookCountriesResult,
@@ -436,6 +506,8 @@ type getBookCountriesQuery = {
  */
 @module("@pgtyped/runtime") @new external getBookCountries: IR.t => PreparedStatement.t<getBookCountriesParams, getBookCountriesResult> = "PreparedQuery";
 let getBookCountries = getBookCountries(getBookCountriesIR)
+
+@gentype
 let getBookCountries = (params, ~client) => getBookCountries->PreparedStatement.run(params, ~client)
 
 

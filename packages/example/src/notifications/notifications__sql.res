@@ -2,24 +2,29 @@
 open PgTyped
 
 
+@gentype
 type notification_type = [#"deadline" | #"notification" | #"reminder"]
 
+@gentype
 type sendNotificationsParams_notifications = {
   user_id: int,
   payload: JSON.t,
   @as("type") type_: notification_type
 }
 /** 'SendNotifications' parameters type */
+@gentype
 type sendNotificationsParams = {
   notifications: array<sendNotificationsParams_notifications>,
 }
 
 /** 'SendNotifications' return type */
+@gentype
 type sendNotificationsResult = {
   notification_id: int,
 }
 
 /** 'SendNotifications' query type */
+@gentype
 type sendNotificationsQuery = {
   params: sendNotificationsParams,
   result: sendNotificationsResult,
@@ -36,16 +41,20 @@ type sendNotificationsQuery = {
  */
 @module("@pgtyped/runtime") @new external sendNotifications: IR.t => PreparedStatement.t<sendNotificationsParams, sendNotificationsResult> = "PreparedQuery";
 let sendNotifications = sendNotifications(sendNotificationsIR)
+
+@gentype
 let sendNotifications = (params, ~client) => sendNotifications->PreparedStatement.run(params, ~client)
 
 
 /** 'GetNotifications' parameters type */
+@gentype
 type getNotificationsParams = {
   date: dateOrString,
   userId?: Null.t<int>,
 }
 
 /** 'GetNotifications' return type */
+@gentype
 type getNotificationsResult = {
   created_at: string,
   id: int,
@@ -55,6 +64,7 @@ type getNotificationsResult = {
 }
 
 /** 'GetNotifications' query type */
+@gentype
 type getNotificationsQuery = {
   params: getNotificationsParams,
   result: getNotificationsResult,
@@ -73,15 +83,19 @@ type getNotificationsQuery = {
  */
 @module("@pgtyped/runtime") @new external getNotifications: IR.t => PreparedStatement.t<getNotificationsParams, getNotificationsResult> = "PreparedQuery";
 let getNotifications = getNotifications(getNotificationsIR)
+
+@gentype
 let getNotifications = (params, ~client) => getNotifications->PreparedStatement.run(params, ~client)
 
 
 /** 'ThresholdFrogs' parameters type */
+@gentype
 type thresholdFrogsParams = {
   numFrogs: int,
 }
 
 /** 'ThresholdFrogs' return type */
+@gentype
 type thresholdFrogsResult = {
   payload: JSON.t,
   @as("type") type_: notification_type,
@@ -89,6 +103,7 @@ type thresholdFrogsResult = {
 }
 
 /** 'ThresholdFrogs' query type */
+@gentype
 type thresholdFrogsQuery = {
   params: thresholdFrogsParams,
   result: thresholdFrogsResult,
@@ -107,6 +122,8 @@ type thresholdFrogsQuery = {
  */
 @module("@pgtyped/runtime") @new external thresholdFrogs: IR.t => PreparedStatement.t<thresholdFrogsParams, thresholdFrogsResult> = "PreparedQuery";
 let thresholdFrogs = thresholdFrogs(thresholdFrogsIR)
+
+@gentype
 let thresholdFrogs = (params, ~client) => thresholdFrogs->PreparedStatement.run(params, ~client)
 
 

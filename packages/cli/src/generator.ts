@@ -35,7 +35,7 @@ export interface IField {
 }
 
 const interfaceGen = (interfaceName: string, contents: string) =>
-  `type ${interfaceName} = {
+  `@gentype\ntype ${interfaceName} = {
 ${contents}
 }\n\n`;
 
@@ -58,7 +58,7 @@ export const generateInterface = (interfaceName: string, fields: IField[]) => {
 };
 
 export const generateTypeAlias = (typeName: string, alias: string) =>
-  `type ${typeName} = ${alias}\n\n`;
+  `@gentype\ntype ${typeName} = ${alias}\n\n`;
 
 type ParsedQuery =
   | {
@@ -203,7 +203,7 @@ export async function queryToTypeDeclarations(
         .join(',\n');
       fieldType = `{\n${fieldType}\n}\n`;
       const name = `${interfacePrefix}${interfaceName}Params_${param.name}`;
-      records.push(`type ${name} = ${fieldType}`);
+      records.push(`@gentype\ntype ${name} = ${fieldType}`);
       fieldType = name;
       if (isArray) {
         fieldType = `array<${fieldType}>`;
@@ -409,8 +409,8 @@ export async function generateDeclarationFile(
       ` */\n`;
     declarationFileContents +=
       `@module("@pgtyped/runtime") @new external ${typeDec.query.name}: IR.t => PreparedStatement.t<${typeDec.query.paramTypeAlias}, ${typeDec.query.returnTypeAlias}> = "PreparedQuery";\n` +
-      `let ${typeDec.query.name} = ${typeDec.query.name}(${typeDec.query.name}IR)\n` +
-      `let ${typeDec.query.name} = (params, ~client) => ${typeDec.query.name}->PreparedStatement.run(params, ~client)` +
+      `let ${typeDec.query.name} = ${typeDec.query.name}(${typeDec.query.name}IR)\n\n` +
+      `@gentype\nlet ${typeDec.query.name} = (params, ~client) => ${typeDec.query.name}->PreparedStatement.run(params, ~client)` +
       `\n\n\n`;
   }
   return { declarationFileContents, typeDecs };

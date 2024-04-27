@@ -205,7 +205,7 @@ export function declareImport(
 }
 
 function declareAlias(name: string, definition: string): string {
-  return `type ${name} = ${definition}\n`;
+  return `@gentype\ntype ${name} = ${definition}\n`;
 }
 
 function declareStringUnion(name: string, values: string[]) {
