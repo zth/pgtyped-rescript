@@ -32,7 +32,8 @@ CREATE TABLE books (
   rank INTEGER,
   name TEXT,
   author_id INTEGER REFERENCES authors,
-  categories category[]
+  categories category[],
+  meta jsonb[]
 );
 
 CREATE TABLE book_comments (

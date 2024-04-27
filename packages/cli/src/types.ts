@@ -20,11 +20,25 @@ const Date: Type = { name: 'Date.t' };
 const DateOrString: Type = { name: 'dateOrString' };
 const Bytes: Type = { name: 'Buffer.t' };
 const Void: Type = { name: 'unit' };
-const Json: Type = { name: 'Js.Json.t' };
-const getArray = (baseType: Type): Type => ({
-  name: `${baseType.name}Array`,
-  definition: `array<${baseType.definition ?? baseType.name}>`,
-});
+const Json: Type = { name: 'JSON.t' };
+const getArray = (baseType: Type): Type => {
+  const definition = `array<${baseType.definition ?? baseType.name}>`;
+
+  if (baseType.name.includes('.')) {
+    // Module path in ReScript
+    const splitName = baseType.name.split('.');
+    const name = `array${splitName.join('_')}`;
+    return {
+      name,
+      definition,
+    };
+  } else {
+    return {
+      name: `${baseType.name}Array`,
+      definition: `array<${baseType.definition ?? baseType.name}>`,
+    };
+  }
+};
 
 export const DefaultTypeMapping = Object.freeze({
   // Integer types

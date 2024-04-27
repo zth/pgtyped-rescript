@@ -6,7 +6,7 @@ type notification_type = [#"deadline" | #"notification" | #"reminder"]
 
 type sendNotificationsParams_notifications = {
   user_id: int,
-  payload: Js.Json.t,
+  payload: JSON.t,
   @as("type") type_: notification_type
 }
 /** 'SendNotifications' parameters type */
@@ -49,7 +49,7 @@ type getNotificationsParams = {
 type getNotificationsResult = {
   created_at: string,
   id: int,
-  payload: Js.Json.t,
+  payload: JSON.t,
   @as("type") type_: notification_type,
   user_id: Null.t<int>,
 }
@@ -83,7 +83,7 @@ type thresholdFrogsParams = {
 
 /** 'ThresholdFrogs' return type */
 type thresholdFrogsResult = {
-  payload: Js.Json.t,
+  payload: JSON.t,
   @as("type") type_: notification_type,
   user_name: string,
 }
