@@ -49,11 +49,11 @@ open Jest
 external env: {..} = "process.env"
 
 let dbConfig = {
-  Pg.Client.host: env["PGHOST"]->Option.getWithDefault("127.0.0.1"),
-  user: env["PGUSER"]->Option.getWithDefault("postgres"),
-  password: env["PGPASSWORD"]->Option.getWithDefault("password"),
-  database: env["PGDATABASE"]->Option.getWithDefault("postgres"),
-  port: env["PGPORT"]->Option.flatMap(port => Int.fromString(port))->Option.getWithDefault(5432),
+  Pg.Client.host: env["PGHOST"]->Option.getOr("127.0.0.1"),
+  user: env["PGUSER"]->Option.getOr("postgres"),
+  password: env["PGPASSWORD"]->Option.getOr("password"),
+  database: env["PGDATABASE"]->Option.getOr("postgres"),
+  port: env["PGPORT"]->Option.flatMap(port => Int.fromString(port))->Option.getOr(5432),
 }
 
 let client = ref(None)

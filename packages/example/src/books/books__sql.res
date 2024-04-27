@@ -22,6 +22,7 @@ type findBookByIdParams = {
 /** 'FindBookById' return type */
 type findBookByIdResult = {
   author_id: Null.t<int>,
+  big_int: Null.t<bigint>,
   categories: Null.t<categoryArray>,
   id: int,
   meta: Null.t<arrayJSON_t>,
@@ -56,6 +57,7 @@ type findBookByCategoryParams = {
 /** 'FindBookByCategory' return type */
 type findBookByCategoryResult = {
   author_id: Null.t<int>,
+  big_int: Null.t<bigint>,
   categories: Null.t<categoryArray>,
   id: int,
   meta: Null.t<arrayJSON_t>,
@@ -121,6 +123,7 @@ type findBookUnicodeParams = unit
 /** 'FindBookUnicode' return type */
 type findBookUnicodeResult = {
   author_id: Null.t<int>,
+  big_int: Null.t<bigint>,
   categories: Null.t<categoryArray>,
   id: int,
   meta: Null.t<arrayJSON_t>,
@@ -294,6 +297,7 @@ type getBooksByAuthorNameParams = {
 /** 'GetBooksByAuthorName' return type */
 type getBooksByAuthorNameResult = {
   author_id: Null.t<int>,
+  big_int: Null.t<bigint>,
   categories: Null.t<categoryArray>,
   id: int,
   meta: Null.t<arrayJSON_t>,
@@ -385,7 +389,7 @@ type countBooksParams = unit
 
 /** 'CountBooks' return type */
 type countBooksResult = {
-  book_count: Null.t<BigInt.t>,
+  book_count: Null.t<bigint>,
 }
 
 /** 'CountBooks' query type */

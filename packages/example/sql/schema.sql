@@ -33,7 +33,8 @@ CREATE TABLE books (
   name TEXT,
   author_id INTEGER REFERENCES authors,
   categories category[],
-  meta jsonb[]
+  meta jsonb[],
+  big_int bigint
 );
 
 CREATE TABLE book_comments (

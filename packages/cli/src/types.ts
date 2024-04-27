@@ -21,6 +21,7 @@ const DateOrString: Type = { name: 'dateOrString' };
 const Bytes: Type = { name: 'Buffer.t' };
 const Void: Type = { name: 'unit' };
 const Json: Type = { name: 'JSON.t' };
+const BigInt: Type = { name: 'bigint' };
 const getArray = (baseType: Type): Type => {
   const definition = `array<${baseType.definition ?? baseType.name}>`;
 
@@ -47,7 +48,7 @@ export const DefaultTypeMapping = Object.freeze({
   int8: { parameter: NumberOrString, return: String },
   smallint: { parameter: Int, return: Int },
   int: { parameter: Int, return: Int },
-  bigint: { parameter: NumberOrString, return: String },
+  bigint: { parameter: BigInt, return: BigInt },
 
   // Precision types
   real: { parameter: Float, return: Float },
@@ -60,7 +61,7 @@ export const DefaultTypeMapping = Object.freeze({
   // Serial types
   smallserial: { parameter: Int, return: Int },
   serial: { parameter: Int, return: Int },
-  bigserial: { parameter: NumberOrString, return: String },
+  bigserial: { parameter: BigInt, return: BigInt },
 
   // Common string types
   uuid: { parameter: String, return: String },

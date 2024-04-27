@@ -10,7 +10,7 @@
     "date": {
       "return": "string"
     },
-    "int8": "BigInt.t"    
+    "int8": "bigint"    
   },
   "srcDir": "./src/",
   "dbUrl": "postgres://postgres:password@localhost/postgres"
