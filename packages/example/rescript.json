@@ -10,6 +10,7 @@
     },
     "suffix": ".js",
     "bs-dependencies": ["@rescript/core", "pgtyped-rescript"],
-    "bsc-flags": ["-open RescriptCore"]
+    "bsc-flags": ["-open RescriptCore"],
+    "gentypeconfig": {}
   }
   

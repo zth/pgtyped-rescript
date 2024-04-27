@@ -32,11 +32,55 @@ type getAllCommentsQuery = {
  * SELECT * FROM book_comments WHERE id = :id! OR user_id = :id                                      
  * ```
  */
-@module("@pgtyped/runtime") @new external getAllComments: IR.t => PreparedStatement.t<getAllCommentsParams, getAllCommentsResult> = "PreparedQuery";
-let getAllComments = getAllComments(getAllCommentsIR)
+@gentype
+module GetAllComments: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, getAllCommentsParams) => promise<array<getAllCommentsResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, getAllCommentsParams) => promise<option<getAllCommentsResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    getAllCommentsParams,
+    ~errorMessage: string=?
+  ) => promise<result<getAllCommentsResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, getAllCommentsParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external getAllComments: IR.t => PreparedStatement.t<getAllCommentsParams, getAllCommentsResult> = "PreparedQuery";
+  let query = getAllComments(getAllCommentsIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let getAllComments = (params, ~client) => getAllComments->PreparedStatement.run(params, ~client)
+@deprecated("Use 'GetAllComments.many' directly instead")
+let getAllComments = (params, ~client) => GetAllComments.many(client, params)
 
 
 /** 'GetAllCommentsByIds' parameters type */
@@ -69,11 +113,55 @@ type getAllCommentsByIdsQuery = {
  * SELECT * FROM book_comments WHERE id in :ids AND id in :ids!
  * ```
  */
-@module("@pgtyped/runtime") @new external getAllCommentsByIds: IR.t => PreparedStatement.t<getAllCommentsByIdsParams, getAllCommentsByIdsResult> = "PreparedQuery";
-let getAllCommentsByIds = getAllCommentsByIds(getAllCommentsByIdsIR)
+@gentype
+module GetAllCommentsByIds: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, getAllCommentsByIdsParams) => promise<array<getAllCommentsByIdsResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, getAllCommentsByIdsParams) => promise<option<getAllCommentsByIdsResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    getAllCommentsByIdsParams,
+    ~errorMessage: string=?
+  ) => promise<result<getAllCommentsByIdsResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, getAllCommentsByIdsParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external getAllCommentsByIds: IR.t => PreparedStatement.t<getAllCommentsByIdsParams, getAllCommentsByIdsResult> = "PreparedQuery";
+  let query = getAllCommentsByIds(getAllCommentsByIdsIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let getAllCommentsByIds = (params, ~client) => getAllCommentsByIds->PreparedStatement.run(params, ~client)
+@deprecated("Use 'GetAllCommentsByIds.many' directly instead")
+let getAllCommentsByIds = (params, ~client) => GetAllCommentsByIds.many(client, params)
 
 
 @gentype
@@ -113,11 +201,55 @@ type insertCommentQuery = {
  * VALUES :comments RETURNING *
  * ```
  */
-@module("@pgtyped/runtime") @new external insertComment: IR.t => PreparedStatement.t<insertCommentParams, insertCommentResult> = "PreparedQuery";
-let insertComment = insertComment(insertCommentIR)
+@gentype
+module InsertComment: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, insertCommentParams) => promise<array<insertCommentResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, insertCommentParams) => promise<option<insertCommentResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    insertCommentParams,
+    ~errorMessage: string=?
+  ) => promise<result<insertCommentResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, insertCommentParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external insertComment: IR.t => PreparedStatement.t<insertCommentParams, insertCommentResult> = "PreparedQuery";
+  let query = insertComment(insertCommentIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let insertComment = (params, ~client) => insertComment->PreparedStatement.run(params, ~client)
+@deprecated("Use 'InsertComment.many' directly instead")
+let insertComment = (params, ~client) => InsertComment.many(client, params)
 
 
 /** 'SelectExistsTest' parameters type */
@@ -145,10 +277,54 @@ type selectExistsTestQuery = {
  * SELECT EXISTS ( SELECT 1 WHERE true ) AS "isTransactionExists"
  * ```
  */
-@module("@pgtyped/runtime") @new external selectExistsTest: IR.t => PreparedStatement.t<selectExistsTestParams, selectExistsTestResult> = "PreparedQuery";
-let selectExistsTest = selectExistsTest(selectExistsTestIR)
+@gentype
+module SelectExistsTest: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, selectExistsTestParams) => promise<array<selectExistsTestResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, selectExistsTestParams) => promise<option<selectExistsTestResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    selectExistsTestParams,
+    ~errorMessage: string=?
+  ) => promise<result<selectExistsTestResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, selectExistsTestParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external selectExistsTest: IR.t => PreparedStatement.t<selectExistsTestParams, selectExistsTestResult> = "PreparedQuery";
+  let query = selectExistsTest(selectExistsTestIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let selectExistsTest = (params, ~client) => selectExistsTest->PreparedStatement.run(params, ~client)
+@deprecated("Use 'SelectExistsTest.many' directly instead")
+let selectExistsTest = (params, ~client) => SelectExistsTest.many(client, params)
 
 

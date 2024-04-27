@@ -39,11 +39,55 @@ type sendNotificationsQuery = {
  * VALUES :notifications RETURNING id as notification_id
  * ```
  */
-@module("@pgtyped/runtime") @new external sendNotifications: IR.t => PreparedStatement.t<sendNotificationsParams, sendNotificationsResult> = "PreparedQuery";
-let sendNotifications = sendNotifications(sendNotificationsIR)
+@gentype
+module SendNotifications: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, sendNotificationsParams) => promise<array<sendNotificationsResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, sendNotificationsParams) => promise<option<sendNotificationsResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    sendNotificationsParams,
+    ~errorMessage: string=?
+  ) => promise<result<sendNotificationsResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, sendNotificationsParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external sendNotifications: IR.t => PreparedStatement.t<sendNotificationsParams, sendNotificationsResult> = "PreparedQuery";
+  let query = sendNotifications(sendNotificationsIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let sendNotifications = (params, ~client) => sendNotifications->PreparedStatement.run(params, ~client)
+@deprecated("Use 'SendNotifications.many' directly instead")
+let sendNotifications = (params, ~client) => SendNotifications.many(client, params)
 
 
 /** 'GetNotifications' parameters type */
@@ -81,11 +125,55 @@ type getNotificationsQuery = {
  *  AND created_at > :date!
  * ```
  */
-@module("@pgtyped/runtime") @new external getNotifications: IR.t => PreparedStatement.t<getNotificationsParams, getNotificationsResult> = "PreparedQuery";
-let getNotifications = getNotifications(getNotificationsIR)
+@gentype
+module GetNotifications: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, getNotificationsParams) => promise<array<getNotificationsResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, getNotificationsParams) => promise<option<getNotificationsResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    getNotificationsParams,
+    ~errorMessage: string=?
+  ) => promise<result<getNotificationsResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, getNotificationsParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external getNotifications: IR.t => PreparedStatement.t<getNotificationsParams, getNotificationsResult> = "PreparedQuery";
+  let query = getNotifications(getNotificationsIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let getNotifications = (params, ~client) => getNotifications->PreparedStatement.run(params, ~client)
+@deprecated("Use 'GetNotifications.many' directly instead")
+let getNotifications = (params, ~client) => GetNotifications.many(client, params)
 
 
 /** 'ThresholdFrogs' parameters type */
@@ -120,10 +208,54 @@ type thresholdFrogsQuery = {
  * WHERE CAST (n.payload->'num_frogs' AS int) > :numFrogs!
  * ```
  */
-@module("@pgtyped/runtime") @new external thresholdFrogs: IR.t => PreparedStatement.t<thresholdFrogsParams, thresholdFrogsResult> = "PreparedQuery";
-let thresholdFrogs = thresholdFrogs(thresholdFrogsIR)
+@gentype
+module ThresholdFrogs: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, thresholdFrogsParams) => promise<array<thresholdFrogsResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, thresholdFrogsParams) => promise<option<thresholdFrogsResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    thresholdFrogsParams,
+    ~errorMessage: string=?
+  ) => promise<result<thresholdFrogsResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, thresholdFrogsParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external thresholdFrogs: IR.t => PreparedStatement.t<thresholdFrogsParams, thresholdFrogsResult> = "PreparedQuery";
+  let query = thresholdFrogs(thresholdFrogsIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let thresholdFrogs = (params, ~client) => thresholdFrogs->PreparedStatement.run(params, ~client)
+@deprecated("Use 'ThresholdFrogs.many' directly instead")
+let thresholdFrogs = (params, ~client) => ThresholdFrogs.many(client, params)
 
 

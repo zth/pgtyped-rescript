@@ -82,61 +82,55 @@ module Books = Books__sql
 module Notifications = Notifications__sql
 
 testAsync("select query with unicode characters", async () => {
-  let result = await Books.findBookUnicode((), ~client=getClient())
+  let result = await getClient()->Books.FindBookUnicode.many()
   expect(result)->Expect.toMatchSnapshot
 })
 
 testAsync("select query with parameters", async () => {
-  let comments = await Comments.getAllComments({id: 1}, ~client=getClient())
+  let comments = await getClient()->Comments.GetAllComments.many({id: 1})
   expect(comments)->Expect.toMatchSnapshot
 })
 
 testAsync("select query with dynamic or", async () => {
-  let result = await Books.findBookNameOrRank(
-    {
-      rank: Value(1),
-    },
-    ~client=getClient(),
-  )
+  let result = await getClient()->Books.FindBookNameOrRank.many({
+    rank: Value(1),
+  })
   expect(result)->Expect.toMatchSnapshot
 })
 
 testAsync("insert query with parameter spread", async () => {
-  let insertedBookId = switch await Books.insertBooks(
-    {
-      books: [
-        {
-          authorId: 1,
-          name: "A Brief History of Time: From the Big Bang to Black Holes",
-          rank: 1,
-          categories: [#novel, #"science-fiction"],
-        },
-      ],
-    },
-    ~client=getClient(),
-  ) {
+  let insertedBookId = switch await getClient()->Books.InsertBooks.many({
+    books: [
+      {
+        authorId: 1,
+        name: "A Brief History of Time: From the Big Bang to Black Holes",
+        rank: 1,
+        categories: [#novel, #"science-fiction"],
+      },
+    ],
+  }) {
   | [{book_id: id}] => id
   | _ => panic("Unexpected result inserting books")
   }
 
-  switch await Books.findBookById({id: Value(insertedBookId)}, ~client=getClient()) {
+  switch await getClient()->Books.FindBookById.many({id: Value(insertedBookId)}) {
   | [insertedBook] => expect(insertedBook.categories)->Expect.toEqual("{novel,science-fiction}")
   | _ => panic("Unexpected result fetching newly inserted book")
   }
 })
 
 testAsync("update query with a non-null parameter override", async () => {
-  let _ = await Books.updateBooks(
-    {id: 2, rank: Value(12), name: Value("Another title")},
-    ~client=getClient(),
-  )
+  let _ = await getClient()->Books.UpdateBooks.many({
+    id: 2,
+    rank: Value(12),
+    name: Value("Another title"),
+  })
 })
 
 testAsync("insert query with an inline sql comment", async () => {
-  switch await Comments.insertComment(
-    {comments: [{commentBody: "Just a comment", userId: 1}]},
-    ~client=getClient(),
-  ) {
+  switch await getClient()->Comments.InsertComment.many({
+    comments: [{commentBody: "Just a comment", userId: 1}],
+  }) {
   | [result] =>
     expect(result)->Expect.toMatchSnapshotWithConfig({
       "id": expectThis->Expect.any(Expect.Any.number),
@@ -146,28 +140,26 @@ testAsync("insert query with an inline sql comment", async () => {
 })
 
 testAsync("dynamic update query", async () => {
-  let _ = await Books.updateBooksCustom({id: 2, rank: Value(13)}, ~client=getClient())
+  let _ = await getClient()->Books.UpdateBooksCustom.many({id: 2, rank: Value(13)})
 })
 
 testAsync("update query with a multiple non-null parameter overrides", async () => {
-  let _ = await Books.updateBooksRankNotNull(
-    {id: 2, rank: 12, name: Value("Another title")},
-    ~client=getClient(),
-  )
+  let _ = await getClient()->Books.UpdateBooksRankNotNull.many({
+    id: 2,
+    rank: 12,
+    name: Value("Another title"),
+  })
 })
 
 testAsync("select query with join and a parameter override", async () => {
-  let books = await Books.getBooksByAuthorName(
-    {
-      authorName: "Carl Sagan",
-    },
-    ~client=getClient(),
-  )
+  let books = await getClient()->Books.GetBooksByAuthorName.many({
+    authorName: "Carl Sagan",
+  })
   expect(books)->Expect.toMatchSnapshot
 })
 
 testAsync("select query with aggregation", async () => {
-  switch await Books.aggregateEmailsAndTest({testAges: Value([35, 23, 19])}, ~client=getClient()) {
+  switch await getClient()->Books.AggregateEmailsAndTest.many({testAges: Value([35, 23, 19])}) {
   | [aggregateData] =>
     expect(aggregateData.agetest)->Expect.toBe(true)
     expect(aggregateData.emails)->Expect.toEqual([
@@ -180,34 +172,52 @@ testAsync("select query with aggregation", async () => {
 })
 
 testAsync("insert query with an enum field", async () => {
-  let _ = await Notifications.sendNotifications(
-    {
-      notifications: [
-        {
-          user_id: 2,
-          payload: {
-            open Js.Json
-            Object(Dict.fromArray([("num_frogs", Number(82.))]))
-          },
-          type_: #reminder,
+  let _ = await getClient()->Notifications.SendNotifications.many({
+    notifications: [
+      {
+        user_id: 2,
+        payload: {
+          open Js.Json
+          Object(Dict.fromArray([("num_frogs", Number(82.))]))
         },
-      ],
-    },
-    ~client=getClient(),
-  )
+        type_: #reminder,
+      },
+    ],
+  })
 })
 
 testAsync("select query with json fields and casts", async () => {
-  let notifications = await Notifications.thresholdFrogs({numFrogs: 80}, ~client=getClient())
+  let notifications = await getClient()->Notifications.ThresholdFrogs.many({numFrogs: 80})
   expect(notifications)->Expect.toMatchSnapshot
 })
 
 testAsync("select query nullability override on return field", async () => {
-  let result = await Books.getBooks((), ~client=getClient())
+  let result = await getClient()->Books.GetBooks.many()
   expect(result)->Expect.toMatchSnapshot
 })
 
 testAsync("select exists query, testing #472", async () => {
-  let result = await Comments.selectExistsTest((), ~client=getClient())
+  let result = await getClient()->Comments.SelectExistsTest.many()
   expect(result)->Expect.toMatchSnapshot
+})
+
+testAsync("`one` works in success case", async () => {
+  let result = await getClient()->Books.GetBooksByAuthorName.one({authorName: "Carl Sagan"})
+  expect(result->Option.isSome)->Expect.toBe(true)
+})
+
+testAsync("`one` works in fail case", async () => {
+  let result = await getClient()->Books.GetBooksByAuthorName.one({authorName: "Bertolt Brecht"})
+  expect(result->Option.isSome)->Expect.toBe(false)
+})
+
+testAsync("`expectOne` works in success case", async () => {
+  let result = await getClient()->Books.GetBooksByAuthorName.expectOne({authorName: "Carl Sagan"})
+  expect(result->Result.isOk)->Expect.toBe(true)
+})
+
+testAsync("`expectOne` works in fail case", async () => {
+  let result =
+    await getClient()->Books.GetBooksByAuthorName.expectOne({authorName: "Bertolt Brecht"})
+  expect(result->Result.isError)->Expect.toBe(true)
 })

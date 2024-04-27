@@ -50,3 +50,9 @@ services:
       - build
     command: npx jest -c jest-cjs.config.ts index.test.ts
 
+  test-update-snapshots:
+    <<: *build
+    depends_on:
+      - build
+    command: npx jest rescript.test.js -u
+

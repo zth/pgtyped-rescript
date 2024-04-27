@@ -53,11 +53,55 @@ type findBookByIdQuery = {
  * SELECT * FROM books WHERE id = :id
  * ```
  */
-@module("@pgtyped/runtime") @new external findBookById: IR.t => PreparedStatement.t<findBookByIdParams, findBookByIdResult> = "PreparedQuery";
-let findBookById = findBookById(findBookByIdIR)
+@gentype
+module FindBookById: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<array<findBookByIdResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<option<findBookByIdResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    findBookByIdParams,
+    ~errorMessage: string=?
+  ) => promise<result<findBookByIdResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external findBookById: IR.t => PreparedStatement.t<findBookByIdParams, findBookByIdResult> = "PreparedQuery";
+  let query = findBookById(findBookByIdIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let findBookById = (params, ~client) => findBookById->PreparedStatement.run(params, ~client)
+@deprecated("Use 'FindBookById.many' directly instead")
+let findBookById = (params, ~client) => FindBookById.many(client, params)
 
 
 /** 'FindBookByCategory' parameters type */
@@ -93,11 +137,55 @@ type findBookByCategoryQuery = {
  * SELECT * FROM books WHERE :category = ANY(categories)
  * ```
  */
-@module("@pgtyped/runtime") @new external findBookByCategory: IR.t => PreparedStatement.t<findBookByCategoryParams, findBookByCategoryResult> = "PreparedQuery";
-let findBookByCategory = findBookByCategory(findBookByCategoryIR)
+@gentype
+module FindBookByCategory: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, findBookByCategoryParams) => promise<array<findBookByCategoryResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, findBookByCategoryParams) => promise<option<findBookByCategoryResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    findBookByCategoryParams,
+    ~errorMessage: string=?
+  ) => promise<result<findBookByCategoryResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, findBookByCategoryParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external findBookByCategory: IR.t => PreparedStatement.t<findBookByCategoryParams, findBookByCategoryResult> = "PreparedQuery";
+  let query = findBookByCategory(findBookByCategoryIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let findBookByCategory = (params, ~client) => findBookByCategory->PreparedStatement.run(params, ~client)
+@deprecated("Use 'FindBookByCategory.many' directly instead")
+let findBookByCategory = (params, ~client) => FindBookByCategory.many(client, params)
 
 
 /** 'FindBookNameOrRank' parameters type */
@@ -131,11 +219,55 @@ type findBookNameOrRankQuery = {
  * WHERE (name = :name OR rank = :rank)
  * ```
  */
-@module("@pgtyped/runtime") @new external findBookNameOrRank: IR.t => PreparedStatement.t<findBookNameOrRankParams, findBookNameOrRankResult> = "PreparedQuery";
-let findBookNameOrRank = findBookNameOrRank(findBookNameOrRankIR)
+@gentype
+module FindBookNameOrRank: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, findBookNameOrRankParams) => promise<array<findBookNameOrRankResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, findBookNameOrRankParams) => promise<option<findBookNameOrRankResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    findBookNameOrRankParams,
+    ~errorMessage: string=?
+  ) => promise<result<findBookNameOrRankResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, findBookNameOrRankParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external findBookNameOrRank: IR.t => PreparedStatement.t<findBookNameOrRankParams, findBookNameOrRankResult> = "PreparedQuery";
+  let query = findBookNameOrRank(findBookNameOrRankIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let findBookNameOrRank = (params, ~client) => findBookNameOrRank->PreparedStatement.run(params, ~client)
+@deprecated("Use 'FindBookNameOrRank.many' directly instead")
+let findBookNameOrRank = (params, ~client) => FindBookNameOrRank.many(client, params)
 
 
 /** 'FindBookUnicode' parameters type */
@@ -169,11 +301,55 @@ type findBookUnicodeQuery = {
  * SELECT * FROM books WHERE name = 'שקל'
  * ```
  */
-@module("@pgtyped/runtime") @new external findBookUnicode: IR.t => PreparedStatement.t<findBookUnicodeParams, findBookUnicodeResult> = "PreparedQuery";
-let findBookUnicode = findBookUnicode(findBookUnicodeIR)
+@gentype
+module FindBookUnicode: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, findBookUnicodeParams) => promise<array<findBookUnicodeResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, findBookUnicodeParams) => promise<option<findBookUnicodeResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    findBookUnicodeParams,
+    ~errorMessage: string=?
+  ) => promise<result<findBookUnicodeResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, findBookUnicodeParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external findBookUnicode: IR.t => PreparedStatement.t<findBookUnicodeParams, findBookUnicodeResult> = "PreparedQuery";
+  let query = findBookUnicode(findBookUnicodeIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let findBookUnicode = (params, ~client) => findBookUnicode->PreparedStatement.run(params, ~client)
+@deprecated("Use 'FindBookUnicode.many' directly instead")
+let findBookUnicode = (params, ~client) => FindBookUnicode.many(client, params)
 
 
 @gentype
@@ -211,11 +387,55 @@ type insertBooksQuery = {
  * VALUES :books RETURNING id as book_id
  * ```
  */
-@module("@pgtyped/runtime") @new external insertBooks: IR.t => PreparedStatement.t<insertBooksParams, insertBooksResult> = "PreparedQuery";
-let insertBooks = insertBooks(insertBooksIR)
+@gentype
+module InsertBooks: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, insertBooksParams) => promise<array<insertBooksResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, insertBooksParams) => promise<option<insertBooksResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    insertBooksParams,
+    ~errorMessage: string=?
+  ) => promise<result<insertBooksResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, insertBooksParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external insertBooks: IR.t => PreparedStatement.t<insertBooksParams, insertBooksResult> = "PreparedQuery";
+  let query = insertBooks(insertBooksIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let insertBooks = (params, ~client) => insertBooks->PreparedStatement.run(params, ~client)
+@deprecated("Use 'InsertBooks.many' directly instead")
+let insertBooks = (params, ~client) => InsertBooks.many(client, params)
 
 
 /** 'UpdateBooksCustom' parameters type */
@@ -252,11 +472,55 @@ type updateBooksCustomQuery = {
  * WHERE id = :id!
  * ```
  */
-@module("@pgtyped/runtime") @new external updateBooksCustom: IR.t => PreparedStatement.t<updateBooksCustomParams, updateBooksCustomResult> = "PreparedQuery";
-let updateBooksCustom = updateBooksCustom(updateBooksCustomIR)
+@gentype
+module UpdateBooksCustom: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, updateBooksCustomParams) => promise<array<updateBooksCustomResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, updateBooksCustomParams) => promise<option<updateBooksCustomResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    updateBooksCustomParams,
+    ~errorMessage: string=?
+  ) => promise<result<updateBooksCustomResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, updateBooksCustomParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external updateBooksCustom: IR.t => PreparedStatement.t<updateBooksCustomParams, updateBooksCustomResult> = "PreparedQuery";
+  let query = updateBooksCustom(updateBooksCustomIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let updateBooksCustom = (params, ~client) => updateBooksCustom->PreparedStatement.run(params, ~client)
+@deprecated("Use 'UpdateBooksCustom.many' directly instead")
+let updateBooksCustom = (params, ~client) => UpdateBooksCustom.many(client, params)
 
 
 /** 'UpdateBooks' parameters type */
@@ -291,11 +555,55 @@ type updateBooksQuery = {
  * WHERE id = :id!
  * ```
  */
-@module("@pgtyped/runtime") @new external updateBooks: IR.t => PreparedStatement.t<updateBooksParams, updateBooksResult> = "PreparedQuery";
-let updateBooks = updateBooks(updateBooksIR)
+@gentype
+module UpdateBooks: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, updateBooksParams) => promise<array<updateBooksResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, updateBooksParams) => promise<option<updateBooksResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    updateBooksParams,
+    ~errorMessage: string=?
+  ) => promise<result<updateBooksResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, updateBooksParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external updateBooks: IR.t => PreparedStatement.t<updateBooksParams, updateBooksResult> = "PreparedQuery";
+  let query = updateBooks(updateBooksIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let updateBooks = (params, ~client) => updateBooks->PreparedStatement.run(params, ~client)
+@deprecated("Use 'UpdateBooks.many' directly instead")
+let updateBooks = (params, ~client) => UpdateBooks.many(client, params)
 
 
 /** 'UpdateBooksRankNotNull' parameters type */
@@ -329,11 +637,55 @@ type updateBooksRankNotNullQuery = {
  * WHERE id = :id!
  * ```
  */
-@module("@pgtyped/runtime") @new external updateBooksRankNotNull: IR.t => PreparedStatement.t<updateBooksRankNotNullParams, updateBooksRankNotNullResult> = "PreparedQuery";
-let updateBooksRankNotNull = updateBooksRankNotNull(updateBooksRankNotNullIR)
+@gentype
+module UpdateBooksRankNotNull: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, updateBooksRankNotNullParams) => promise<array<updateBooksRankNotNullResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, updateBooksRankNotNullParams) => promise<option<updateBooksRankNotNullResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    updateBooksRankNotNullParams,
+    ~errorMessage: string=?
+  ) => promise<result<updateBooksRankNotNullResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, updateBooksRankNotNullParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external updateBooksRankNotNull: IR.t => PreparedStatement.t<updateBooksRankNotNullParams, updateBooksRankNotNullResult> = "PreparedQuery";
+  let query = updateBooksRankNotNull(updateBooksRankNotNullIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let updateBooksRankNotNull = (params, ~client) => updateBooksRankNotNull->PreparedStatement.run(params, ~client)
+@deprecated("Use 'UpdateBooksRankNotNull.many' directly instead")
+let updateBooksRankNotNull = (params, ~client) => UpdateBooksRankNotNull.many(client, params)
 
 
 /** 'GetBooksByAuthorName' parameters type */
@@ -371,11 +723,55 @@ type getBooksByAuthorNameQuery = {
  * WHERE a.first_name || ' ' || a.last_name = :authorName!
  * ```
  */
-@module("@pgtyped/runtime") @new external getBooksByAuthorName: IR.t => PreparedStatement.t<getBooksByAuthorNameParams, getBooksByAuthorNameResult> = "PreparedQuery";
-let getBooksByAuthorName = getBooksByAuthorName(getBooksByAuthorNameIR)
+@gentype
+module GetBooksByAuthorName: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, getBooksByAuthorNameParams) => promise<array<getBooksByAuthorNameResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, getBooksByAuthorNameParams) => promise<option<getBooksByAuthorNameResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    getBooksByAuthorNameParams,
+    ~errorMessage: string=?
+  ) => promise<result<getBooksByAuthorNameResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, getBooksByAuthorNameParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external getBooksByAuthorName: IR.t => PreparedStatement.t<getBooksByAuthorNameParams, getBooksByAuthorNameResult> = "PreparedQuery";
+  let query = getBooksByAuthorName(getBooksByAuthorNameIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let getBooksByAuthorName = (params, ~client) => getBooksByAuthorName->PreparedStatement.run(params, ~client)
+@deprecated("Use 'GetBooksByAuthorName.many' directly instead")
+let getBooksByAuthorName = (params, ~client) => GetBooksByAuthorName.many(client, params)
 
 
 /** 'AggregateEmailsAndTest' parameters type */
@@ -406,11 +802,55 @@ type aggregateEmailsAndTestQuery = {
  * SELECT array_agg(email) as "emails!", array_agg(age) = :testAges as ageTest FROM users
  * ```
  */
-@module("@pgtyped/runtime") @new external aggregateEmailsAndTest: IR.t => PreparedStatement.t<aggregateEmailsAndTestParams, aggregateEmailsAndTestResult> = "PreparedQuery";
-let aggregateEmailsAndTest = aggregateEmailsAndTest(aggregateEmailsAndTestIR)
+@gentype
+module AggregateEmailsAndTest: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, aggregateEmailsAndTestParams) => promise<array<aggregateEmailsAndTestResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, aggregateEmailsAndTestParams) => promise<option<aggregateEmailsAndTestResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    aggregateEmailsAndTestParams,
+    ~errorMessage: string=?
+  ) => promise<result<aggregateEmailsAndTestResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, aggregateEmailsAndTestParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external aggregateEmailsAndTest: IR.t => PreparedStatement.t<aggregateEmailsAndTestParams, aggregateEmailsAndTestResult> = "PreparedQuery";
+  let query = aggregateEmailsAndTest(aggregateEmailsAndTestIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let aggregateEmailsAndTest = (params, ~client) => aggregateEmailsAndTest->PreparedStatement.run(params, ~client)
+@deprecated("Use 'AggregateEmailsAndTest.many' directly instead")
+let aggregateEmailsAndTest = (params, ~client) => AggregateEmailsAndTest.many(client, params)
 
 
 /** 'GetBooks' parameters type */
@@ -439,11 +879,55 @@ type getBooksQuery = {
  * SELECT id, name as "name!" FROM books
  * ```
  */
-@module("@pgtyped/runtime") @new external getBooks: IR.t => PreparedStatement.t<getBooksParams, getBooksResult> = "PreparedQuery";
-let getBooks = getBooks(getBooksIR)
+@gentype
+module GetBooks: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, getBooksParams) => promise<array<getBooksResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, getBooksParams) => promise<option<getBooksResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    getBooksParams,
+    ~errorMessage: string=?
+  ) => promise<result<getBooksResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, getBooksParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external getBooks: IR.t => PreparedStatement.t<getBooksParams, getBooksResult> = "PreparedQuery";
+  let query = getBooks(getBooksIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let getBooks = (params, ~client) => getBooks->PreparedStatement.run(params, ~client)
+@deprecated("Use 'GetBooks.many' directly instead")
+let getBooks = (params, ~client) => GetBooks.many(client, params)
 
 
 /** 'CountBooks' parameters type */
@@ -471,11 +955,55 @@ type countBooksQuery = {
  * SELECT count(*) as book_count FROM books
  * ```
  */
-@module("@pgtyped/runtime") @new external countBooks: IR.t => PreparedStatement.t<countBooksParams, countBooksResult> = "PreparedQuery";
-let countBooks = countBooks(countBooksIR)
+@gentype
+module CountBooks: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, countBooksParams) => promise<array<countBooksResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, countBooksParams) => promise<option<countBooksResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    countBooksParams,
+    ~errorMessage: string=?
+  ) => promise<result<countBooksResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, countBooksParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external countBooks: IR.t => PreparedStatement.t<countBooksParams, countBooksResult> = "PreparedQuery";
+  let query = countBooks(countBooksIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let countBooks = (params, ~client) => countBooks->PreparedStatement.run(params, ~client)
+@deprecated("Use 'CountBooks.many' directly instead")
+let countBooks = (params, ~client) => CountBooks.many(client, params)
 
 
 /** 'GetBookCountries' parameters type */
@@ -504,10 +1032,54 @@ type getBookCountriesQuery = {
  * SELECT * FROM book_country
  * ```
  */
-@module("@pgtyped/runtime") @new external getBookCountries: IR.t => PreparedStatement.t<getBookCountriesParams, getBookCountriesResult> = "PreparedQuery";
-let getBookCountries = getBookCountries(getBookCountriesIR)
+@gentype
+module GetBookCountries: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, getBookCountriesParams) => promise<array<getBookCountriesResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, getBookCountriesParams) => promise<option<getBookCountriesResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    getBookCountriesParams,
+    ~errorMessage: string=?
+  ) => promise<result<getBookCountriesResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, getBookCountriesParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external getBookCountries: IR.t => PreparedStatement.t<getBookCountriesParams, getBookCountriesResult> = "PreparedQuery";
+  let query = getBookCountries(getBookCountriesIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 @gentype
-let getBookCountries = (params, ~client) => getBookCountries->PreparedStatement.run(params, ~client)
+@deprecated("Use 'GetBookCountries.many' directly instead")
+let getBookCountries = (params, ~client) => GetBookCountries.many(client, params)
 
 

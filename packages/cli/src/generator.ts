@@ -407,11 +407,74 @@ export async function generateDeclarationFile(
       `${queryPP}\n` +
       ` * \`\`\`\n` +
       ` */\n`;
-    declarationFileContents +=
-      `@module("@pgtyped/runtime") @new external ${typeDec.query.name}: IR.t => PreparedStatement.t<${typeDec.query.paramTypeAlias}, ${typeDec.query.returnTypeAlias}> = "PreparedQuery";\n` +
-      `let ${typeDec.query.name} = ${typeDec.query.name}(${typeDec.query.name}IR)\n\n` +
-      `@gentype\nlet ${typeDec.query.name} = (params, ~client) => ${typeDec.query.name}->PreparedStatement.run(params, ~client)` +
-      `\n\n\n`;
+    declarationFileContents += `@gentype
+module ${
+      typeDec.query.name.slice(0, 1).toUpperCase() + typeDec.query.name.slice(1)
+    }: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, ${
+    typeDec.query.name
+  }Params) => promise<array<${typeDec.query.name}Result>>
+  /** Returns exactly 1 result. Returns \`None\` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, ${
+    typeDec.query.name
+  }Params) => promise<option<${typeDec.query.name}Result>>
+  
+  /** Returns exactly 1 result. Returns \`Error\` (with an optionally provided \`errorMessage\`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    ${typeDec.query.name}Params,
+    ~errorMessage: string=?
+  ) => promise<result<${typeDec.query.name}Result, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, ${
+    typeDec.query.name
+  }Params) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external ${
+    typeDec.query.name
+  }: IR.t => PreparedStatement.t<${typeDec.query.paramTypeAlias}, ${
+      typeDec.query.returnTypeAlias
+    }> = "PreparedQuery";
+  let query = ${typeDec.query.name}(${typeDec.query.name}IR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
+
+@gentype
+@deprecated("Use '${
+      typeDec.query.name.slice(0, 1).toUpperCase() + typeDec.query.name.slice(1)
+    }.many' directly instead")
+let ${typeDec.query.name} = (params, ~client) => ${
+      typeDec.query.name.slice(0, 1).toUpperCase() + typeDec.query.name.slice(1)
+    }.many(client, params)
+
+
+`;
   }
   return { declarationFileContents, typeDecs };
 }

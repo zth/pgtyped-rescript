@@ -4,6 +4,7 @@
 - BREAKING: Up required ReScript version to `>=11.1.0` and `@rescript/core` to `>=1.3.0`.
 - Proper `bigint` support.
 - Emit `@gentype` annotations for everything.
+- Add each query to its own ReScript module, and emit helpers `many`, `one`, `expectOne` and `execute`.
 
 # 2.2.2
 
