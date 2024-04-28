@@ -1,5 +1,7 @@
 # main
 
+# 2.3.1
+
 - Fix missing `rescript.json` in published package.
 
 # 2.3.0
