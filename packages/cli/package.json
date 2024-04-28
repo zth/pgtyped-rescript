@@ -15,7 +15,7 @@
     "url": "https://github.com/adelsz/pgtyped.git"
   },
   "files": [
-    "bsconfig.json",
+    "rescript.json",
     "lib",
     "src/res"
   ],

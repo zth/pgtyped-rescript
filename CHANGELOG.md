@@ -1,5 +1,7 @@
 # main
 
+- Fix missing `rescript.json` in published package.
+
 # 2.3.0
 
 - Fix type generation for arrays of types like `JSON.t`.
