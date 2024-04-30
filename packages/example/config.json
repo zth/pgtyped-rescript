@@ -6,7 +6,7 @@
       "emitTemplate": "{{dir}}/{{name}}__sql.res"
     },
     {
-      "mode": "ts", 
+      "mode": "res", 
       "include": "**/*.res",
       "emitTemplate": "{{dir}}/{{name}}__sql.res"
     }

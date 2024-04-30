@@ -12,6 +12,7 @@ export function parseCode(
     };
   }
 
+  // Replace with more robust @rescript/tools CLI usage when that package ships linuxarm64 binary.
   const regex = /%sql(?:\.\w+)?\(`([^`]*)`\)/g;
   let match;
   let queries = [];

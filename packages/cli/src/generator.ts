@@ -280,7 +280,7 @@ async function generateTypedecsFromFile(
   contents: string,
   fileName: string,
   connection: any,
-  mode: 'ts' | 'sql',
+  mode: 'res' | 'sql',
   types: TypeAllocator,
   config: ParsedConfig,
 ): Promise<ITypedQuery[]> {
@@ -289,7 +289,7 @@ async function generateTypedecsFromFile(
   const typeSource: TypeSource = (query) => getTypes(query, connection);
 
   const { queries, events } =
-    mode === 'ts'
+    mode === 'res'
       ? parseRescriptFile(contents, fileName)
       : parseSQLFile(contents);
   if (events.length > 0) {
@@ -333,7 +333,7 @@ export async function generateDeclarationFile(
   contents: string,
   fileName: string,
   connection: any,
-  mode: 'ts' | 'sql',
+  mode: 'res' | 'sql',
   config: ParsedConfig,
   decsFileName: string,
 ): Promise<{ typeDecs: ITypedQuery[]; declarationFileContents: string }> {
