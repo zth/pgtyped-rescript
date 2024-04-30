@@ -20,8 +20,8 @@ const transformCodecProps = {
   emitTemplate: t.union([t.string, t.undefined]),
 };
 
-const TSTransformCodec = t.type({
-  mode: t.literal('ts'),
+const ResTransformCodec = t.type({
+  mode: t.literal('res'),
   ...transformCodecProps,
 });
 
@@ -30,7 +30,7 @@ const SQLTransformCodec = t.type({
   ...transformCodecProps,
 });
 
-const TransformCodec = t.union([TSTransformCodec, SQLTransformCodec]);
+const TransformCodec = t.union([ResTransformCodec, SQLTransformCodec]);
 
 export type TransformConfig = t.TypeOf<typeof TransformCodec>;
 

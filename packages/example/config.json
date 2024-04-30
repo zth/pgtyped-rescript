@@ -4,7 +4,12 @@
       "mode": "sql",
       "include": "**/*.sql",
       "emitTemplate": "{{dir}}/{{name}}__sql.res"
-    }    
+    },
+    {
+      "mode": "res", 
+      "include": "**/*.res",
+      "emitTemplate": "{{dir}}/{{name}}__sql.res"
+    }
   ],
   "typesOverrides": {
     "date": {

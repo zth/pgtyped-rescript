@@ -35,8 +35,8 @@ export default async function processFile({
   if (transform.emitTemplate) {
     decsFileName = nun.renderString(transform.emitTemplate, ppath);
   } else {
-    const suffix = transform.mode === 'ts' ? 'types.ts' : 'ts';
-    decsFileName = path.resolve(ppath.dir, `${ppath.name}.${suffix}`);
+    const suffix = transform.mode === 'res' ? '__sql.res' : '.res';
+    decsFileName = path.resolve(ppath.dir, `${ppath.name}${suffix}`);
   }
 
   // last part fixes https://github.com/adelsz/pgtyped/issues/390

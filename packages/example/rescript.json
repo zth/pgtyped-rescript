@@ -11,6 +11,7 @@
     "suffix": ".js",
     "bs-dependencies": ["@rescript/core", "pgtyped-rescript"],
     "bsc-flags": ["-open RescriptCore"],
+    "ppx-flags": ["rescript-embed-lang/ppx"],
     "gentypeconfig": {}
   }
   

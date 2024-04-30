@@ -19,7 +19,7 @@ import { pascalCase } from 'pascal-case';
 import path from 'path';
 import { ParsedConfig } from './config.js';
 import { TypeAllocator, TypeMapping, TypeScope } from './types.js';
-import { parseCode as parseTypescriptFile } from './parseTypescript.js';
+import { parseCode as parseRescriptFile } from './parseRescript.js';
 import { IQueryTypes } from 'pgtyped-rescript-query/lib/actions';
 
 export enum ProcessingMode {
@@ -280,7 +280,7 @@ async function generateTypedecsFromFile(
   contents: string,
   fileName: string,
   connection: any,
-  mode: 'ts' | 'sql',
+  mode: 'res' | 'sql',
   types: TypeAllocator,
   config: ParsedConfig,
 ): Promise<ITypedQuery[]> {
@@ -289,8 +289,8 @@ async function generateTypedecsFromFile(
   const typeSource: TypeSource = (query) => getTypes(query, connection);
 
   const { queries, events } =
-    mode === 'ts'
-      ? parseTypescriptFile(contents, fileName)
+    mode === 'res'
+      ? parseRescriptFile(contents, fileName)
       : parseSQLFile(contents);
   if (events.length > 0) {
     prettyPrintEvents(contents, events);
@@ -300,51 +300,30 @@ async function generateTypedecsFromFile(
   }
   for (const queryAST of queries) {
     let typedQuery: ITypedQuery;
-    if (mode === 'sql') {
-      const sqlQueryAST = queryAST as SQLQueryAST;
-      const result = await queryToTypeDeclarations(
-        { ast: sqlQueryAST, mode: ProcessingMode.SQL },
-        typeSource,
-        types,
-        config,
-      );
-      typedQuery = {
-        mode: 'sql' as const,
-        query: {
-          name: camelCase(sqlQueryAST.name),
-          ast: sqlQueryAST,
-          ir: queryASTToIR(sqlQueryAST),
-          paramTypeAlias: toRescriptName(
-            `${interfacePrefix}${pascalCase(sqlQueryAST.name)}Params`,
-          ),
-          returnTypeAlias: toRescriptName(
-            `${interfacePrefix}${pascalCase(sqlQueryAST.name)}Result`,
-          ),
-        },
-        fileName,
-        typeDeclaration: result,
-      };
-    } else {
-      const tsQueryAST = queryAST as TSQueryAST;
-      const result = await queryToTypeDeclarations(
-        {
-          ast: tsQueryAST,
-          mode: ProcessingMode.TS,
-        },
-        typeSource,
-        types,
-        config,
-      );
-      typedQuery = {
-        mode: 'ts' as const,
-        fileName,
-        query: {
-          name: tsQueryAST.name,
-          ast: tsQueryAST,
-        },
-        typeDeclaration: result,
-      };
-    }
+
+    const sqlQueryAST = queryAST as SQLQueryAST;
+    const result = await queryToTypeDeclarations(
+      { ast: sqlQueryAST, mode: ProcessingMode.SQL },
+      typeSource,
+      types,
+      config,
+    );
+    typedQuery = {
+      mode: 'sql' as const,
+      query: {
+        name: camelCase(sqlQueryAST.name),
+        ast: sqlQueryAST,
+        ir: queryASTToIR(sqlQueryAST),
+        paramTypeAlias: toRescriptName(
+          `${interfacePrefix}${pascalCase(sqlQueryAST.name)}Params`,
+        ),
+        returnTypeAlias: toRescriptName(
+          `${interfacePrefix}${pascalCase(sqlQueryAST.name)}Result`,
+        ),
+      },
+      fileName,
+      typeDeclaration: result,
+    };
     results.push(typedQuery);
   }
   return results;
@@ -354,7 +333,7 @@ export async function generateDeclarationFile(
   contents: string,
   fileName: string,
   connection: any,
-  mode: 'ts' | 'sql',
+  mode: 'res' | 'sql',
   config: ParsedConfig,
   decsFileName: string,
 ): Promise<{ typeDecs: ITypedQuery[]; declarationFileContents: string }> {
