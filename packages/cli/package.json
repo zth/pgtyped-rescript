@@ -1,6 +1,6 @@
 {
   "name": "pgtyped-rescript",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

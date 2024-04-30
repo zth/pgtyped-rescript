@@ -1,5 +1,9 @@
 # main
 
+# 2.4.0
+
+- Add mode for embedding `%sql` (with `one`, `expectOne`, `many`, and `execute` flavors) in ReScript directly.
+
 # 2.3.1
 
 - Fix missing `rescript.json` in published package.
