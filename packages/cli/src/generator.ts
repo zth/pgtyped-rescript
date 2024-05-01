@@ -370,19 +370,15 @@ export async function generateDeclarationFile(
     if (typeDec.mode === 'ts') {
       continue;
     }
-    const queryPP = typeDec.query.ast.statement.body
-      .split('\n')
-      .map((s: string) => ' * ' + s)
-      .join('\n');
     declarationFileContents += `%%private(let ${
       typeDec.query.name
     }IR: IR.t = %raw(\`${JSON.stringify(typeDec.query.ir)}\`))\n\n`;
     declarationFileContents +=
       `/**\n` +
-      ` * Query generated from SQL:\n` +
-      ` * \`\`\`\n` +
-      `${queryPP}\n` +
-      ` * \`\`\`\n` +
+      ` Runnable query:\n` +
+      ` \`\`\`sql\n` +
+      `${processSQLQueryIR(typeDec.query.ir).query}\n` +
+      ` \`\`\`\n\n` +
       ` */\n`;
     declarationFileContents += `@gentype
 module ${

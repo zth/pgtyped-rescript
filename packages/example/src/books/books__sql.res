@@ -48,10 +48,11 @@ type findBookByIdQuery = {
 %%private(let findBookByIdIR: IR.t = %raw(`{"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"SELECT * FROM books WHERE id = :id"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT * FROM books WHERE id = :id
- * ```
+ Runnable query:
+ ```sql
+SELECT * FROM books WHERE id = $1
+ ```
+
  */
 @gentype
 module FindBookById: {
@@ -132,10 +133,11 @@ type findBookByCategoryQuery = {
 %%private(let findBookByCategoryIR: IR.t = %raw(`{"usedParamSet":{"category":true},"params":[{"name":"category","required":false,"transform":{"type":"scalar"},"locs":[{"a":26,"b":34}]}],"statement":"SELECT * FROM books WHERE :category = ANY(categories)"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT * FROM books WHERE :category = ANY(categories)
- * ```
+ Runnable query:
+ ```sql
+SELECT * FROM books WHERE $1 = ANY(categories)
+ ```
+
  */
 @gentype
 module FindBookByCategory: {
@@ -212,12 +214,13 @@ type findBookNameOrRankQuery = {
 %%private(let findBookNameOrRankIR: IR.t = %raw(`{"usedParamSet":{"name":true,"rank":true},"params":[{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":41,"b":45}]},{"name":"rank","required":false,"transform":{"type":"scalar"},"locs":[{"a":57,"b":61}]}],"statement":"SELECT id, name\nFROM books\nWHERE (name = :name OR rank = :rank)"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT id, name
- * FROM books
- * WHERE (name = :name OR rank = :rank)
- * ```
+ Runnable query:
+ ```sql
+SELECT id, name
+FROM books
+WHERE (name = $1 OR rank = $2)
+ ```
+
  */
 @gentype
 module FindBookNameOrRank: {
@@ -296,10 +299,11 @@ type findBookUnicodeQuery = {
 %%private(let findBookUnicodeIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT * FROM books WHERE name = 'שקל'"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT * FROM books WHERE name = 'שקל'
- * ```
+ Runnable query:
+ ```sql
+SELECT * FROM books WHERE name = 'שקל'
+ ```
+
  */
 @gentype
 module FindBookUnicode: {
@@ -381,11 +385,12 @@ type insertBooksQuery = {
 %%private(let insertBooksIR: IR.t = %raw(`{"usedParamSet":{"books":true},"params":[{"name":"books","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"rank","required":true},{"name":"name","required":true},{"name":"authorId","required":true},{"name":"categories","required":false}]},"locs":[{"a":61,"b":66}]}],"statement":"INSERT INTO books (rank, name, author_id, categories)\nVALUES :books RETURNING id as book_id"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * INSERT INTO books (rank, name, author_id, categories)
- * VALUES :books RETURNING id as book_id
- * ```
+ Runnable query:
+ ```sql
+INSERT INTO books (rank, name, author_id, categories)
+VALUES ($1,$2,$3,$4) RETURNING id as book_id
+ ```
+
  */
 @gentype
 module InsertBooks: {
@@ -463,11 +468,12 @@ type insertBookQuery = {
 %%private(let insertBookIR: IR.t = %raw(`{"usedParamSet":{"rank":true,"name":true,"author_id":true,"categories":true},"params":[{"name":"rank","required":true,"transform":{"type":"scalar"},"locs":[{"a":62,"b":67}]},{"name":"name","required":true,"transform":{"type":"scalar"},"locs":[{"a":70,"b":75}]},{"name":"author_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":88}]},{"name":"categories","required":false,"transform":{"type":"scalar"},"locs":[{"a":91,"b":101}]}],"statement":"INSERT INTO books (rank, name, author_id, categories)\nVALUES (:rank!, :name!, :author_id!, :categories) RETURNING id as book_id"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * INSERT INTO books (rank, name, author_id, categories)
- * VALUES (:rank!, :name!, :author_id!, :categories) RETURNING id as book_id
- * ```
+ Runnable query:
+ ```sql
+INSERT INTO books (rank, name, author_id, categories)
+VALUES ($1, $2, $3, $4) RETURNING id as book_id
+ ```
+
  */
 @gentype
 module InsertBook: {
@@ -541,18 +547,19 @@ type updateBooksCustomQuery = {
 %%private(let updateBooksCustomIR: IR.t = %raw(`{"usedParamSet":{"rank":true,"id":true},"params":[{"name":"rank","required":false,"transform":{"type":"scalar"},"locs":[{"a":49,"b":53},{"a":95,"b":99}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":161,"b":164}]}],"statement":"UPDATE books\nSET\n    rank = (\n        CASE WHEN (:rank::int IS NOT NULL)\n                 THEN :rank\n             ELSE rank\n            END\n        )\nWHERE id = :id!"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * UPDATE books
- * SET
- *     rank = (
- *         CASE WHEN (:rank::int IS NOT NULL)
- *                  THEN :rank
- *              ELSE rank
- *             END
- *         )
- * WHERE id = :id!
- * ```
+ Runnable query:
+ ```sql
+UPDATE books
+SET
+    rank = (
+        CASE WHEN ($1::int IS NOT NULL)
+                 THEN $1
+             ELSE rank
+            END
+        )
+WHERE id = $2
+ ```
+
  */
 @gentype
 module UpdateBooksCustom: {
@@ -627,15 +634,16 @@ type updateBooksQuery = {
 %%private(let updateBooksIR: IR.t = %raw(`{"usedParamSet":{"name":true,"rank":true,"id":true},"params":[{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":50,"b":54}]},{"name":"rank","required":false,"transform":{"type":"scalar"},"locs":[{"a":68,"b":72}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":85,"b":88}]}],"statement":"UPDATE books\n                     \nSET\n    name = :name,\n    rank = :rank\nWHERE id = :id!"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * UPDATE books
- *                      
- * SET
- *     name = :name,
- *     rank = :rank
- * WHERE id = :id!
- * ```
+ Runnable query:
+ ```sql
+UPDATE books
+                     
+SET
+    name = $1,
+    rank = $2
+WHERE id = $3
+ ```
+
  */
 @gentype
 module UpdateBooks: {
@@ -710,14 +718,15 @@ type updateBooksRankNotNullQuery = {
 %%private(let updateBooksRankNotNullIR: IR.t = %raw(`{"usedParamSet":{"rank":true,"name":true,"id":true},"params":[{"name":"rank","required":true,"transform":{"type":"scalar"},"locs":[{"a":28,"b":33}]},{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":47,"b":51}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":64,"b":67}]}],"statement":"UPDATE books\nSET\n    rank = :rank!,\n    name = :name\nWHERE id = :id!"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * UPDATE books
- * SET
- *     rank = :rank!,
- *     name = :name
- * WHERE id = :id!
- * ```
+ Runnable query:
+ ```sql
+UPDATE books
+SET
+    rank = $1,
+    name = $2
+WHERE id = $3
+ ```
+
  */
 @gentype
 module UpdateBooksRankNotNull: {
@@ -798,12 +807,13 @@ type getBooksByAuthorNameQuery = {
 %%private(let getBooksByAuthorNameIR: IR.t = %raw(`{"usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":110,"b":121}]}],"statement":"SELECT b.* FROM books b\nINNER JOIN authors a ON a.id = b.author_id\nWHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT b.* FROM books b
- * INNER JOIN authors a ON a.id = b.author_id
- * WHERE a.first_name || ' ' || a.last_name = :authorName!
- * ```
+ Runnable query:
+ ```sql
+SELECT b.* FROM books b
+INNER JOIN authors a ON a.id = b.author_id
+WHERE a.first_name || ' ' || a.last_name = $1
+ ```
+
  */
 @gentype
 module GetBooksByAuthorName: {
@@ -879,10 +889,11 @@ type aggregateEmailsAndTestQuery = {
 %%private(let aggregateEmailsAndTestIR: IR.t = %raw(`{"usedParamSet":{"testAges":true},"params":[{"name":"testAges","required":false,"transform":{"type":"scalar"},"locs":[{"a":55,"b":63}]}],"statement":"SELECT array_agg(email) as \"emails!\", array_agg(age) = :testAges as ageTest FROM users"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT array_agg(email) as "emails!", array_agg(age) = :testAges as ageTest FROM users
- * ```
+ Runnable query:
+ ```sql
+SELECT array_agg(email) as "emails!", array_agg(age) = $1 as ageTest FROM users
+ ```
+
  */
 @gentype
 module AggregateEmailsAndTest: {
@@ -956,10 +967,11 @@ type getBooksQuery = {
 %%private(let getBooksIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT id, name as \"name!\" FROM books"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT id, name as "name!" FROM books
- * ```
+ Runnable query:
+ ```sql
+SELECT id, name as "name!" FROM books
+ ```
+
  */
 @gentype
 module GetBooks: {
@@ -1032,10 +1044,11 @@ type countBooksQuery = {
 %%private(let countBooksIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT count(*) as book_count FROM books"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT count(*) as book_count FROM books
- * ```
+ Runnable query:
+ ```sql
+SELECT count(*) as book_count FROM books
+ ```
+
  */
 @gentype
 module CountBooks: {
@@ -1109,10 +1122,11 @@ type getBookCountriesQuery = {
 %%private(let getBookCountriesIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT * FROM book_country"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT * FROM book_country
- * ```
+ Runnable query:
+ ```sql
+SELECT * FROM book_country
+ ```
+
  */
 @gentype
 module GetBookCountries: {

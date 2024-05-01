@@ -39,10 +39,11 @@ type findBookByIdQuery = {
 %%private(let findBookByIdIR: IR.t = %raw(`{"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"SELECT * FROM books WHERE id = :id"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT * FROM books WHERE id = :id
- * ```
+ Runnable query:
+ ```sql
+SELECT * FROM books WHERE id = $1
+ ```
+
  */
 @gentype
 module FindBookById: {
@@ -123,12 +124,13 @@ type booksByAuthorQuery = {
 %%private(let booksByAuthorIR: IR.t = %raw(`{"usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":129}]}],"statement":"SELECT b.* FROM books b\n    INNER JOIN authors a ON a.id = b.author_id\n    WHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
 
 /**
- * Query generated from SQL:
- * ```
- * SELECT b.* FROM books b
- *     INNER JOIN authors a ON a.id = b.author_id
- *     WHERE a.first_name || ' ' || a.last_name = :authorName!
- * ```
+ Runnable query:
+ ```sql
+SELECT b.* FROM books b
+    INNER JOIN authors a ON a.id = b.author_id
+    WHERE a.first_name || ' ' || a.last_name = $1
+ ```
+
  */
 @gentype
 module BooksByAuthor: {
