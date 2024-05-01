@@ -32,7 +32,7 @@
     "watch": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {
-    "@pgtyped/runtime": "^2.1.0",
+    "pgtyped-rescript-runtime": "^2.2.0",
     "@pgtyped/wire": "^2.2.0",
     "chalk": "^4.1.0",
     "debug": "^4.1.1"
