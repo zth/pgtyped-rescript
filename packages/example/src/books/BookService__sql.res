@@ -14,19 +14,19 @@ type categoryArray = array<category>
 /** 'FindBookById' parameters type */
 @gentype
 type findBookByIdParams = {
-  id?: Null.t<int>,
+  id?: int,
 }
 
 /** 'FindBookById' return type */
 @gentype
 type findBookByIdResult = {
-  author_id: Null.t<int>,
-  big_int: Null.t<bigint>,
-  categories: Null.t<categoryArray>,
+  author_id: option<int>,
+  big_int: option<bigint>,
+  categories: option<categoryArray>,
   id: int,
-  meta: Null.t<arrayJSON_t>,
-  name: Null.t<string>,
-  rank: Null.t<int>,
+  meta: option<arrayJSON_t>,
+  name: option<string>,
+  rank: option<int>,
 }
 
 /** 'FindBookById' query type */
@@ -104,13 +104,13 @@ type booksByAuthorParams = {
 /** 'BooksByAuthor' return type */
 @gentype
 type booksByAuthorResult = {
-  author_id: Null.t<int>,
-  big_int: Null.t<bigint>,
-  categories: Null.t<categoryArray>,
+  author_id: option<int>,
+  big_int: option<bigint>,
+  categories: option<categoryArray>,
   id: int,
-  meta: Null.t<arrayJSON_t>,
-  name: Null.t<string>,
-  rank: Null.t<int>,
+  meta: option<arrayJSON_t>,
+  name: option<string>,
+  rank: option<int>,
 }
 
 /** 'BooksByAuthor' query type */

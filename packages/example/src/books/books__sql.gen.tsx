@@ -9,8 +9,6 @@ import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/
 
 import type {t as JSON_t} from './JSON.gen';
 
-import type {t as Null_t} from './Null.gen';
-
 export type category = "novel" | "science-fiction" | "thriller";
 
 export type iso31661Alpha2 = 
@@ -246,44 +244,44 @@ export type intArray = number[];
 export type stringArray = string[];
 
 /** 'FindBookById' parameters type */
-export type findBookByIdParams = { readonly id?: Null_t<number> };
+export type findBookByIdParams = { readonly id?: number };
 
 /** 'FindBookById' return type */
 export type findBookByIdResult = {
-  readonly author_id: Null_t<number>; 
-  readonly big_int: Null_t<bigint>; 
-  readonly categories: Null_t<categoryArray>; 
+  readonly author_id: (undefined | number); 
+  readonly big_int: (undefined | bigint); 
+  readonly categories: (undefined | categoryArray); 
   readonly id: number; 
-  readonly meta: Null_t<arrayJSON_t>; 
-  readonly name: Null_t<string>; 
-  readonly rank: Null_t<number>
+  readonly meta: (undefined | arrayJSON_t); 
+  readonly name: (undefined | string); 
+  readonly rank: (undefined | number)
 };
 
 /** 'FindBookById' query type */
 export type findBookByIdQuery = { readonly params: findBookByIdParams; readonly result: findBookByIdResult };
 
 /** 'FindBookByCategory' parameters type */
-export type findBookByCategoryParams = { readonly category?: Null_t<category> };
+export type findBookByCategoryParams = { readonly category?: category };
 
 /** 'FindBookByCategory' return type */
 export type findBookByCategoryResult = {
-  readonly author_id: Null_t<number>; 
-  readonly big_int: Null_t<bigint>; 
-  readonly categories: Null_t<categoryArray>; 
+  readonly author_id: (undefined | number); 
+  readonly big_int: (undefined | bigint); 
+  readonly categories: (undefined | categoryArray); 
   readonly id: number; 
-  readonly meta: Null_t<arrayJSON_t>; 
-  readonly name: Null_t<string>; 
-  readonly rank: Null_t<number>
+  readonly meta: (undefined | arrayJSON_t); 
+  readonly name: (undefined | string); 
+  readonly rank: (undefined | number)
 };
 
 /** 'FindBookByCategory' query type */
 export type findBookByCategoryQuery = { readonly params: findBookByCategoryParams; readonly result: findBookByCategoryResult };
 
 /** 'FindBookNameOrRank' parameters type */
-export type findBookNameOrRankParams = { readonly name?: Null_t<string>; readonly rank?: Null_t<number> };
+export type findBookNameOrRankParams = { readonly name?: string; readonly rank?: number };
 
 /** 'FindBookNameOrRank' return type */
-export type findBookNameOrRankResult = { readonly id: number; readonly name: Null_t<string> };
+export type findBookNameOrRankResult = { readonly id: number; readonly name: (undefined | string) };
 
 /** 'FindBookNameOrRank' query type */
 export type findBookNameOrRankQuery = { readonly params: findBookNameOrRankParams; readonly result: findBookNameOrRankResult };
@@ -293,13 +291,13 @@ export type findBookUnicodeParams = void;
 
 /** 'FindBookUnicode' return type */
 export type findBookUnicodeResult = {
-  readonly author_id: Null_t<number>; 
-  readonly big_int: Null_t<bigint>; 
-  readonly categories: Null_t<categoryArray>; 
+  readonly author_id: (undefined | number); 
+  readonly big_int: (undefined | bigint); 
+  readonly categories: (undefined | categoryArray); 
   readonly id: number; 
-  readonly meta: Null_t<arrayJSON_t>; 
-  readonly name: Null_t<string>; 
-  readonly rank: Null_t<number>
+  readonly meta: (undefined | arrayJSON_t); 
+  readonly name: (undefined | string); 
+  readonly rank: (undefined | number)
 };
 
 /** 'FindBookUnicode' query type */
@@ -321,8 +319,22 @@ export type insertBooksResult = { readonly book_id: number };
 /** 'InsertBooks' query type */
 export type insertBooksQuery = { readonly params: insertBooksParams; readonly result: insertBooksResult };
 
+/** 'InsertBook' parameters type */
+export type insertBookParams = {
+  readonly author_id: number; 
+  readonly categories?: categoryArray; 
+  readonly name: string; 
+  readonly rank: number
+};
+
+/** 'InsertBook' return type */
+export type insertBookResult = { readonly book_id: number };
+
+/** 'InsertBook' query type */
+export type insertBookQuery = { readonly params: insertBookParams; readonly result: insertBookResult };
+
 /** 'UpdateBooksCustom' parameters type */
-export type updateBooksCustomParams = { readonly id: number; readonly rank?: Null_t<number> };
+export type updateBooksCustomParams = { readonly id: number; readonly rank?: number };
 
 /** 'UpdateBooksCustom' return type */
 export type updateBooksCustomResult = void;
@@ -333,8 +345,8 @@ export type updateBooksCustomQuery = { readonly params: updateBooksCustomParams;
 /** 'UpdateBooks' parameters type */
 export type updateBooksParams = {
   readonly id: number; 
-  readonly name?: Null_t<string>; 
-  readonly rank?: Null_t<number>
+  readonly name?: string; 
+  readonly rank?: number
 };
 
 /** 'UpdateBooks' return type */
@@ -346,7 +358,7 @@ export type updateBooksQuery = { readonly params: updateBooksParams; readonly re
 /** 'UpdateBooksRankNotNull' parameters type */
 export type updateBooksRankNotNullParams = {
   readonly id: number; 
-  readonly name?: Null_t<string>; 
+  readonly name?: string; 
   readonly rank: number
 };
 
@@ -361,23 +373,23 @@ export type getBooksByAuthorNameParams = { readonly authorName: string };
 
 /** 'GetBooksByAuthorName' return type */
 export type getBooksByAuthorNameResult = {
-  readonly author_id: Null_t<number>; 
-  readonly big_int: Null_t<bigint>; 
-  readonly categories: Null_t<categoryArray>; 
+  readonly author_id: (undefined | number); 
+  readonly big_int: (undefined | bigint); 
+  readonly categories: (undefined | categoryArray); 
   readonly id: number; 
-  readonly meta: Null_t<arrayJSON_t>; 
-  readonly name: Null_t<string>; 
-  readonly rank: Null_t<number>
+  readonly meta: (undefined | arrayJSON_t); 
+  readonly name: (undefined | string); 
+  readonly rank: (undefined | number)
 };
 
 /** 'GetBooksByAuthorName' query type */
 export type getBooksByAuthorNameQuery = { readonly params: getBooksByAuthorNameParams; readonly result: getBooksByAuthorNameResult };
 
 /** 'AggregateEmailsAndTest' parameters type */
-export type aggregateEmailsAndTestParams = { readonly testAges?: Null_t<intArray> };
+export type aggregateEmailsAndTestParams = { readonly testAges?: intArray };
 
 /** 'AggregateEmailsAndTest' return type */
-export type aggregateEmailsAndTestResult = { readonly agetest: Null_t<boolean>; readonly emails: stringArray };
+export type aggregateEmailsAndTestResult = { readonly agetest: (undefined | boolean); readonly emails: stringArray };
 
 /** 'AggregateEmailsAndTest' query type */
 export type aggregateEmailsAndTestQuery = { readonly params: aggregateEmailsAndTestParams; readonly result: aggregateEmailsAndTestResult };
@@ -395,7 +407,7 @@ export type getBooksQuery = { readonly params: getBooksParams; readonly result: 
 export type countBooksParams = void;
 
 /** 'CountBooks' return type */
-export type countBooksResult = { readonly book_count: Null_t<bigint> };
+export type countBooksResult = { readonly book_count: (undefined | bigint) };
 
 /** 'CountBooks' query type */
 export type countBooksQuery = { readonly params: countBooksParams; readonly result: countBooksResult };
@@ -488,6 +500,22 @@ export const InsertBooks_expectOne: (_1:PgTyped_Pg_Client_t, _2:insertBooksParam
 export const InsertBooks_execute: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams) => Promise<void> = books__sqlJS.InsertBooks.execute as any;
 
 export const insertBooks: (params:insertBooksParams, client:PgTyped_Pg_Client_t) => Promise<insertBooksResult[]> = books__sqlJS.insertBooks as any;
+
+/** Returns an array of all matched results. */
+export const InsertBook_many: (_1:PgTyped_Pg_Client_t, _2:insertBookParams) => Promise<insertBookResult[]> = books__sqlJS.InsertBook.many as any;
+
+/** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+export const InsertBook_one: (_1:PgTyped_Pg_Client_t, _2:insertBookParams) => Promise<(undefined | insertBookResult)> = books__sqlJS.InsertBook.one as any;
+
+/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const InsertBook_expectOne: (_1:PgTyped_Pg_Client_t, _2:insertBookParams, errorMessage:(undefined | string)) => Promise<
+    { TAG: "Ok"; _0: insertBookResult }
+  | { TAG: "Error"; _0: string }> = books__sqlJS.InsertBook.expectOne as any;
+
+/** Executes the query, but ignores whatever is returned by it. */
+export const InsertBook_execute: (_1:PgTyped_Pg_Client_t, _2:insertBookParams) => Promise<void> = books__sqlJS.InsertBook.execute as any;
+
+export const insertBook: (params:insertBookParams, client:PgTyped_Pg_Client_t) => Promise<insertBookResult[]> = books__sqlJS.insertBook as any;
 
 /** Returns an array of all matched results. */
 export const UpdateBooksCustom_many: (_1:PgTyped_Pg_Client_t, _2:updateBooksCustomParams) => Promise<updateBooksCustomResult[]> = books__sqlJS.UpdateBooksCustom.many as any;
@@ -654,6 +682,25 @@ export const UpdateBooks: {
   /** Executes the query, but ignores whatever is returned by it. */
   execute: (_1:PgTyped_Pg_Client_t, _2:updateBooksParams) => Promise<void>
 } = books__sqlJS.UpdateBooks as any;
+
+export const InsertBook: {
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:insertBookParams, errorMessage:(undefined | string)) => Promise<
+    {
+    TAG: "Ok"; 
+    _0: insertBookResult
+  }
+  | {
+    TAG: "Error"; 
+    _0: string
+  }>; 
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  one: (_1:PgTyped_Pg_Client_t, _2:insertBookParams) => Promise<(undefined | insertBookResult)>; 
+  /** Returns an array of all matched results. */
+  many: (_1:PgTyped_Pg_Client_t, _2:insertBookParams) => Promise<insertBookResult[]>; 
+  /** Executes the query, but ignores whatever is returned by it. */
+  execute: (_1:PgTyped_Pg_Client_t, _2:insertBookParams) => Promise<void>
+} = books__sqlJS.InsertBook as any;
 
 export const FindBookByCategory: {
   /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */

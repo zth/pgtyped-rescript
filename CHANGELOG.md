@@ -1,6 +1,7 @@
 # main
 
 - Autoinsert trailing commas in embedded SQL blocks.
+- BREAKING CHANGE: `Null.t` is no longer emitted, all `null` values are autoconverted to `option`. This gives a much more idiomatic ReScript experience.
 
 # 2.4.0
 

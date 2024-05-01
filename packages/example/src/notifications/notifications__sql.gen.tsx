@@ -11,8 +11,6 @@ import type {dateOrString as PgTyped_dateOrString} from 'pgtyped-rescript/src/re
 
 import type {t as JSON_t} from './JSON.gen';
 
-import type {t as Null_t} from './Null.gen';
-
 export type notification_type = "deadline" | "notification" | "reminder";
 
 export type sendNotificationsParams_notifications = {
@@ -31,7 +29,7 @@ export type sendNotificationsResult = { readonly notification_id: number };
 export type sendNotificationsQuery = { readonly params: sendNotificationsParams; readonly result: sendNotificationsResult };
 
 /** 'GetNotifications' parameters type */
-export type getNotificationsParams = { readonly date: PgTyped_dateOrString; readonly userId?: Null_t<number> };
+export type getNotificationsParams = { readonly date: PgTyped_dateOrString; readonly userId?: number };
 
 /** 'GetNotifications' return type */
 export type getNotificationsResult = {
@@ -39,7 +37,7 @@ export type getNotificationsResult = {
   readonly id: number; 
   readonly payload: JSON_t; 
   readonly type: notification_type; 
-  readonly user_id: Null_t<number>
+  readonly user_id: (undefined | number)
 };
 
 /** 'GetNotifications' query type */

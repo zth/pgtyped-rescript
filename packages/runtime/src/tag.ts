@@ -23,8 +23,11 @@ function mapQueryResultRows(rows: any[]): any[] {
     for (const columnName in row) {
       if (isHintedColumn(columnName)) {
         const newColumnNameWithoutSuffix = columnName.slice(0, -1);
-        row[newColumnNameWithoutSuffix] = row[columnName];
+        row[newColumnNameWithoutSuffix] = row[columnName] ?? undefined;
         delete row[columnName];
+      }
+      if (row[columnName] === null) {
+        row[columnName] = undefined;
       }
     }
   }

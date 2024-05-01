@@ -3,7 +3,7 @@
 exports[`insert query with an inline sql comment 1`] = `
 Object {
   "body": "Just a comment",
-  "book_id": null,
+  "book_id": undefined,
   "id": Any<Number>,
   "user_id": 1,
 }
@@ -51,10 +51,10 @@ exports[`select query with join and a parameter override 1`] = `
 Array [
   Object {
     "author_id": 2,
-    "big_int": null,
-    "categories": null,
+    "big_int": undefined,
+    "categories": undefined,
     "id": 2,
-    "meta": null,
+    "meta": undefined,
     "name": "The Dragons Of Eden",
     "rank": 4,
   },

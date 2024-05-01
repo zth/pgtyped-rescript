@@ -23,19 +23,19 @@ type stringArray = array<string>
 /** 'FindBookById' parameters type */
 @gentype
 type findBookByIdParams = {
-  id?: Null.t<int>,
+  id?: int,
 }
 
 /** 'FindBookById' return type */
 @gentype
 type findBookByIdResult = {
-  author_id: Null.t<int>,
-  big_int: Null.t<bigint>,
-  categories: Null.t<categoryArray>,
+  author_id: option<int>,
+  big_int: option<bigint>,
+  categories: option<categoryArray>,
   id: int,
-  meta: Null.t<arrayJSON_t>,
-  name: Null.t<string>,
-  rank: Null.t<int>,
+  meta: option<arrayJSON_t>,
+  name: option<string>,
+  rank: option<int>,
 }
 
 /** 'FindBookById' query type */
@@ -107,19 +107,19 @@ let findBookById = (params, ~client) => FindBookById.many(client, params)
 /** 'FindBookByCategory' parameters type */
 @gentype
 type findBookByCategoryParams = {
-  category?: Null.t<category>,
+  category?: category,
 }
 
 /** 'FindBookByCategory' return type */
 @gentype
 type findBookByCategoryResult = {
-  author_id: Null.t<int>,
-  big_int: Null.t<bigint>,
-  categories: Null.t<categoryArray>,
+  author_id: option<int>,
+  big_int: option<bigint>,
+  categories: option<categoryArray>,
   id: int,
-  meta: Null.t<arrayJSON_t>,
-  name: Null.t<string>,
-  rank: Null.t<int>,
+  meta: option<arrayJSON_t>,
+  name: option<string>,
+  rank: option<int>,
 }
 
 /** 'FindBookByCategory' query type */
@@ -191,15 +191,15 @@ let findBookByCategory = (params, ~client) => FindBookByCategory.many(client, pa
 /** 'FindBookNameOrRank' parameters type */
 @gentype
 type findBookNameOrRankParams = {
-  name?: Null.t<string>,
-  rank?: Null.t<int>,
+  name?: string,
+  rank?: int,
 }
 
 /** 'FindBookNameOrRank' return type */
 @gentype
 type findBookNameOrRankResult = {
   id: int,
-  name: Null.t<string>,
+  name: option<string>,
 }
 
 /** 'FindBookNameOrRank' query type */
@@ -277,13 +277,13 @@ type findBookUnicodeParams = unit
 /** 'FindBookUnicode' return type */
 @gentype
 type findBookUnicodeResult = {
-  author_id: Null.t<int>,
-  big_int: Null.t<bigint>,
-  categories: Null.t<categoryArray>,
+  author_id: option<int>,
+  big_int: option<bigint>,
+  categories: option<categoryArray>,
   id: int,
-  meta: Null.t<arrayJSON_t>,
-  name: Null.t<string>,
-  rank: Null.t<int>,
+  meta: option<arrayJSON_t>,
+  name: option<string>,
+  rank: option<int>,
 }
 
 /** 'FindBookUnicode' query type */
@@ -438,11 +438,93 @@ module InsertBooks: {
 let insertBooks = (params, ~client) => InsertBooks.many(client, params)
 
 
+/** 'InsertBook' parameters type */
+@gentype
+type insertBookParams = {
+  author_id: int,
+  categories?: categoryArray,
+  name: string,
+  rank: int,
+}
+
+/** 'InsertBook' return type */
+@gentype
+type insertBookResult = {
+  book_id: int,
+}
+
+/** 'InsertBook' query type */
+@gentype
+type insertBookQuery = {
+  params: insertBookParams,
+  result: insertBookResult,
+}
+
+%%private(let insertBookIR: IR.t = %raw(`{"usedParamSet":{"rank":true,"name":true,"author_id":true,"categories":true},"params":[{"name":"rank","required":true,"transform":{"type":"scalar"},"locs":[{"a":62,"b":67}]},{"name":"name","required":true,"transform":{"type":"scalar"},"locs":[{"a":70,"b":75}]},{"name":"author_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":88}]},{"name":"categories","required":false,"transform":{"type":"scalar"},"locs":[{"a":91,"b":101}]}],"statement":"INSERT INTO books (rank, name, author_id, categories)\nVALUES (:rank!, :name!, :author_id!, :categories) RETURNING id as book_id"}`))
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO books (rank, name, author_id, categories)
+ * VALUES (:rank!, :name!, :author_id!, :categories) RETURNING id as book_id
+ * ```
+ */
+@gentype
+module InsertBook: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, insertBookParams) => promise<array<insertBookResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, insertBookParams) => promise<option<insertBookResult>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    insertBookParams,
+    ~errorMessage: string=?
+  ) => promise<result<insertBookResult, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, insertBookParams) => promise<unit>
+} = {
+  @module("@pgtyped/runtime") @new external insertBook: IR.t => PreparedStatement.t<insertBookParams, insertBookResult> = "PreparedQuery";
+  let query = insertBook(insertBookIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
+
+@gentype
+@deprecated("Use 'InsertBook.many' directly instead")
+let insertBook = (params, ~client) => InsertBook.many(client, params)
+
+
 /** 'UpdateBooksCustom' parameters type */
 @gentype
 type updateBooksCustomParams = {
   id: int,
-  rank?: Null.t<int>,
+  rank?: int,
 }
 
 /** 'UpdateBooksCustom' return type */
@@ -527,8 +609,8 @@ let updateBooksCustom = (params, ~client) => UpdateBooksCustom.many(client, para
 @gentype
 type updateBooksParams = {
   id: int,
-  name?: Null.t<string>,
-  rank?: Null.t<int>,
+  name?: string,
+  rank?: int,
 }
 
 /** 'UpdateBooks' return type */
@@ -610,7 +692,7 @@ let updateBooks = (params, ~client) => UpdateBooks.many(client, params)
 @gentype
 type updateBooksRankNotNullParams = {
   id: int,
-  name?: Null.t<string>,
+  name?: string,
   rank: int,
 }
 
@@ -697,13 +779,13 @@ type getBooksByAuthorNameParams = {
 /** 'GetBooksByAuthorName' return type */
 @gentype
 type getBooksByAuthorNameResult = {
-  author_id: Null.t<int>,
-  big_int: Null.t<bigint>,
-  categories: Null.t<categoryArray>,
+  author_id: option<int>,
+  big_int: option<bigint>,
+  categories: option<categoryArray>,
   id: int,
-  meta: Null.t<arrayJSON_t>,
-  name: Null.t<string>,
-  rank: Null.t<int>,
+  meta: option<arrayJSON_t>,
+  name: option<string>,
+  rank: option<int>,
 }
 
 /** 'GetBooksByAuthorName' query type */
@@ -777,13 +859,13 @@ let getBooksByAuthorName = (params, ~client) => GetBooksByAuthorName.many(client
 /** 'AggregateEmailsAndTest' parameters type */
 @gentype
 type aggregateEmailsAndTestParams = {
-  testAges?: Null.t<intArray>,
+  testAges?: intArray,
 }
 
 /** 'AggregateEmailsAndTest' return type */
 @gentype
 type aggregateEmailsAndTestResult = {
-  agetest: Null.t<bool>,
+  agetest: option<bool>,
   emails: stringArray,
 }
 
@@ -937,7 +1019,7 @@ type countBooksParams = unit
 /** 'CountBooks' return type */
 @gentype
 type countBooksResult = {
-  book_count: Null.t<bigint>,
+  book_count: option<bigint>,
 }
 
 /** 'CountBooks' query type */

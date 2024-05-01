@@ -93,7 +93,7 @@ testAsync("select query with parameters", async () => {
 
 testAsync("select query with dynamic or", async () => {
   let result = await getClient()->Books.FindBookNameOrRank.many({
-    rank: Value(1),
+    rank: 1,
   })
   expect(result)->Expect.toMatchSnapshot
 })
@@ -113,17 +113,53 @@ testAsync("insert query with parameter spread", async () => {
   | _ => panic("Unexpected result inserting books")
   }
 
-  switch await getClient()->Books.FindBookById.many({id: Value(insertedBookId)}) {
+  switch await getClient()->Books.FindBookById.many({id: insertedBookId}) {
   | [insertedBook] => expect(insertedBook.categories)->Expect.toEqual("{novel,science-fiction}")
   | _ => panic("Unexpected result fetching newly inserted book")
+  }
+})
+
+testAsync("insert query with non-supplied optional value", async () => {
+  let insertedBookId = switch await getClient()->Books.InsertBooks.many({
+    books: [
+      {
+        authorId: 1,
+        name: "A Brief History of Time: From the Big Bang to Black Holes",
+        rank: 1,
+      },
+    ],
+  }) {
+  | [{book_id: id}] => id
+  | _ => panic("Unexpected result inserting books")
+  }
+
+  switch await getClient()->Books.FindBookById.many({id: insertedBookId}) {
+  | [insertedBook] => expect(insertedBook.categories)->Expect.toEqual(None)
+  | _ => panic("Unexpected result fetching newly inserted book")
+  }
+})
+
+testAsync("insert query with non-supplied opt value", async () => {
+  let insertedBookId = switch await getClient()->Books.InsertBook.one({
+    author_id: 1,
+    name: "A Brief History of Time: From the Big Bang to Black Holes",
+    rank: 1,
+  }) {
+  | Some({book_id: id}) => id
+  | None => panic("Unexpected result inserting book")
+  }
+
+  switch await getClient()->Books.FindBookById.one({id: insertedBookId}) {
+  | Some(insertedBook) => expect(insertedBook.categories)->Expect.toEqual(None)
+  | None => panic("Unexpected result fetching newly inserted book")
   }
 })
 
 testAsync("update query with a non-null parameter override", async () => {
   let _ = await getClient()->Books.UpdateBooks.many({
     id: 2,
-    rank: Value(12),
-    name: Value("Another title"),
+    rank: 12,
+    name: "Another title",
   })
 })
 
@@ -140,14 +176,14 @@ testAsync("insert query with an inline sql comment", async () => {
 })
 
 testAsync("dynamic update query", async () => {
-  let _ = await getClient()->Books.UpdateBooksCustom.many({id: 2, rank: Value(13)})
+  let _ = await getClient()->Books.UpdateBooksCustom.many({id: 2, rank: 13})
 })
 
 testAsync("update query with a multiple non-null parameter overrides", async () => {
   let _ = await getClient()->Books.UpdateBooksRankNotNull.many({
     id: 2,
     rank: 12,
-    name: Value("Another title"),
+    name: "Another title",
   })
 })
 
@@ -159,7 +195,7 @@ testAsync("select query with join and a parameter override", async () => {
 })
 
 testAsync("select query with aggregation", async () => {
-  switch await getClient()->Books.AggregateEmailsAndTest.many({testAges: Value([35, 23, 19])}) {
+  switch await getClient()->Books.AggregateEmailsAndTest.many({testAges: [35, 23, 19]}) {
   | [aggregateData] =>
     expect(aggregateData.agetest)->Expect.toBe(true)
     expect(aggregateData.emails)->Expect.toEqual([

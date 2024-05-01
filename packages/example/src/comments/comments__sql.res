@@ -11,10 +11,10 @@ type getAllCommentsParams = {
 /** 'GetAllComments' return type */
 @gentype
 type getAllCommentsResult = {
-  body: Null.t<string>,
-  book_id: Null.t<int>,
+  body: option<string>,
+  book_id: option<int>,
   id: int,
-  user_id: Null.t<int>,
+  user_id: option<int>,
 }
 
 /** 'GetAllComments' query type */
@@ -92,10 +92,10 @@ type getAllCommentsByIdsParams = {
 /** 'GetAllCommentsByIds' return type */
 @gentype
 type getAllCommentsByIdsResult = {
-  body: Null.t<string>,
-  book_id: Null.t<int>,
+  body: option<string>,
+  book_id: option<int>,
   id: int,
-  user_id: Null.t<int>,
+  user_id: option<int>,
 }
 
 /** 'GetAllCommentsByIds' query type */
@@ -178,10 +178,10 @@ type insertCommentParams = {
 /** 'InsertComment' return type */
 @gentype
 type insertCommentResult = {
-  body: Null.t<string>,
-  book_id: Null.t<int>,
+  body: option<string>,
+  book_id: option<int>,
   id: int,
-  user_id: Null.t<int>,
+  user_id: option<int>,
 }
 
 /** 'InsertComment' query type */
@@ -259,7 +259,7 @@ type selectExistsTestParams = unit
 /** 'SelectExistsTest' return type */
 @gentype
 type selectExistsTestResult = {
-  isTransactionExists: Null.t<bool>,
+  isTransactionExists: option<bool>,
 }
 
 /** 'SelectExistsTest' query type */

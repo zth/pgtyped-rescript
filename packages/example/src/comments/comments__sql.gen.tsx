@@ -7,17 +7,15 @@ const comments__sqlJS = require('./comments__sql.js');
 
 import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/PgTyped.gen';
 
-import type {t as Null_t} from './Null.gen';
-
 /** 'GetAllComments' parameters type */
 export type getAllCommentsParams = { readonly id: number };
 
 /** 'GetAllComments' return type */
 export type getAllCommentsResult = {
-  readonly body: Null_t<string>; 
-  readonly book_id: Null_t<number>; 
+  readonly body: (undefined | string); 
+  readonly book_id: (undefined | number); 
   readonly id: number; 
-  readonly user_id: Null_t<number>
+  readonly user_id: (undefined | number)
 };
 
 /** 'GetAllComments' query type */
@@ -28,10 +26,10 @@ export type getAllCommentsByIdsParams = { readonly ids: number[] };
 
 /** 'GetAllCommentsByIds' return type */
 export type getAllCommentsByIdsResult = {
-  readonly body: Null_t<string>; 
-  readonly book_id: Null_t<number>; 
+  readonly body: (undefined | string); 
+  readonly book_id: (undefined | number); 
   readonly id: number; 
-  readonly user_id: Null_t<number>
+  readonly user_id: (undefined | number)
 };
 
 /** 'GetAllCommentsByIds' query type */
@@ -44,10 +42,10 @@ export type insertCommentParams = { readonly comments: insertCommentParams_comme
 
 /** 'InsertComment' return type */
 export type insertCommentResult = {
-  readonly body: Null_t<string>; 
-  readonly book_id: Null_t<number>; 
+  readonly body: (undefined | string); 
+  readonly book_id: (undefined | number); 
   readonly id: number; 
-  readonly user_id: Null_t<number>
+  readonly user_id: (undefined | number)
 };
 
 /** 'InsertComment' query type */
@@ -57,7 +55,7 @@ export type insertCommentQuery = { readonly params: insertCommentParams; readonl
 export type selectExistsTestParams = void;
 
 /** 'SelectExistsTest' return type */
-export type selectExistsTestResult = { readonly isTransactionExists: Null_t<boolean> };
+export type selectExistsTestResult = { readonly isTransactionExists: (undefined | boolean) };
 
 /** 'SelectExistsTest' query type */
 export type selectExistsTestQuery = { readonly params: selectExistsTestParams; readonly result: selectExistsTestResult };

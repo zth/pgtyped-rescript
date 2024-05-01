@@ -94,7 +94,7 @@ let sendNotifications = (params, ~client) => SendNotifications.many(client, para
 @gentype
 type getNotificationsParams = {
   date: dateOrString,
-  userId?: Null.t<int>,
+  userId?: int,
 }
 
 /** 'GetNotifications' return type */
@@ -104,7 +104,7 @@ type getNotificationsResult = {
   id: int,
   payload: JSON.t,
   @as("type") type_: notification_type,
-  user_id: Null.t<int>,
+  user_id: option<int>,
 }
 
 /** 'GetNotifications' query type */

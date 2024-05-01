@@ -145,7 +145,7 @@ export async function queryToTypeDeclarations(
       (addNullability || nullable || nullable == null) &&
       !removeNullability
     ) {
-      tsTypeName = 'Null.t<' + tsTypeName + '>';
+      tsTypeName = 'option<' + tsTypeName + '>';
     }
 
     if (addNullability || removeNullability) {
@@ -176,7 +176,7 @@ export async function queryToTypeDeclarations(
       let tsTypeName = types.use(pgTypeName, TypeScope.Parameter);
 
       if (!param.required) {
-        tsTypeName = 'Null.t<' + tsTypeName + '>';
+        tsTypeName = tsTypeName;
       }
 
       // Allow optional scalar parameters to be missing from parameters object
@@ -289,9 +289,7 @@ async function generateTypedecsFromFile(
   const typeSource: TypeSource = (query) => getTypes(query, connection);
 
   const { queries, events } =
-    mode === 'res'
-      ? parseRescriptFile(contents, fileName)
-      : parseSQLFile(contents);
+    mode === 'res' ? parseRescriptFile(contents) : parseSQLFile(contents);
   if (events.length > 0) {
     prettyPrintEvents(contents, events);
     if (events.find((e) => 'critical' in e)) {
