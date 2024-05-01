@@ -1,10 +1,7 @@
 import { parseSQLFile } from '@pgtyped/parser';
 import { SQLParseResult } from '@pgtyped/parser/lib/loader/sql';
 
-export function parseCode(
-  fileContent: string,
-  _fileName: string,
-): SQLParseResult {
+export function parseCode(fileContent: string): SQLParseResult {
   if (!fileContent.includes('%sql')) {
     return {
       queries: [],
@@ -18,7 +15,11 @@ export function parseCode(
   const queries = [];
 
   while ((match = regex.exec(fileContent)) !== null) {
-    queries.push(match[1]);
+    let query = match[1].trim();
+    if (!query.endsWith(';')) {
+      query += ';';
+    }
+    queries.push(query);
   }
 
   const asSql = queries.join('\n\n');

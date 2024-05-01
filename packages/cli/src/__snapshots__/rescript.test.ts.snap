@@ -1,0 +1,99 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`inserts trailing semicolon when needed 1`] = `
+Object {
+  "events": Array [],
+  "queries": Array [
+    Object {
+      "name": "FindBookById",
+      "params": Array [
+        Object {
+          "codeRefs": Object {
+            "used": Array [
+              Object {
+                "a": 61,
+                "b": 62,
+                "col": 36,
+                "line": 2,
+              },
+            ],
+          },
+          "name": "id",
+          "required": false,
+          "transform": Object {
+            "type": "scalar",
+          },
+        },
+      ],
+      "statement": Object {
+        "body": "SELECT * FROM books WHERE id = :id",
+        "loc": Object {
+          "a": 29,
+          "b": 62,
+          "col": 4,
+          "line": 2,
+        },
+      },
+      "usedParamSet": Object {
+        "id": true,
+      },
+    },
+    Object {
+      "name": "FindBooks",
+      "params": Array [],
+      "statement": Object {
+        "body": "SELECT * FROM books",
+        "loc": Object {
+          "a": 92,
+          "b": 110,
+          "col": 4,
+          "line": 5,
+        },
+      },
+      "usedParamSet": Object {},
+    },
+  ],
+}
+`;
+
+exports[`parser finds string template in correct file 1`] = `
+Object {
+  "events": Array [],
+  "queries": Array [
+    Object {
+      "name": "FindBookById",
+      "params": Array [
+        Object {
+          "codeRefs": Object {
+            "used": Array [
+              Object {
+                "a": 61,
+                "b": 62,
+                "col": 36,
+                "line": 2,
+              },
+            ],
+          },
+          "name": "id",
+          "required": false,
+          "transform": Object {
+            "type": "scalar",
+          },
+        },
+      ],
+      "statement": Object {
+        "body": "SELECT * FROM books WHERE id = :id",
+        "loc": Object {
+          "a": 29,
+          "b": 62,
+          "col": 4,
+          "line": 2,
+        },
+      },
+      "usedParamSet": Object {
+        "id": true,
+      },
+    },
+  ],
+}
+`;
