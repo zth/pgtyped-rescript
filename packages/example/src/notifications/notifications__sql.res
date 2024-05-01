@@ -61,7 +61,7 @@ module SendNotifications: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, sendNotificationsParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external sendNotifications: IR.t => PreparedStatement.t<sendNotificationsParams, sendNotificationsResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external sendNotifications: IR.t => PreparedStatement.t<sendNotificationsParams, sendNotificationsResult> = "PreparedQuery";
   let query = sendNotifications(sendNotificationsIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -148,7 +148,7 @@ module GetNotifications: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, getNotificationsParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external getNotifications: IR.t => PreparedStatement.t<getNotificationsParams, getNotificationsResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external getNotifications: IR.t => PreparedStatement.t<getNotificationsParams, getNotificationsResult> = "PreparedQuery";
   let query = getNotifications(getNotificationsIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -232,7 +232,7 @@ module ThresholdFrogs: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, thresholdFrogsParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external thresholdFrogs: IR.t => PreparedStatement.t<thresholdFrogsParams, thresholdFrogsResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external thresholdFrogs: IR.t => PreparedStatement.t<thresholdFrogsParams, thresholdFrogsResult> = "PreparedQuery";
   let query = thresholdFrogs(thresholdFrogsIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 

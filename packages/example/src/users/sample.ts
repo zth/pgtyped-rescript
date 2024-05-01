@@ -1,4 +1,4 @@
-import { sql } from '@pgtyped/runtime';
+import { sql } from 'pgtyped-rescript-runtime';
 import { IGetUsersWithCommentsQuery } from './sample.types.js';
 import { Client } from 'pg';
 

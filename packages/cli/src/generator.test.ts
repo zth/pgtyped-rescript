@@ -1,4 +1,4 @@
-import { ParameterTransform } from '@pgtyped/runtime';
+import { ParameterTransform } from 'pgtyped-rescript-runtime';
 
 import { parseSQLFile } from '@pgtyped/parser';
 import { IQueryTypes } from 'pgtyped-rescript-query/lib/actions';

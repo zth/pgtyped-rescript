@@ -2,7 +2,7 @@ import {
   ParameterTransform,
   processSQLQueryIR,
   processTSQueryAST,
-} from '@pgtyped/runtime';
+} from 'pgtyped-rescript-runtime';
 
 import {
   parseSQLFile,
@@ -340,7 +340,7 @@ export async function generateDeclarationFile(
   if (mode === 'sql') {
     // Second parameter has no effect here, we could have used any value
     types.use(
-      { name: 'PreparedQuery', from: '@pgtyped/runtime' },
+      { name: 'PreparedQuery', from: 'pgtyped-rescript-runtime' },
       TypeScope.Return,
     );
   }
@@ -409,7 +409,7 @@ module ${
     typeDec.query.name
   }Params) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external ${
+  @module("pgtyped-rescript-runtime") @new external ${
     typeDec.query.name
   }: IR.t => PreparedStatement.t<${typeDec.query.paramTypeAlias}, ${
       typeDec.query.returnTypeAlias

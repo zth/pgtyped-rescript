@@ -54,7 +54,7 @@ module GetAllComments: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, getAllCommentsParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external getAllComments: IR.t => PreparedStatement.t<getAllCommentsParams, getAllCommentsResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external getAllComments: IR.t => PreparedStatement.t<getAllCommentsParams, getAllCommentsResult> = "PreparedQuery";
   let query = getAllComments(getAllCommentsIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -136,7 +136,7 @@ module GetAllCommentsByIds: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, getAllCommentsByIdsParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external getAllCommentsByIds: IR.t => PreparedStatement.t<getAllCommentsByIdsParams, getAllCommentsByIdsResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external getAllCommentsByIds: IR.t => PreparedStatement.t<getAllCommentsByIdsParams, getAllCommentsByIdsResult> = "PreparedQuery";
   let query = getAllCommentsByIds(getAllCommentsByIdsIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -225,7 +225,7 @@ module InsertComment: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, insertCommentParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external insertComment: IR.t => PreparedStatement.t<insertCommentParams, insertCommentResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external insertComment: IR.t => PreparedStatement.t<insertCommentParams, insertCommentResult> = "PreparedQuery";
   let query = insertComment(insertCommentIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -302,7 +302,7 @@ module SelectExistsTest: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, selectExistsTestParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external selectExistsTest: IR.t => PreparedStatement.t<selectExistsTestParams, selectExistsTestResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external selectExistsTest: IR.t => PreparedStatement.t<selectExistsTestParams, selectExistsTestResult> = "PreparedQuery";
   let query = selectExistsTest(selectExistsTestIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 

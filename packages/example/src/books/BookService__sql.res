@@ -66,7 +66,7 @@ module FindBookById: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external findBookById: IR.t => PreparedStatement.t<findBookByIdParams, findBookByIdResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external findBookById: IR.t => PreparedStatement.t<findBookByIdParams, findBookByIdResult> = "PreparedQuery";
   let query = findBookById(findBookByIdIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -153,7 +153,7 @@ module BooksByAuthor: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, booksByAuthorParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external booksByAuthor: IR.t => PreparedStatement.t<booksByAuthorParams, booksByAuthorResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external booksByAuthor: IR.t => PreparedStatement.t<booksByAuthorParams, booksByAuthorResult> = "PreparedQuery";
   let query = booksByAuthor(booksByAuthorIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 

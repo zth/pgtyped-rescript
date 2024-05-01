@@ -75,7 +75,7 @@ module FindBookById: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external findBookById: IR.t => PreparedStatement.t<findBookByIdParams, findBookByIdResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external findBookById: IR.t => PreparedStatement.t<findBookByIdParams, findBookByIdResult> = "PreparedQuery";
   let query = findBookById(findBookByIdIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -160,7 +160,7 @@ module FindBookByCategory: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, findBookByCategoryParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external findBookByCategory: IR.t => PreparedStatement.t<findBookByCategoryParams, findBookByCategoryResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external findBookByCategory: IR.t => PreparedStatement.t<findBookByCategoryParams, findBookByCategoryResult> = "PreparedQuery";
   let query = findBookByCategory(findBookByCategoryIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -243,7 +243,7 @@ module FindBookNameOrRank: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, findBookNameOrRankParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external findBookNameOrRank: IR.t => PreparedStatement.t<findBookNameOrRankParams, findBookNameOrRankResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external findBookNameOrRank: IR.t => PreparedStatement.t<findBookNameOrRankParams, findBookNameOrRankResult> = "PreparedQuery";
   let query = findBookNameOrRank(findBookNameOrRankIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -326,7 +326,7 @@ module FindBookUnicode: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, findBookUnicodeParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external findBookUnicode: IR.t => PreparedStatement.t<findBookUnicodeParams, findBookUnicodeResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external findBookUnicode: IR.t => PreparedStatement.t<findBookUnicodeParams, findBookUnicodeResult> = "PreparedQuery";
   let query = findBookUnicode(findBookUnicodeIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -413,7 +413,7 @@ module InsertBooks: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, insertBooksParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external insertBooks: IR.t => PreparedStatement.t<insertBooksParams, insertBooksResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external insertBooks: IR.t => PreparedStatement.t<insertBooksParams, insertBooksResult> = "PreparedQuery";
   let query = insertBooks(insertBooksIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -496,7 +496,7 @@ module InsertBook: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, insertBookParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external insertBook: IR.t => PreparedStatement.t<insertBookParams, insertBookResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external insertBook: IR.t => PreparedStatement.t<insertBookParams, insertBookResult> = "PreparedQuery";
   let query = insertBook(insertBookIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -582,7 +582,7 @@ module UpdateBooksCustom: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, updateBooksCustomParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external updateBooksCustom: IR.t => PreparedStatement.t<updateBooksCustomParams, updateBooksCustomResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external updateBooksCustom: IR.t => PreparedStatement.t<updateBooksCustomParams, updateBooksCustomResult> = "PreparedQuery";
   let query = updateBooksCustom(updateBooksCustomIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -666,7 +666,7 @@ module UpdateBooks: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, updateBooksParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external updateBooks: IR.t => PreparedStatement.t<updateBooksParams, updateBooksResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external updateBooks: IR.t => PreparedStatement.t<updateBooksParams, updateBooksResult> = "PreparedQuery";
   let query = updateBooks(updateBooksIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -749,7 +749,7 @@ module UpdateBooksRankNotNull: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, updateBooksRankNotNullParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external updateBooksRankNotNull: IR.t => PreparedStatement.t<updateBooksRankNotNullParams, updateBooksRankNotNullResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external updateBooksRankNotNull: IR.t => PreparedStatement.t<updateBooksRankNotNullParams, updateBooksRankNotNullResult> = "PreparedQuery";
   let query = updateBooksRankNotNull(updateBooksRankNotNullIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -836,7 +836,7 @@ module GetBooksByAuthorName: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, getBooksByAuthorNameParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external getBooksByAuthorName: IR.t => PreparedStatement.t<getBooksByAuthorNameParams, getBooksByAuthorNameResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external getBooksByAuthorName: IR.t => PreparedStatement.t<getBooksByAuthorNameParams, getBooksByAuthorNameResult> = "PreparedQuery";
   let query = getBooksByAuthorName(getBooksByAuthorNameIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -916,7 +916,7 @@ module AggregateEmailsAndTest: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, aggregateEmailsAndTestParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external aggregateEmailsAndTest: IR.t => PreparedStatement.t<aggregateEmailsAndTestParams, aggregateEmailsAndTestResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external aggregateEmailsAndTest: IR.t => PreparedStatement.t<aggregateEmailsAndTestParams, aggregateEmailsAndTestResult> = "PreparedQuery";
   let query = aggregateEmailsAndTest(aggregateEmailsAndTestIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -994,7 +994,7 @@ module GetBooks: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, getBooksParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external getBooks: IR.t => PreparedStatement.t<getBooksParams, getBooksResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external getBooks: IR.t => PreparedStatement.t<getBooksParams, getBooksResult> = "PreparedQuery";
   let query = getBooks(getBooksIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -1071,7 +1071,7 @@ module CountBooks: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, countBooksParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external countBooks: IR.t => PreparedStatement.t<countBooksParams, countBooksResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external countBooks: IR.t => PreparedStatement.t<countBooksParams, countBooksResult> = "PreparedQuery";
   let query = countBooks(countBooksIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
@@ -1149,7 +1149,7 @@ module GetBookCountries: {
   @gentype
   let execute: (PgTyped.Pg.Client.t, getBookCountriesParams) => promise<unit>
 } = {
-  @module("@pgtyped/runtime") @new external getBookCountries: IR.t => PreparedStatement.t<getBookCountriesParams, getBookCountriesResult> = "PreparedQuery";
+  @module("pgtyped-rescript-runtime") @new external getBookCountries: IR.t => PreparedStatement.t<getBookCountriesParams, getBookCountriesResult> = "PreparedQuery";
   let query = getBookCountries(getBookCountriesIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
