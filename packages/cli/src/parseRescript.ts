@@ -31,6 +31,7 @@ export function parseCode(
   content.reverse();
 
   const queries: Array<string> = [];
+  let unnamedQueriesCount = 0;
 
   content.forEach((v) => {
     let query = v.contents.trim();
@@ -39,21 +40,23 @@ export function parseCode(
     }
 
     if (!query.includes('@name')) {
+      unnamedQueriesCount += 1;
       // Handle potentially existing doc comment
       if (query.trim().startsWith('/*')) {
         const lines = query.split('\n');
 
-        let comment = `/* @name Query${queries.length + 1}\n`;
+        let comment = `/*\n@name Query${unnamedQueriesCount}\n`;
         for (let i = 0; i <= lines.length - 1; i += 1) {
           const line = lines[i].trim().replace('/*', '');
           comment += line + '\n';
           if (line.endsWith('*/')) {
+            query = lines.slice(i + 1).join('\n');
             break;
           }
         }
         query = `${comment}\n${query}`;
       } else {
-        query = `/* @name Query${queries.length + 1} */\n${query}`;
+        query = `/* @name Query${unnamedQueriesCount} */\n${query}`;
       }
     }
 
