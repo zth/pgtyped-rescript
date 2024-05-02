@@ -19,6 +19,26 @@ export function parseCode(fileContent: string): SQLParseResult {
     if (!query.endsWith(';')) {
       query += ';';
     }
+
+    if (!query.includes('@name')) {
+      // Handle potentially existing doc comment
+      if (query.trim().startsWith('/*')) {
+        const lines = query.split('\n');
+
+        let comment = `/* @name Query${queries.length + 1}\n`;
+        for (let i = 0; i <= lines.length - 1; i += 1) {
+          const line = lines[i].trim().replace('/*', '');
+          comment += line + '\n';
+          if (line.endsWith('*/')) {
+            break;
+          }
+        }
+        query = `${comment}\n${query}`;
+      } else {
+        query = `/* @name Query${queries.length + 1} */\n${query}`;
+      }
+    }
+
     queries.push(query);
   }
 

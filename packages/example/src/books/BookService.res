@@ -9,7 +9,6 @@ let findBookById = (client, ~id) => {
 
 let booksByAuthor = (client, ~authorName) => {
   let query = %sql.many(`
-    /* @name BooksByAuthor */
     SELECT b.* FROM books b
     INNER JOIN authors a ON a.id = b.author_id
     WHERE a.first_name || ' ' || a.last_name = :authorName!;

@@ -1,5 +1,95 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`inserts @name when needed 1`] = `
+Object {
+  "events": Array [],
+  "queries": Array [
+    Object {
+      "name": "FindBookById",
+      "params": Array [
+        Object {
+          "codeRefs": Object {
+            "used": Array [
+              Object {
+                "a": 61,
+                "b": 62,
+                "col": 36,
+                "line": 2,
+              },
+            ],
+          },
+          "name": "id",
+          "required": false,
+          "transform": Object {
+            "type": "scalar",
+          },
+        },
+      ],
+      "statement": Object {
+        "body": "SELECT * FROM books WHERE id = :id",
+        "loc": Object {
+          "a": 29,
+          "b": 62,
+          "col": 4,
+          "line": 2,
+        },
+      },
+      "usedParamSet": Object {
+        "id": true,
+      },
+    },
+    Object {
+      "name": "Query2",
+      "params": Array [],
+      "statement": Object {
+        "body": "SELECT * FROM books",
+        "loc": Object {
+          "a": 85,
+          "b": 103,
+          "col": 0,
+          "line": 5,
+        },
+      },
+      "usedParamSet": Object {},
+    },
+    Object {
+      "name": "Query3",
+      "params": Array [
+        Object {
+          "codeRefs": Object {
+            "used": Array [
+              Object {
+                "a": 158,
+                "b": 159,
+                "col": 32,
+                "line": 8,
+              },
+            ],
+          },
+          "name": "id",
+          "required": false,
+          "transform": Object {
+            "type": "scalar",
+          },
+        },
+      ],
+      "statement": Object {
+        "body": "SELECT * FROM books WHERE id = :id",
+        "loc": Object {
+          "a": 126,
+          "b": 159,
+          "col": 0,
+          "line": 8,
+        },
+      },
+      "usedParamSet": Object {
+        "id": true,
+      },
+    },
+  ],
+}
+`;
+
 exports[`inserts trailing semicolon when needed 1`] = `
 Object {
   "events": Array [],
@@ -92,6 +182,69 @@ Object {
       },
       "usedParamSet": Object {
         "id": true,
+      },
+    },
+  ],
+}
+`;
+
+exports[`preserves @param when inserting @name 1`] = `
+Object {
+  "events": Array [],
+  "queries": Array [
+    Object {
+      "name": "Query1",
+      "params": Array [
+        Object {
+          "codeRefs": Object {
+            "defined": Object {
+              "a": 24,
+              "b": 35,
+              "col": 7,
+              "line": 3,
+            },
+            "used": Array [
+              Object {
+                "a": 196,
+                "b": 207,
+                "col": 63,
+                "line": 9,
+              },
+            ],
+          },
+          "name": "notification",
+          "required": false,
+          "transform": Object {
+            "keys": Array [
+              Object {
+                "name": "payload",
+                "required": false,
+              },
+              Object {
+                "name": "user_id",
+                "required": false,
+              },
+              Object {
+                "name": "type",
+                "required": false,
+              },
+            ],
+            "type": "pick_tuple",
+          },
+        },
+      ],
+      "statement": Object {
+        "body": "                                                               
+    INSERT INTO notifications (payload, user_id, type) VALUES :notification",
+        "loc": Object {
+          "a": 69,
+          "b": 207,
+          "col": 0,
+          "line": 6,
+        },
+      },
+      "usedParamSet": Object {
+        "notification": true,
       },
     },
   ],
