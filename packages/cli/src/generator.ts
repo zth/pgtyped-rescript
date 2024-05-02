@@ -289,7 +289,9 @@ async function generateTypedecsFromFile(
   const typeSource: TypeSource = (query) => getTypes(query, connection);
 
   const { queries, events } =
-    mode === 'res' ? parseRescriptFile(contents) : parseSQLFile(contents);
+    mode === 'res'
+      ? parseRescriptFile(contents, fileName)
+      : parseSQLFile(contents);
   if (events.length > 0) {
     prettyPrintEvents(contents, events);
     if (events.find((e) => 'critical' in e)) {

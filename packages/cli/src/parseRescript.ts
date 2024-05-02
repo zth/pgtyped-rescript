@@ -1,7 +1,13 @@
 import { parseSQLFile } from '@pgtyped/parser';
 import { SQLParseResult } from '@pgtyped/parser/lib/loader/sql';
+import cp from 'child_process';
+// @ts-ignore
+import { getBinaryPath } from '@rescript/tools/npm/getBinaryPath.js';
 
-export function parseCode(fileContent: string): SQLParseResult {
+export function parseCode(
+  fileContent: string,
+  fileName: string,
+): SQLParseResult {
   if (!fileContent.includes('%sql')) {
     return {
       queries: [],
@@ -10,12 +16,22 @@ export function parseCode(fileContent: string): SQLParseResult {
   }
 
   // Replace with more robust @rescript/tools CLI usage when that package ships linuxarm64 binary.
-  const regex = /%sql(?:\.\w+)?\(`([^`]*)`\)/g;
-  let match;
-  const queries = [];
+  const content: Array<{ contents: string }> = JSON.parse(
+    cp
+      .execFileSync(getBinaryPath(), [
+        'extract-embedded',
+        ['sql', 'sql.one', 'sql.expectOne', 'sql.many', 'sql.execute'].join(
+          ',',
+        ),
+        fileName,
+      ])
+      .toString(),
+  );
 
-  while ((match = regex.exec(fileContent)) !== null) {
-    let query = match[1].trim();
+  const queries: Array<string> = [];
+
+  content.forEach((v) => {
+    let query = v.contents.trim();
     if (!query.endsWith(';')) {
       query += ';';
     }
@@ -40,7 +56,7 @@ export function parseCode(fileContent: string): SQLParseResult {
     }
 
     queries.push(query);
-  }
+  });
 
   const asSql = queries.join('\n\n');
 

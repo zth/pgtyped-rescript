@@ -28,7 +28,7 @@
     "pgtyped-rescript": "^2.4.0",
     "pgtyped-rescript-query": "^2.3.0",
     "rescript": "11.1.0",
-    "rescript-embed-lang": "^0.5.0",
+    "rescript-embed-lang": "^0.5.1",
     "typescript": "4.9.4"
   },
   "devDependencies": {

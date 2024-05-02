@@ -11,6 +11,93 @@ type arrayJSON_t = array<JSON.t>
 @gentype
 type categoryArray = array<category>
 
+/** 'Query1' parameters type */
+@gentype
+type query1Params = {
+  authorName: string,
+}
+
+/** 'Query1' return type */
+@gentype
+type query1Result = {
+  author_id: option<int>,
+  big_int: option<bigint>,
+  categories: option<categoryArray>,
+  id: int,
+  meta: option<arrayJSON_t>,
+  name: option<string>,
+  rank: option<int>,
+}
+
+/** 'Query1' query type */
+@gentype
+type query1Query = {
+  params: query1Params,
+  result: query1Result,
+}
+
+%%private(let query1IR: IR.t = %raw(`{"usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":129}]}],"statement":"SELECT b.* FROM books b\n    INNER JOIN authors a ON a.id = b.author_id\n    WHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
+
+/**
+ Runnable query:
+ ```sql
+SELECT b.* FROM books b
+    INNER JOIN authors a ON a.id = b.author_id
+    WHERE a.first_name || ' ' || a.last_name = $1
+ ```
+
+ */
+@gentype
+module Query1: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, query1Params) => promise<array<query1Result>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, query1Params) => promise<option<query1Result>>
+  
+  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    query1Params,
+    ~errorMessage: string=?
+  ) => promise<result<query1Result, string>>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, query1Params) => promise<unit>
+} = {
+  @module("pgtyped-rescript-runtime") @new external query1: IR.t => PreparedStatement.t<query1Params, query1Result> = "PreparedQuery";
+  let query = query1(query1IR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => Ok(item)
+  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
+
+@gentype
+@deprecated("Use 'Query1.many' directly instead")
+let query1 = (params, ~client) => Query1.many(client, params)
+
+
 /** 'FindBookById' parameters type */
 @gentype
 type findBookByIdParams = {
@@ -94,92 +181,5 @@ module FindBookById: {
 @gentype
 @deprecated("Use 'FindBookById.many' directly instead")
 let findBookById = (params, ~client) => FindBookById.many(client, params)
-
-
-/** 'BooksByAuthor' parameters type */
-@gentype
-type booksByAuthorParams = {
-  authorName: string,
-}
-
-/** 'BooksByAuthor' return type */
-@gentype
-type booksByAuthorResult = {
-  author_id: option<int>,
-  big_int: option<bigint>,
-  categories: option<categoryArray>,
-  id: int,
-  meta: option<arrayJSON_t>,
-  name: option<string>,
-  rank: option<int>,
-}
-
-/** 'BooksByAuthor' query type */
-@gentype
-type booksByAuthorQuery = {
-  params: booksByAuthorParams,
-  result: booksByAuthorResult,
-}
-
-%%private(let booksByAuthorIR: IR.t = %raw(`{"usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":129}]}],"statement":"SELECT b.* FROM books b\n    INNER JOIN authors a ON a.id = b.author_id\n    WHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
-
-/**
- Runnable query:
- ```sql
-SELECT b.* FROM books b
-    INNER JOIN authors a ON a.id = b.author_id
-    WHERE a.first_name || ' ' || a.last_name = $1
- ```
-
- */
-@gentype
-module BooksByAuthor: {
-  /** Returns an array of all matched results. */
-  @gentype
-  let many: (PgTyped.Pg.Client.t, booksByAuthorParams) => promise<array<booksByAuthorResult>>
-  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
-  @gentype
-  let one: (PgTyped.Pg.Client.t, booksByAuthorParams) => promise<option<booksByAuthorResult>>
-  
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  @gentype
-  let expectOne: (
-    PgTyped.Pg.Client.t,
-    booksByAuthorParams,
-    ~errorMessage: string=?
-  ) => promise<result<booksByAuthorResult, string>>
-
-  /** Executes the query, but ignores whatever is returned by it. */
-  @gentype
-  let execute: (PgTyped.Pg.Client.t, booksByAuthorParams) => promise<unit>
-} = {
-  @module("pgtyped-rescript-runtime") @new external booksByAuthor: IR.t => PreparedStatement.t<booksByAuthorParams, booksByAuthorResult> = "PreparedQuery";
-  let query = booksByAuthor(booksByAuthorIR)
-  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
-
-  @gentype
-  let many = (client, params) => query(params, ~client)
-
-  @gentype
-  let one = async (client, params) => switch await query(params, ~client) {
-  | [item] => Some(item)
-  | _ => None
-  }
-
-  @gentype
-  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
-  }
-
-  @gentype
-  let execute = async (client, params) => {
-    let _ = await query(params, ~client)
-  }
-}
-
-@gentype
-@deprecated("Use 'BooksByAuthor.many' directly instead")
-let booksByAuthor = (params, ~client) => BooksByAuthor.many(client, params)
 
 
