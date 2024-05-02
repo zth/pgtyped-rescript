@@ -16,3 +16,15 @@ let booksByAuthor = (client, ~authorName) => {
 
   client->query({authorName: authorName})
 }
+
+let queryWithParams = %sql.one(`
+  /*
+    @param notification -> (payload, user_id, type)
+  */
+  INSERT INTO notifications (payload, user_id, type) VALUES :notification
+`)
+
+let queryWithParamsSingleLine = %sql.one(`
+  /* @param notification -> (payload, user_id, type) */
+  INSERT INTO notifications (payload, user_id, type) VALUES :notification
+`)
