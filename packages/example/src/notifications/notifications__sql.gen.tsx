@@ -62,10 +62,8 @@ export const SendNotifications_many: (_1:PgTyped_Pg_Client_t, _2:sendNotificatio
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const SendNotifications_one: (_1:PgTyped_Pg_Client_t, _2:sendNotificationsParams) => Promise<(undefined | sendNotificationsResult)> = notifications__sqlJS.SendNotifications.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const SendNotifications_expectOne: (_1:PgTyped_Pg_Client_t, _2:sendNotificationsParams, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: sendNotificationsResult }
-  | { TAG: "Error"; _0: string }> = notifications__sqlJS.SendNotifications.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const SendNotifications_expectOne: (_1:PgTyped_Pg_Client_t, _2:sendNotificationsParams, errorMessage:(undefined | string)) => Promise<sendNotificationsResult> = notifications__sqlJS.SendNotifications.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const SendNotifications_execute: (_1:PgTyped_Pg_Client_t, _2:sendNotificationsParams) => Promise<void> = notifications__sqlJS.SendNotifications.execute as any;
@@ -78,10 +76,8 @@ export const GetNotifications_many: (_1:PgTyped_Pg_Client_t, _2:getNotifications
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const GetNotifications_one: (_1:PgTyped_Pg_Client_t, _2:getNotificationsParams) => Promise<(undefined | getNotificationsResult)> = notifications__sqlJS.GetNotifications.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const GetNotifications_expectOne: (_1:PgTyped_Pg_Client_t, _2:getNotificationsParams, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: getNotificationsResult }
-  | { TAG: "Error"; _0: string }> = notifications__sqlJS.GetNotifications.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const GetNotifications_expectOne: (_1:PgTyped_Pg_Client_t, _2:getNotificationsParams, errorMessage:(undefined | string)) => Promise<getNotificationsResult> = notifications__sqlJS.GetNotifications.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const GetNotifications_execute: (_1:PgTyped_Pg_Client_t, _2:getNotificationsParams) => Promise<void> = notifications__sqlJS.GetNotifications.execute as any;
@@ -94,10 +90,8 @@ export const ThresholdFrogs_many: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsPara
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const ThresholdFrogs_one: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsParams) => Promise<(undefined | thresholdFrogsResult)> = notifications__sqlJS.ThresholdFrogs.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const ThresholdFrogs_expectOne: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsParams, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: thresholdFrogsResult }
-  | { TAG: "Error"; _0: string }> = notifications__sqlJS.ThresholdFrogs.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const ThresholdFrogs_expectOne: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsParams, errorMessage:(undefined | string)) => Promise<thresholdFrogsResult> = notifications__sqlJS.ThresholdFrogs.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const ThresholdFrogs_execute: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsParams) => Promise<void> = notifications__sqlJS.ThresholdFrogs.execute as any;
@@ -105,16 +99,8 @@ export const ThresholdFrogs_execute: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsP
 export const thresholdFrogs: (params:thresholdFrogsParams, client:PgTyped_Pg_Client_t) => Promise<thresholdFrogsResult[]> = notifications__sqlJS.thresholdFrogs as any;
 
 export const ThresholdFrogs: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsParams, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: thresholdFrogsResult
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsParams, errorMessage:(undefined | string)) => Promise<thresholdFrogsResult>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsParams) => Promise<(undefined | thresholdFrogsResult)>; 
   /** Returns an array of all matched results. */
@@ -124,16 +110,8 @@ export const ThresholdFrogs: {
 } = notifications__sqlJS.ThresholdFrogs as any;
 
 export const SendNotifications: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:sendNotificationsParams, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: sendNotificationsResult
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:sendNotificationsParams, errorMessage:(undefined | string)) => Promise<sendNotificationsResult>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:sendNotificationsParams) => Promise<(undefined | sendNotificationsResult)>; 
   /** Returns an array of all matched results. */
@@ -143,16 +121,8 @@ export const SendNotifications: {
 } = notifications__sqlJS.SendNotifications as any;
 
 export const GetNotifications: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:getNotificationsParams, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: getNotificationsResult
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:getNotificationsParams, errorMessage:(undefined | string)) => Promise<getNotificationsResult>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:getNotificationsParams) => Promise<(undefined | getNotificationsResult)>; 
   /** Returns an array of all matched results. */

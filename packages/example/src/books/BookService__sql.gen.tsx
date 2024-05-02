@@ -87,10 +87,8 @@ export const FindBookById_many: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams) 
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const FindBookById_one: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams) => Promise<(undefined | findBookByIdResult)> = BookService__sqlJS.FindBookById.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const FindBookById_expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: findBookByIdResult }
-  | { TAG: "Error"; _0: string }> = BookService__sqlJS.FindBookById.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const FindBookById_expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams, errorMessage:(undefined | string)) => Promise<findBookByIdResult> = BookService__sqlJS.FindBookById.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const FindBookById_execute: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams) => Promise<void> = BookService__sqlJS.FindBookById.execute as any;
@@ -103,10 +101,8 @@ export const Query1_many: (_1:PgTyped_Pg_Client_t, _2:query1Params) => Promise<q
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const Query1_one: (_1:PgTyped_Pg_Client_t, _2:query1Params) => Promise<(undefined | query1Result)> = BookService__sqlJS.Query1.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const Query1_expectOne: (_1:PgTyped_Pg_Client_t, _2:query1Params, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: query1Result }
-  | { TAG: "Error"; _0: string }> = BookService__sqlJS.Query1.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const Query1_expectOne: (_1:PgTyped_Pg_Client_t, _2:query1Params, errorMessage:(undefined | string)) => Promise<query1Result> = BookService__sqlJS.Query1.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const Query1_execute: (_1:PgTyped_Pg_Client_t, _2:query1Params) => Promise<void> = BookService__sqlJS.Query1.execute as any;
@@ -119,10 +115,8 @@ export const Query2_many: (_1:PgTyped_Pg_Client_t, _2:query2Params) => Promise<q
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const Query2_one: (_1:PgTyped_Pg_Client_t, _2:query2Params) => Promise<(undefined | query2Result)> = BookService__sqlJS.Query2.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const Query2_expectOne: (_1:PgTyped_Pg_Client_t, _2:query2Params, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: query2Result }
-  | { TAG: "Error"; _0: string }> = BookService__sqlJS.Query2.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const Query2_expectOne: (_1:PgTyped_Pg_Client_t, _2:query2Params, errorMessage:(undefined | string)) => Promise<query2Result> = BookService__sqlJS.Query2.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const Query2_execute: (_1:PgTyped_Pg_Client_t, _2:query2Params) => Promise<void> = BookService__sqlJS.Query2.execute as any;
@@ -135,10 +129,8 @@ export const Query3_many: (_1:PgTyped_Pg_Client_t, _2:query3Params) => Promise<q
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const Query3_one: (_1:PgTyped_Pg_Client_t, _2:query3Params) => Promise<(undefined | query3Result)> = BookService__sqlJS.Query3.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const Query3_expectOne: (_1:PgTyped_Pg_Client_t, _2:query3Params, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: query3Result }
-  | { TAG: "Error"; _0: string }> = BookService__sqlJS.Query3.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const Query3_expectOne: (_1:PgTyped_Pg_Client_t, _2:query3Params, errorMessage:(undefined | string)) => Promise<query3Result> = BookService__sqlJS.Query3.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const Query3_execute: (_1:PgTyped_Pg_Client_t, _2:query3Params) => Promise<void> = BookService__sqlJS.Query3.execute as any;
@@ -146,16 +138,8 @@ export const Query3_execute: (_1:PgTyped_Pg_Client_t, _2:query3Params) => Promis
 export const query3: (params:query3Params, client:PgTyped_Pg_Client_t) => Promise<query3Result[]> = BookService__sqlJS.query3 as any;
 
 export const FindBookById: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: findBookByIdResult
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams, errorMessage:(undefined | string)) => Promise<findBookByIdResult>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams) => Promise<(undefined | findBookByIdResult)>; 
   /** Returns an array of all matched results. */
@@ -165,16 +149,8 @@ export const FindBookById: {
 } = BookService__sqlJS.FindBookById as any;
 
 export const Query1: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:query1Params, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: query1Result
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:query1Params, errorMessage:(undefined | string)) => Promise<query1Result>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:query1Params) => Promise<(undefined | query1Result)>; 
   /** Returns an array of all matched results. */
@@ -184,16 +160,8 @@ export const Query1: {
 } = BookService__sqlJS.Query1 as any;
 
 export const Query2: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:query2Params, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: query2Result
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:query2Params, errorMessage:(undefined | string)) => Promise<query2Result>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:query2Params) => Promise<(undefined | query2Result)>; 
   /** Returns an array of all matched results. */
@@ -203,16 +171,8 @@ export const Query2: {
 } = BookService__sqlJS.Query2 as any;
 
 export const Query3: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:query3Params, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: query3Result
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:query3Params, errorMessage:(undefined | string)) => Promise<query3Result>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:query3Params) => Promise<(undefined | query3Result)>; 
   /** Returns an array of all matched results. */

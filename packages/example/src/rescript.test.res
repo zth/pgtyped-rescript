@@ -247,13 +247,18 @@ testAsync("`one` works in fail case", async () => {
   expect(result->Option.isSome)->Expect.toBe(false)
 })
 
-testAsync("`expectOne` works in success case", async () => {
-  let result = await getClient()->Books.GetBooksByAuthorName.expectOne({authorName: "Carl Sagan"})
-  expect(result->Result.isOk)->Expect.toBe(true)
+testAsync("`expectOne` works", async () => {
+  let _result = await getClient()->Books.GetBooksByAuthorName.expectOne({authorName: "Carl Sagan"})
+  expect(true)->Expect.toBe(true)
 })
 
 testAsync("`expectOne` works in fail case", async () => {
-  let result =
-    await getClient()->Books.GetBooksByAuthorName.expectOne({authorName: "Bertolt Brecht"})
-  expect(result->Result.isError)->Expect.toBe(true)
+  let result = switch await getClient()->Books.GetBooksByAuthorName.expectOne({
+    authorName: "Bertolt Brecht",
+  }) {
+  | exception Exn.Error(_) => true
+  | _ => false
+  }
+
+  expect(result)->Expect.toBe(true)
 })

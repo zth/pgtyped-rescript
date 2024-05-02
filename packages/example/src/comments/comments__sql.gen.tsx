@@ -66,10 +66,8 @@ export const GetAllComments_many: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsPara
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const GetAllComments_one: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsParams) => Promise<(undefined | getAllCommentsResult)> = comments__sqlJS.GetAllComments.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const GetAllComments_expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsParams, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: getAllCommentsResult }
-  | { TAG: "Error"; _0: string }> = comments__sqlJS.GetAllComments.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const GetAllComments_expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsParams, errorMessage:(undefined | string)) => Promise<getAllCommentsResult> = comments__sqlJS.GetAllComments.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const GetAllComments_execute: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsParams) => Promise<void> = comments__sqlJS.GetAllComments.execute as any;
@@ -82,10 +80,8 @@ export const GetAllCommentsByIds_many: (_1:PgTyped_Pg_Client_t, _2:getAllComment
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const GetAllCommentsByIds_one: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsByIdsParams) => Promise<(undefined | getAllCommentsByIdsResult)> = comments__sqlJS.GetAllCommentsByIds.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const GetAllCommentsByIds_expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsByIdsParams, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: getAllCommentsByIdsResult }
-  | { TAG: "Error"; _0: string }> = comments__sqlJS.GetAllCommentsByIds.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const GetAllCommentsByIds_expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsByIdsParams, errorMessage:(undefined | string)) => Promise<getAllCommentsByIdsResult> = comments__sqlJS.GetAllCommentsByIds.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const GetAllCommentsByIds_execute: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsByIdsParams) => Promise<void> = comments__sqlJS.GetAllCommentsByIds.execute as any;
@@ -98,10 +94,8 @@ export const InsertComment_many: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const InsertComment_one: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams) => Promise<(undefined | insertCommentResult)> = comments__sqlJS.InsertComment.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const InsertComment_expectOne: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: insertCommentResult }
-  | { TAG: "Error"; _0: string }> = comments__sqlJS.InsertComment.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const InsertComment_expectOne: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams, errorMessage:(undefined | string)) => Promise<insertCommentResult> = comments__sqlJS.InsertComment.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const InsertComment_execute: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams) => Promise<void> = comments__sqlJS.InsertComment.execute as any;
@@ -114,10 +108,8 @@ export const SelectExistsTest_many: (_1:PgTyped_Pg_Client_t, _2:selectExistsTest
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
 export const SelectExistsTest_one: (_1:PgTyped_Pg_Client_t, _2:selectExistsTestParams) => Promise<(undefined | selectExistsTestResult)> = comments__sqlJS.SelectExistsTest.one as any;
 
-/** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const SelectExistsTest_expectOne: (_1:PgTyped_Pg_Client_t, _2:selectExistsTestParams, errorMessage:(undefined | string)) => Promise<
-    { TAG: "Ok"; _0: selectExistsTestResult }
-  | { TAG: "Error"; _0: string }> = comments__sqlJS.SelectExistsTest.expectOne as any;
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const SelectExistsTest_expectOne: (_1:PgTyped_Pg_Client_t, _2:selectExistsTestParams, errorMessage:(undefined | string)) => Promise<selectExistsTestResult> = comments__sqlJS.SelectExistsTest.expectOne as any;
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const SelectExistsTest_execute: (_1:PgTyped_Pg_Client_t, _2:selectExistsTestParams) => Promise<void> = comments__sqlJS.SelectExistsTest.execute as any;
@@ -125,16 +117,8 @@ export const SelectExistsTest_execute: (_1:PgTyped_Pg_Client_t, _2:selectExistsT
 export const selectExistsTest: (params:selectExistsTestParams, client:PgTyped_Pg_Client_t) => Promise<selectExistsTestResult[]> = comments__sqlJS.selectExistsTest as any;
 
 export const SelectExistsTest: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:selectExistsTestParams, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: selectExistsTestResult
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:selectExistsTestParams, errorMessage:(undefined | string)) => Promise<selectExistsTestResult>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:selectExistsTestParams) => Promise<(undefined | selectExistsTestResult)>; 
   /** Returns an array of all matched results. */
@@ -144,16 +128,8 @@ export const SelectExistsTest: {
 } = comments__sqlJS.SelectExistsTest as any;
 
 export const GetAllComments: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsParams, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: getAllCommentsResult
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsParams, errorMessage:(undefined | string)) => Promise<getAllCommentsResult>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsParams) => Promise<(undefined | getAllCommentsResult)>; 
   /** Returns an array of all matched results. */
@@ -163,16 +139,8 @@ export const GetAllComments: {
 } = comments__sqlJS.GetAllComments as any;
 
 export const GetAllCommentsByIds: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsByIdsParams, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: getAllCommentsByIdsResult
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsByIdsParams, errorMessage:(undefined | string)) => Promise<getAllCommentsByIdsResult>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsByIdsParams) => Promise<(undefined | getAllCommentsByIdsResult)>; 
   /** Returns an array of all matched results. */
@@ -182,16 +150,8 @@ export const GetAllCommentsByIds: {
 } = comments__sqlJS.GetAllCommentsByIds as any;
 
 export const InsertComment: {
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  expectOne: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams, errorMessage:(undefined | string)) => Promise<
-    {
-    TAG: "Ok"; 
-    _0: insertCommentResult
-  }
-  | {
-    TAG: "Error"; 
-    _0: string
-  }>; 
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams, errorMessage:(undefined | string)) => Promise<insertCommentResult>; 
   /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
   one: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams) => Promise<(undefined | insertCommentResult)>; 
   /** Returns an array of all matched results. */
