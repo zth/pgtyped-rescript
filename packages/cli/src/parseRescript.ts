@@ -28,6 +28,8 @@ export function parseCode(
       .toString(),
   );
 
+  content.reverse();
+
   const queries: Array<string> = [];
 
   content.forEach((v) => {
