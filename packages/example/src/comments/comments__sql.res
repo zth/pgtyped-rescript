@@ -42,13 +42,13 @@ module GetAllComments: {
   @gentype
   let one: (PgTyped.Pg.Client.t, getAllCommentsParams) => promise<option<getAllCommentsResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     getAllCommentsParams,
     ~errorMessage: string=?
-  ) => promise<result<getAllCommentsResult, string>>
+  ) => promise<getAllCommentsResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -69,8 +69,8 @@ module GetAllComments: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -124,13 +124,13 @@ module GetAllCommentsByIds: {
   @gentype
   let one: (PgTyped.Pg.Client.t, getAllCommentsByIdsParams) => promise<option<getAllCommentsByIdsResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     getAllCommentsByIdsParams,
     ~errorMessage: string=?
-  ) => promise<result<getAllCommentsByIdsResult, string>>
+  ) => promise<getAllCommentsByIdsResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -151,8 +151,8 @@ module GetAllCommentsByIds: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -213,13 +213,13 @@ module InsertComment: {
   @gentype
   let one: (PgTyped.Pg.Client.t, insertCommentParams) => promise<option<insertCommentResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     insertCommentParams,
     ~errorMessage: string=?
-  ) => promise<result<insertCommentResult, string>>
+  ) => promise<insertCommentResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -240,8 +240,8 @@ module InsertComment: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -290,13 +290,13 @@ module SelectExistsTest: {
   @gentype
   let one: (PgTyped.Pg.Client.t, selectExistsTestParams) => promise<option<selectExistsTestResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     selectExistsTestParams,
     ~errorMessage: string=?
-  ) => promise<result<selectExistsTestResult, string>>
+  ) => promise<selectExistsTestResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -317,8 +317,8 @@ module SelectExistsTest: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype

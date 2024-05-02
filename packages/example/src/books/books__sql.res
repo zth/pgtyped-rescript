@@ -63,13 +63,13 @@ module FindBookById: {
   @gentype
   let one: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<option<findBookByIdResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     findBookByIdParams,
     ~errorMessage: string=?
-  ) => promise<result<findBookByIdResult, string>>
+  ) => promise<findBookByIdResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -90,8 +90,8 @@ module FindBookById: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -148,13 +148,13 @@ module FindBookByCategory: {
   @gentype
   let one: (PgTyped.Pg.Client.t, findBookByCategoryParams) => promise<option<findBookByCategoryResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     findBookByCategoryParams,
     ~errorMessage: string=?
-  ) => promise<result<findBookByCategoryResult, string>>
+  ) => promise<findBookByCategoryResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -175,8 +175,8 @@ module FindBookByCategory: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -231,13 +231,13 @@ module FindBookNameOrRank: {
   @gentype
   let one: (PgTyped.Pg.Client.t, findBookNameOrRankParams) => promise<option<findBookNameOrRankResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     findBookNameOrRankParams,
     ~errorMessage: string=?
-  ) => promise<result<findBookNameOrRankResult, string>>
+  ) => promise<findBookNameOrRankResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -258,8 +258,8 @@ module FindBookNameOrRank: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -314,13 +314,13 @@ module FindBookUnicode: {
   @gentype
   let one: (PgTyped.Pg.Client.t, findBookUnicodeParams) => promise<option<findBookUnicodeResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     findBookUnicodeParams,
     ~errorMessage: string=?
-  ) => promise<result<findBookUnicodeResult, string>>
+  ) => promise<findBookUnicodeResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -341,8 +341,8 @@ module FindBookUnicode: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -401,13 +401,13 @@ module InsertBooks: {
   @gentype
   let one: (PgTyped.Pg.Client.t, insertBooksParams) => promise<option<insertBooksResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     insertBooksParams,
     ~errorMessage: string=?
-  ) => promise<result<insertBooksResult, string>>
+  ) => promise<insertBooksResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -428,8 +428,8 @@ module InsertBooks: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -484,13 +484,13 @@ module InsertBook: {
   @gentype
   let one: (PgTyped.Pg.Client.t, insertBookParams) => promise<option<insertBookResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     insertBookParams,
     ~errorMessage: string=?
-  ) => promise<result<insertBookResult, string>>
+  ) => promise<insertBookResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -511,8 +511,8 @@ module InsertBook: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -570,13 +570,13 @@ module UpdateBooksCustom: {
   @gentype
   let one: (PgTyped.Pg.Client.t, updateBooksCustomParams) => promise<option<updateBooksCustomResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     updateBooksCustomParams,
     ~errorMessage: string=?
-  ) => promise<result<updateBooksCustomResult, string>>
+  ) => promise<updateBooksCustomResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -597,8 +597,8 @@ module UpdateBooksCustom: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -654,13 +654,13 @@ module UpdateBooks: {
   @gentype
   let one: (PgTyped.Pg.Client.t, updateBooksParams) => promise<option<updateBooksResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     updateBooksParams,
     ~errorMessage: string=?
-  ) => promise<result<updateBooksResult, string>>
+  ) => promise<updateBooksResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -681,8 +681,8 @@ module UpdateBooks: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -737,13 +737,13 @@ module UpdateBooksRankNotNull: {
   @gentype
   let one: (PgTyped.Pg.Client.t, updateBooksRankNotNullParams) => promise<option<updateBooksRankNotNullResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     updateBooksRankNotNullParams,
     ~errorMessage: string=?
-  ) => promise<result<updateBooksRankNotNullResult, string>>
+  ) => promise<updateBooksRankNotNullResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -764,8 +764,8 @@ module UpdateBooksRankNotNull: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -824,13 +824,13 @@ module GetBooksByAuthorName: {
   @gentype
   let one: (PgTyped.Pg.Client.t, getBooksByAuthorNameParams) => promise<option<getBooksByAuthorNameResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     getBooksByAuthorNameParams,
     ~errorMessage: string=?
-  ) => promise<result<getBooksByAuthorNameResult, string>>
+  ) => promise<getBooksByAuthorNameResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -851,8 +851,8 @@ module GetBooksByAuthorName: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -904,13 +904,13 @@ module AggregateEmailsAndTest: {
   @gentype
   let one: (PgTyped.Pg.Client.t, aggregateEmailsAndTestParams) => promise<option<aggregateEmailsAndTestResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     aggregateEmailsAndTestParams,
     ~errorMessage: string=?
-  ) => promise<result<aggregateEmailsAndTestResult, string>>
+  ) => promise<aggregateEmailsAndTestResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -931,8 +931,8 @@ module AggregateEmailsAndTest: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -982,13 +982,13 @@ module GetBooks: {
   @gentype
   let one: (PgTyped.Pg.Client.t, getBooksParams) => promise<option<getBooksResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     getBooksParams,
     ~errorMessage: string=?
-  ) => promise<result<getBooksResult, string>>
+  ) => promise<getBooksResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -1009,8 +1009,8 @@ module GetBooks: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -1059,13 +1059,13 @@ module CountBooks: {
   @gentype
   let one: (PgTyped.Pg.Client.t, countBooksParams) => promise<option<countBooksResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     countBooksParams,
     ~errorMessage: string=?
-  ) => promise<result<countBooksResult, string>>
+  ) => promise<countBooksResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -1086,8 +1086,8 @@ module CountBooks: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -1137,13 +1137,13 @@ module GetBookCountries: {
   @gentype
   let one: (PgTyped.Pg.Client.t, getBookCountriesParams) => promise<option<getBookCountriesResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     getBookCountriesParams,
     ~errorMessage: string=?
-  ) => promise<result<getBookCountriesResult, string>>
+  ) => promise<getBookCountriesResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -1164,8 +1164,8 @@ module GetBookCountries: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype

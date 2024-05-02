@@ -49,13 +49,13 @@ module SendNotifications: {
   @gentype
   let one: (PgTyped.Pg.Client.t, sendNotificationsParams) => promise<option<sendNotificationsResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     sendNotificationsParams,
     ~errorMessage: string=?
-  ) => promise<result<sendNotificationsResult, string>>
+  ) => promise<sendNotificationsResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -76,8 +76,8 @@ module SendNotifications: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -136,13 +136,13 @@ module GetNotifications: {
   @gentype
   let one: (PgTyped.Pg.Client.t, getNotificationsParams) => promise<option<getNotificationsResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     getNotificationsParams,
     ~errorMessage: string=?
-  ) => promise<result<getNotificationsResult, string>>
+  ) => promise<getNotificationsResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -163,8 +163,8 @@ module GetNotifications: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
@@ -220,13 +220,13 @@ module ThresholdFrogs: {
   @gentype
   let one: (PgTyped.Pg.Client.t, thresholdFrogsParams) => promise<option<thresholdFrogsResult>>
   
-  /** Returns exactly 1 result. Returns `Error` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     thresholdFrogsParams,
     ~errorMessage: string=?
-  ) => promise<result<thresholdFrogsResult, string>>
+  ) => promise<thresholdFrogsResult>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -247,8 +247,8 @@ module ThresholdFrogs: {
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype

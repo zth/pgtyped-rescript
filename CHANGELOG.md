@@ -4,6 +4,7 @@
 - BREAKING CHANGE: `Null.t` is no longer emitted, all `null` values are autoconverted to `option`. This gives a much more idiomatic ReScript experience.
 - Emit actually runnable query in module comment for each query, instead of the original non-valid SQL query.
 - Relax requirement on providing query via `@name` comment.
+- Change `expectOne` to panic if not finding a single item.
 
 # 2.4.0
 

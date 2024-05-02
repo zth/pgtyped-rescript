@@ -397,13 +397,13 @@ module ${
     typeDec.query.name
   }Params) => promise<option<${typeDec.query.name}Result>>
   
-  /** Returns exactly 1 result. Returns \`Error\` (with an optionally provided \`errorMessage\`) if more or less than exactly 1 result is returned. */
+  /** Returns exactly 1 result. Raises \`Exn.t\` (with an optionally provided \`errorMessage\`) if more or less than exactly 1 result is returned. */
   @gentype
   let expectOne: (
     PgTyped.Pg.Client.t,
     ${typeDec.query.name}Params,
     ~errorMessage: string=?
-  ) => promise<result<${typeDec.query.name}Result, string>>
+  ) => promise<${typeDec.query.name}Result>
 
   /** Executes the query, but ignores whatever is returned by it. */
   @gentype
@@ -430,8 +430,8 @@ module ${
 
   @gentype
   let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => Ok(item)
-  | _ => Error(errorMessage->Option.getOr("More or less than one item was returned"))
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
   }
 
   @gentype
