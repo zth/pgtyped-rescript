@@ -1,5 +1,7 @@
 # main
 
+# 2.5.0
+
 - Autoinsert trailing commas in embedded SQL blocks.
 - BREAKING CHANGE: `Null.t` is no longer emitted, all `null` values are autoconverted to `option`. This gives a much more idiomatic ReScript experience.
 - Emit actually runnable query in module comment for each query, instead of the original non-valid SQL query.

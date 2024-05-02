@@ -1,6 +1,6 @@
 {
   "name": "pgtyped-rescript",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -50,7 +50,7 @@
     "io-ts-reporters": "^2.0.1",
     "nunjucks": "3.2.4",
     "pascal-case": "^3.1.1",
-    "pgtyped-rescript-query": "^2.3.0",
+    "pgtyped-rescript-query": "^2.4.0",
     "piscina": "^4.0.0",
     "tinypool": "^0.7.0",
     "ts-parse-database-url": "^1.0.3",
