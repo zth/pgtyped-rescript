@@ -48,7 +48,7 @@ Please refer to the `pgtyped` docs for all configuration options.
 
 `pgtyped-rescript` supports writing queries in separate SQL files, as well as embedded directly in ReScript source code. Below details the separate SQL files approach:
 
-Create a SQL file anywhere in `src`. We call this one `books.sql`:
+Create a SQL file anywhere in `src`. We call this one `books.sql`. Add your queries, together with `@name` comments naming them uniquely within the current file:
 
 ```sql
 /* @name findBookById */
@@ -90,13 +90,14 @@ Optionally, you can write SQL directly in your ReScript code and have a seamless
 
 ```rescript
 let query = %sql.one(`
-  /* @name findBookById */
   SELECT * FROM books WHERE id = :id!;
 `)
 
 let res = await client->query({id: 1})
 Console.log(res)
 ```
+
+Notice that with the `%sql` tags, **there's no requirment to name your queries**. You can still name them if you want, but you don't have to.
 
 In order for this mode to work, you need one more thing - configure the `rescript-embed-lang` PPX in `rescript.json`:
 
