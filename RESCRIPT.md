@@ -90,14 +90,14 @@ Optionally, you can write SQL directly in your ReScript code and have a seamless
 
 ```rescript
 let query = %sql.one(`
-  SELECT * FROM books WHERE id = :id!;
+  SELECT * FROM books WHERE id = :id!
 `)
 
 let res = await client->query({id: 1})
 Console.log(res)
 ```
 
-Notice that with the `%sql` tags, **there's no requirment to name your queries**. You can still name them if you want, but you don't have to.
+Notice that with the `%sql` tags, **there's no requirement to name your queries**. You can still name them if you want, but you don't have to.
 
 In order for this mode to work, you need one more thing - configure the `rescript-embed-lang` PPX in `rescript.json`:
 
@@ -118,21 +118,4 @@ The package comes with minimal bindings to be able to set up a `pg` client. Plea
 @send external end: PgTyped.Pg.Client.t => promise<unit> = "end"
 
 await client->end
-```
-
-## Future
-
-Here are a few loose thoughts around what we could do to improve things even more.
-
-### SQL-in-ReScript version
-
-Co-locate SQL directly in ReScript files. This could look something like:
-
-```rescript
-let findBookById = %sql.one(`
-  /* @name findBookById */
-  SELECT * FROM books WHERE id = :id!;
-`)
-
-let res = await client->findBookById({id: 1})
 ```
