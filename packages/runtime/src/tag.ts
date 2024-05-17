@@ -8,8 +8,8 @@ export interface ICursor<T> {
 }
 
 export interface IDatabaseConnection {
-  query: (query: string, bindings: any[]) => Promise<{ rows: any[] }>;
-  stream?: (query: string, bindings: any[]) => ICursor<any[]>;
+  query: (config: { text: string; values: any[] }) => Promise<{ rows: any[] }>;
+  stream?: (config: { text: string; values: any[] }) => ICursor<any[]>;
 }
 
 /** Check for column modifier suffixes (exclamation and question marks). */
@@ -55,7 +55,10 @@ export class TaggedQuery<TTypePair extends { params: any; result: any }> {
         this.query,
         params as any,
       );
-      const result = await connection.query(processedQuery, bindings);
+      const result = await connection.query({
+        text: processedQuery,
+        values: bindings,
+      });
       return mapQueryResultRows(result.rows);
     };
     this.stream = (params, connection) => {
@@ -65,7 +68,10 @@ export class TaggedQuery<TTypePair extends { params: any; result: any }> {
       );
       if (connection.stream == null)
         throw new Error("Connection doesn't support streaming.");
-      const cursor = connection.stream(processedQuery, bindings);
+      const cursor = connection.stream({
+        text: processedQuery,
+        values: bindings,
+      });
       return {
         async read(rowCount: number) {
           const rows = await cursor.read(rowCount);
@@ -112,7 +118,10 @@ export class PreparedQuery<TParamType, TResultType> {
         this.queryIR,
         params as any,
       );
-      const result = await connection.query(processedQuery, bindings);
+      const result = await connection.query({
+        text: processedQuery,
+        values: bindings,
+      });
       return mapQueryResultRows(result.rows);
     };
     this.stream = (params, connection) => {
@@ -122,7 +131,10 @@ export class PreparedQuery<TParamType, TResultType> {
       );
       if (connection.stream == null)
         throw new Error("Connection doesn't support streaming.");
-      const cursor = connection.stream(processedQuery, bindings);
+      const cursor = connection.stream({
+        text: processedQuery,
+        values: bindings,
+      });
       return {
         async read(rowCount: number) {
           const rows = await cursor.read(rowCount);
