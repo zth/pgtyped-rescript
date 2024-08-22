@@ -1,5 +1,7 @@
 # main
 
+- Improve `pg` bindings.
+
 # 2.5.0
 
 - Autoinsert trailing commas in embedded SQL blocks.
