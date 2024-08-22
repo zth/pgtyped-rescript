@@ -60,7 +60,7 @@ let client = ref(None)
 let getClient = () => client.contents->Option.getExn
 
 beforeAll(async () => {
-  let dbClient = Pg.Client.make(dbConfig)
+  let dbClient = Pg.Client.make(Config(dbConfig))
   client := Some(dbClient)
   await dbClient->Pg.Client.connect
 })

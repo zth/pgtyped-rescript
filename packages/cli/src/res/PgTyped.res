@@ -24,7 +24,7 @@ module Pg = {
       /** default process.env.PGUSER || process.env.USER*/ user?: string,
       /**default process.env.PGPASSWORD*/ password?: string,
       /** default process.env.PGHOST*/ host?: string,
-      /** default process.env.PGPORT*/ port?: float,
+      /** default process.env.PGPORT*/ port?: int,
       /** default process.env.PGDATABASE || user*/ database?: string,
       /** e.g. postgres://user:password@host:5432/database*/ connectionString?: string,
       /** passed directly to node.TLSSocket, supports all tls.connect options*/ ssl?: unknown,
