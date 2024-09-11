@@ -1,5 +1,7 @@
 # main
 
+# 2.6.0
+
 - Improve `pg` bindings.
 - Upgrade `@rescript/core` to `1.6.0`.
 

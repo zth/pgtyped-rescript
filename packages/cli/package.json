@@ -1,6 +1,6 @@
 {
   "name": "pgtyped-rescript",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -38,7 +38,8 @@
   "dependencies": {
     "@pgtyped/parser": "^2.1.0",
     "@pgtyped/wire": "^2.2.0",
-    "@rescript/tools": "^0.6.2",
+    "@rescript/tools": "0.6.4",
+    "@rescript/core": "1.6.0",
     "camel-case": "^4.1.1",
     "chalk": "^4.0.0",
     "chokidar": "^3.3.1",
@@ -57,7 +58,6 @@
     "yargs": "^17.0.1"
   },
   "devDependencies": {
-    "@rescript/core": "1.6.0",
     "@types/debug": "4.1.8",
     "@types/fs-extra": "11.0.1",
     "@types/glob": "8.1.0",
