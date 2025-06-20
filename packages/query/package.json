@@ -35,7 +35,8 @@
     "pgtyped-rescript-runtime": "^2.2.0",
     "@pgtyped/wire": "^2.2.0",
     "chalk": "^4.1.0",
-    "debug": "^4.1.1"
+    "debug": "^4.1.1",
+    "pgsql-ast-parser": "^12.0.1"
   },
   "devDependencies": {
     "@types/chalk": "^2.2.0",

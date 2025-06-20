@@ -34,7 +34,10 @@ CREATE TABLE books (
   author_id INTEGER REFERENCES authors,
   categories category[],
   meta jsonb[],
-  big_int bigint
+  big_int bigint,
+  some_string_enum text check (some_string_enum in ('FIRST', 'second', 'Third', 'fourth')),
+  some_int_enum integer check (some_int_enum in (1, 2, 3, 4)),
+  some_float_enum float check (some_float_enum in (1.5, 2.5, 3.5, 4.5))
 );
 
 CREATE TABLE book_comments (

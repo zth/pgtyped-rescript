@@ -36,6 +36,9 @@ type findBookByIdResult = {
   meta: option<arrayJSON_t>,
   name: option<string>,
   rank: option<int>,
+  some_float_enum: option<float>,
+  some_int_enum: option<[#1 | #2 | #3 | #4]>,
+  some_string_enum: option<[#"FIRST" | #"second" | #"Third" | #"fourth"]>,
 }
 
 /** 'FindBookById' query type */
@@ -121,6 +124,9 @@ type findBookByCategoryResult = {
   meta: option<arrayJSON_t>,
   name: option<string>,
   rank: option<int>,
+  some_float_enum: option<float>,
+  some_int_enum: option<[#1 | #2 | #3 | #4]>,
+  some_string_enum: option<[#"FIRST" | #"second" | #"Third" | #"fourth"]>,
 }
 
 /** 'FindBookByCategory' query type */
@@ -287,6 +293,9 @@ type findBookUnicodeResult = {
   meta: option<arrayJSON_t>,
   name: option<string>,
   rank: option<int>,
+  some_float_enum: option<float>,
+  some_int_enum: option<[#1 | #2 | #3 | #4]>,
+  some_string_enum: option<[#"FIRST" | #"second" | #"Third" | #"fourth"]>,
 }
 
 /** 'FindBookUnicode' query type */
@@ -795,6 +804,9 @@ type getBooksByAuthorNameResult = {
   meta: option<arrayJSON_t>,
   name: option<string>,
   rank: option<int>,
+  some_float_enum: option<float>,
+  some_int_enum: option<[#1 | #2 | #3 | #4]>,
+  some_string_enum: option<[#"FIRST" | #"second" | #"Third" | #"fourth"]>,
 }
 
 /** 'GetBooksByAuthorName' query type */

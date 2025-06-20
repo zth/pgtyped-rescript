@@ -12,6 +12,7 @@ import {
   createInitialSASLResponse,
 } from './sasl-helpers.js';
 import { DatabaseTypeKind, isEnum, MappableType } from './type.js';
+import { parse, astVisitor } from 'pgsql-ast-parser';
 
 const debugQuery = debugBase('client:query');
 
@@ -167,6 +168,7 @@ export interface IQueryTypes {
     type: MappableType;
     nullable?: boolean;
     comment?: string;
+    checkValues?: ConstraintValue[];
   }>;
 }
 
@@ -327,6 +329,48 @@ export function reduceTypeRows(
   );
 }
 
+async function getCheckConstraints(
+  fields: TypeField[],
+  queue: AsyncQueue,
+): Promise<ColumnCheck[]> {
+  const columnFields = fields.filter((f) => f.columnAttrNumber > 0);
+  if (columnFields.length === 0) {
+    return [];
+  }
+
+  const tableOids = Array.from(
+    new Set(columnFields.map((f) => f.tableOID)),
+  ).join(',');
+
+  let rows: string[][] = [];
+
+  try {
+    rows = await runQuery(
+      `
+      SELECT 
+        conrelid, unnest(conkey) AS attnum, 
+        pg_get_expr(conbin, conrelid)
+     FROM 
+        pg_constraint 
+     WHERE 
+        contype='c' AND 
+        conrelid IN (${tableOids}) AND 
+        conname NOT LIKE 'pg_%%';`,
+      queue,
+    );
+  } catch (e) {
+    console.error('CONSTRAINT ERROR', e);
+  }
+
+  return rows
+    .map(([relid, attnum, def]) => ({
+      tableOID: Number(relid),
+      columnAttrNumber: Number(attnum),
+      values: parseCheckAllowedValues(def) ?? [],
+    }))
+    .filter((r) => r.values.length > 0);
+}
+
 // TODO: self-host
 async function runTypesCatalogQuery(
   typeOIDs: number[],
@@ -358,6 +402,57 @@ OR pt.oid IN (SELECT typelem FROM pg_type ptn WHERE ptn.oid IN (${concatenatedTy
       typeCategory,
     }),
   );
+}
+
+interface ColumnCheck {
+  tableOID: number;
+  columnAttrNumber: number;
+  values: ConstraintValue[];
+}
+
+export type ConstraintValue =
+  | { type: 'string'; value: string }
+  | { type: 'integer'; value: number }
+  | { type: 'float'; value: number };
+
+export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
+  try {
+    // Wrap the constraint expression in a valid SQL statement context
+    // so the AST parser can parse it properly
+    const wrappedQuery = `SELECT NULL WHERE ${def}`;
+    const ast = parse(wrappedQuery);
+    const values: ConstraintValue[] = [];
+
+    const visitor = astVisitor((map) => ({
+      constant: (node) => {
+        if (node.type === 'string' && 'value' in node) {
+          values.push({ type: 'string', value: node.value });
+          /*
+        Can't represent floats as polyvariants in ReScript, so ignore for now. 
+        Unboxed variants would support this though, but we'd need a global schema
+        file probably.
+        
+        } else if (node.type === 'numeric' && 'value' in node) {
+          values.push({ type: 'float', value: node.value });*/
+        } else if (node.type === 'integer' && 'value' in node) {
+          values.push({ type: 'integer', value: node.value });
+        }
+        map.super().constant(node);
+      },
+    }));
+
+    // Only care about the WHERE clause
+    for (const statement of ast) {
+      if (statement.type === 'select' && statement.where) {
+        visitor.expr(statement.where);
+      }
+    }
+
+    return values.length > 0 ? values : null;
+  } catch (error) {
+    console.warn('Failed to parse constraint with AST parser:', error);
+    return null;
+  }
 }
 
 interface ColumnComment {
@@ -410,6 +505,7 @@ export async function getTypes(
   const usedTypesOIDs = paramTypeOIDs.concat(returnTypesOIDs);
   const typeRows = await runTypesCatalogQuery(usedTypesOIDs, queue);
   const commentRows = await getComments(fields, queue);
+  const checkRows = await getCheckConstraints(fields, queue);
   const typeMap = reduceTypeRows(typeRows);
 
   const attrMatcher = ({
@@ -452,10 +548,15 @@ export async function getTypes(
   for (const c of commentRows) {
     commentMap[`${c.tableOID}:${c.columnAttrNumber}`] = c.comment;
   }
+  const checkMap: { [attid: string]: ConstraintValue[] } = {};
+  for (const chk of checkRows) {
+    checkMap[`${chk.tableOID}:${chk.columnAttrNumber}`] = chk.values;
+  }
 
   const returnTypes = fields.map((f) => ({
     ...attrMap[getAttid(f)],
     ...(commentMap[getAttid(f)] ? { comment: commentMap[getAttid(f)] } : {}),
+    ...(checkMap[getAttid(f)] ? { checkValues: checkMap[getAttid(f)] } : {}),
     returnName: f.name,
     type: typeMap[f.typeOID],
   }));

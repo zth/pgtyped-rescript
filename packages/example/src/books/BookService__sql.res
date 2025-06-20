@@ -14,108 +14,21 @@ type arrayJSON_t = array<JSON.t>
 @gentype
 type categoryArray = array<category>
 
-/** 'FindBookById' parameters type */
 @gentype
-type findBookByIdParams = {
-  id?: int,
+type query1Params_notification = {
+  payload?: JSON.t,
+  user_id?: int,
+  @as("type") type_?: notification_type
 }
-
-/** 'FindBookById' return type */
-@gentype
-type findBookByIdResult = {
-  author_id: option<int>,
-  big_int: option<bigint>,
-  categories: option<categoryArray>,
-  id: int,
-  meta: option<arrayJSON_t>,
-  name: option<string>,
-  rank: option<int>,
-}
-
-/** 'FindBookById' query type */
-@gentype
-type findBookByIdQuery = {
-  params: findBookByIdParams,
-  result: findBookByIdResult,
-}
-
-%%private(let findBookByIdIR: IR.t = %raw(`{"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"SELECT * FROM books WHERE id = :id"}`))
-
-/**
- Runnable query:
- ```sql
-SELECT * FROM books WHERE id = $1
- ```
-
- */
-@gentype
-module FindBookById: {
-  /** Returns an array of all matched results. */
-  @gentype
-  let many: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<array<findBookByIdResult>>
-  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
-  @gentype
-  let one: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<option<findBookByIdResult>>
-  
-  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-  @gentype
-  let expectOne: (
-    PgTyped.Pg.Client.t,
-    findBookByIdParams,
-    ~errorMessage: string=?
-  ) => promise<findBookByIdResult>
-
-  /** Executes the query, but ignores whatever is returned by it. */
-  @gentype
-  let execute: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<unit>
-} = {
-  @module("pgtyped-rescript-runtime") @new external findBookById: IR.t => PreparedStatement.t<findBookByIdParams, findBookByIdResult> = "PreparedQuery";
-  let query = findBookById(findBookByIdIR)
-  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
-
-  @gentype
-  let many = (client, params) => query(params, ~client)
-
-  @gentype
-  let one = async (client, params) => switch await query(params, ~client) {
-  | [item] => Some(item)
-  | _ => None
-  }
-
-  @gentype
-  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
-  | [item] => item
-  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
-  }
-
-  @gentype
-  let execute = async (client, params) => {
-    let _ = await query(params, ~client)
-  }
-}
-
-@gentype
-@deprecated("Use 'FindBookById.many' directly instead")
-let findBookById = (params, ~client) => FindBookById.many(client, params)
-
-
 /** 'Query1' parameters type */
 @gentype
 type query1Params = {
-  authorName: string,
+  notification: query1Params_notification,
 }
 
 /** 'Query1' return type */
 @gentype
-type query1Result = {
-  author_id: option<int>,
-  big_int: option<bigint>,
-  categories: option<categoryArray>,
-  id: int,
-  meta: option<arrayJSON_t>,
-  name: option<string>,
-  rank: option<int>,
-}
+type query1Result = unit
 
 /** 'Query1' query type */
 @gentype
@@ -124,14 +37,12 @@ type query1Query = {
   result: query1Result,
 }
 
-%%private(let query1IR: IR.t = %raw(`{"usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":129}]}],"statement":"SELECT b.* FROM books b\n    INNER JOIN authors a ON a.id = b.author_id\n    WHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
+%%private(let query1IR: IR.t = %raw(`{"usedParamSet":{"notification":true},"params":[{"name":"notification","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"payload","required":false},{"name":"user_id","required":false},{"name":"type","required":false}]},"locs":[{"a":58,"b":70}]}],"statement":"INSERT INTO notifications (payload, user_id, type) VALUES :notification"}`))
 
 /**
  Runnable query:
  ```sql
-SELECT b.* FROM books b
-    INNER JOIN authors a ON a.id = b.author_id
-    WHERE a.first_name || ' ' || a.last_name = $1
+INSERT INTO notifications (payload, user_id, type) VALUES ($1,$2,$3)
  ```
 
  */
@@ -269,21 +180,26 @@ module Query2: {
 let query2 = (params, ~client) => Query2.many(client, params)
 
 
-@gentype
-type query3Params_notification = {
-  payload?: JSON.t,
-  user_id?: int,
-  @as("type") type_?: notification_type
-}
 /** 'Query3' parameters type */
 @gentype
 type query3Params = {
-  notification: query3Params_notification,
+  authorName: string,
 }
 
 /** 'Query3' return type */
 @gentype
-type query3Result = unit
+type query3Result = {
+  author_id: option<int>,
+  big_int: option<bigint>,
+  categories: option<categoryArray>,
+  id: int,
+  meta: option<arrayJSON_t>,
+  name: option<string>,
+  rank: option<int>,
+  some_float_enum: option<float>,
+  some_int_enum: option<[#1 | #2 | #3 | #4]>,
+  some_string_enum: option<[#"FIRST" | #"second" | #"Third" | #"fourth"]>,
+}
 
 /** 'Query3' query type */
 @gentype
@@ -292,12 +208,14 @@ type query3Query = {
   result: query3Result,
 }
 
-%%private(let query3IR: IR.t = %raw(`{"usedParamSet":{"notification":true},"params":[{"name":"notification","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"payload","required":false},{"name":"user_id","required":false},{"name":"type","required":false}]},"locs":[{"a":58,"b":70}]}],"statement":"INSERT INTO notifications (payload, user_id, type) VALUES :notification"}`))
+%%private(let query3IR: IR.t = %raw(`{"usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":129}]}],"statement":"SELECT b.* FROM books b\n    INNER JOIN authors a ON a.id = b.author_id\n    WHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
 
 /**
  Runnable query:
  ```sql
-INSERT INTO notifications (payload, user_id, type) VALUES ($1,$2,$3)
+SELECT b.* FROM books b
+    INNER JOIN authors a ON a.id = b.author_id
+    WHERE a.first_name || ' ' || a.last_name = $1
  ```
 
  */
@@ -350,5 +268,93 @@ module Query3: {
 @gentype
 @deprecated("Use 'Query3.many' directly instead")
 let query3 = (params, ~client) => Query3.many(client, params)
+
+
+/** 'FindBookById' parameters type */
+@gentype
+type findBookByIdParams = {
+  id?: int,
+}
+
+/** 'FindBookById' return type */
+@gentype
+type findBookByIdResult = {
+  author_id: option<int>,
+  big_int: option<bigint>,
+  categories: option<categoryArray>,
+  id: int,
+  meta: option<arrayJSON_t>,
+  name: option<string>,
+  rank: option<int>,
+  some_float_enum: option<float>,
+  some_int_enum: option<[#1 | #2 | #3 | #4]>,
+  some_string_enum: option<[#"FIRST" | #"second" | #"Third" | #"fourth"]>,
+}
+
+/** 'FindBookById' query type */
+@gentype
+type findBookByIdQuery = {
+  params: findBookByIdParams,
+  result: findBookByIdResult,
+}
+
+%%private(let findBookByIdIR: IR.t = %raw(`{"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"SELECT * FROM books WHERE id = :id"}`))
+
+/**
+ Runnable query:
+ ```sql
+SELECT * FROM books WHERE id = $1
+ ```
+
+ */
+@gentype
+module FindBookById: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<array<findBookByIdResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<option<findBookByIdResult>>
+  
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    findBookByIdParams,
+    ~errorMessage: string=?
+  ) => promise<findBookByIdResult>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<unit>
+} = {
+  @module("pgtyped-rescript-runtime") @new external findBookById: IR.t => PreparedStatement.t<findBookByIdParams, findBookByIdResult> = "PreparedQuery";
+  let query = findBookById(findBookByIdIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
+
+@gentype
+@deprecated("Use 'FindBookById.many' directly instead")
+let findBookById = (params, ~client) => FindBookById.many(client, params)
 
 
