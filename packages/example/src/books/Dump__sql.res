@@ -12,12 +12,28 @@ type dumpParams = unit
 /** 'Dump' return type */
 @gentype
 type dumpResult = {
+  availability: option<string>,
   big_int: option<bigint>,
+  binding_type: option<[#"Hardcover" | #"Paperback" | #"SPIRAL" | #"loose-leaf"]>,
+  discount_rate: option<float>,
+  edition: option<int>,
+  format: option<[#"hardcover" | #"paperback" | #"ebook" | #"audiobook"]>,
   id: int,
+  is_featured: option<bool>,
+  isbn: option<string>,
+  json_test: option<JSON.t>,
+  language: option<[#"en" | #"es" | #"fr" | #"de"]>,
   meta: option<arrayJSON_t>,
+  page_count: option<[#100 | #200 | #300 | #400 | #500]>,
+  price: option<string>,
+  priority: option<[#1 | #2 | #3 | #4 | #5]>,
+  publication_year: option<int>,
+  rating: option<float>,
   some_float_enum: option<float>,
   some_int_enum: option<[#1 | #2 | #3 | #4]>,
   some_string_enum: option<[#"FIRST" | #"second" | #"Third" | #"fourth"]>,
+  status: option<[#"published" | #"draft" | #"archived"]>,
+  weight_kg: option<float>,
 }
 
 /** 'Dump' query type */

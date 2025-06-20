@@ -12,7 +12,7 @@ import {
   createInitialSASLResponse,
 } from './sasl-helpers.js';
 import { DatabaseTypeKind, isEnum, MappableType } from './type.js';
-import { parse, astVisitor } from 'pgsql-ast-parser';
+import { parse, astVisitor, Expr } from 'pgsql-ast-parser';
 
 const debugQuery = debugBase('client:query');
 
@@ -422,6 +422,7 @@ export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
     const wrappedQuery = `SELECT NULL WHERE ${def}`;
     const ast = parse(wrappedQuery);
     const values: ConstraintValue[] = [];
+    let hadInvalidValue = false;
 
     const visitor = astVisitor((map) => ({
       constant: (node) => {
@@ -436,19 +437,55 @@ export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
           values.push({ type: 'float', value: node.value });*/
         } else if (node.type === 'integer' && 'value' in node) {
           values.push({ type: 'integer', value: node.value });
+        } else {
+          hadInvalidValue = true;
         }
         map.super().constant(node);
       },
     }));
 
-    // Only care about the WHERE clause
-    for (const statement of ast) {
-      if (statement.type === 'select' && statement.where) {
-        visitor.expr(statement.where);
+    let disallowReasons = [];
+
+    const select = ast[0];
+    const where = 'where' in select ? select.where : null;
+
+    if (where != null) {
+      if (
+        where.type === 'binary' &&
+        where.op === '=' &&
+        where.left.type === 'ref'
+      ) {
+        // TODO: Match on the ref type so it matches the column name?
+        const rhs = where.right;
+        let targetNode: Expr | null = null;
+
+        if (rhs.type === 'call' && rhs.function.name === 'any') {
+          // Check args
+          if (rhs.args.length === 1) {
+            targetNode = rhs.args[0];
+          } else {
+            disallowReasons.push('ANY with multiple args');
+          }
+        } else {
+          disallowReasons.push('NOT ANY');
+        }
+
+        if (targetNode != null) {
+          visitor.expr(targetNode);
+        }
+      } else {
+        disallowReasons.push('Check constraint too complex');
       }
     }
 
-    return values.length > 0 ? values : null;
+    if (disallowReasons.length > 0) {
+      /*console.warn('NOT ALLOWED', {
+        disallowReasons,
+        wrappedQuery,
+      });*/
+    }
+
+    return values.length > 0 && !hadInvalidValue ? values : null;
   } catch (error) {
     console.warn('Failed to parse constraint with AST parser:', error);
     return null;
