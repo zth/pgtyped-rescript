@@ -4,7 +4,7 @@ services:
 
   db:
     image: postgres:15-alpine
-    platform: linux/arm64
+    platform: ${DOCKER_PLATFORM:-linux/arm64}
     restart: always
     container_name: pgtyped_db
     environment:
@@ -20,7 +20,7 @@ services:
       context: .
       args:
         NODE_IMAGE: "node:${NODE_VERSION:-18}-alpine"
-    platform: linux/arm64
+    platform: ${DOCKER_PLATFORM:-linux/arm64}
     container_name: pgtyped_build
     environment:
       PGHOST: db
