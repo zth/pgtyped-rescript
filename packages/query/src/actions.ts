@@ -358,8 +358,8 @@ async function getCheckConstraints(
         conname NOT LIKE 'pg_%%';`,
       queue,
     );
-  } catch (e) {
-    console.error('CONSTRAINT ERROR', e);
+  } catch {
+    // Ignore
   }
 
   return rows
@@ -444,7 +444,7 @@ export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
       },
     }));
 
-    let disallowReasons = [];
+    const disallowReasons: string[] = [];
 
     const select = ast[0];
     const where = 'where' in select ? select.where : null;
@@ -486,8 +486,8 @@ export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
     }
 
     return values.length > 0 && !hadInvalidValue ? values : null;
-  } catch (error) {
-    console.warn('Failed to parse constraint with AST parser:', error);
+  } catch {
+    // Ignore
     return null;
   }
 }
