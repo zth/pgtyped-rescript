@@ -9,9 +9,6 @@ type category = [#"novel" | #"science-fiction" | #"thriller"]
 type notification_type = [#"deadline" | #"notification" | #"reminder"]
 
 @gentype
-type arrayJSON_t = array<JSON.t>
-
-@gentype
 type categoryArray = array<category>
 
 @gentype
@@ -190,15 +187,10 @@ type query3Params = {
 @gentype
 type query3Result = {
   author_id: option<int>,
-  big_int: option<bigint>,
   categories: option<categoryArray>,
   id: int,
-  meta: option<arrayJSON_t>,
   name: option<string>,
   rank: option<int>,
-  some_float_enum: option<float>,
-  some_int_enum: option<[#1 | #2 | #3 | #4]>,
-  some_string_enum: option<[#"FIRST" | #"second" | #"Third" | #"fourth"]>,
 }
 
 /** 'Query3' query type */
@@ -280,15 +272,10 @@ type findBookByIdParams = {
 @gentype
 type findBookByIdResult = {
   author_id: option<int>,
-  big_int: option<bigint>,
   categories: option<categoryArray>,
   id: int,
-  meta: option<arrayJSON_t>,
   name: option<string>,
   rank: option<int>,
-  some_float_enum: option<float>,
-  some_int_enum: option<[#1 | #2 | #3 | #4]>,
-  some_string_enum: option<[#"FIRST" | #"second" | #"Third" | #"fourth"]>,
 }
 
 /** 'FindBookById' query type */

@@ -32,12 +32,7 @@ CREATE TABLE books (
   rank INTEGER,
   name TEXT,
   author_id INTEGER REFERENCES authors,
-  categories category[],
-  meta jsonb[],
-  big_int bigint,
-  some_string_enum text check (some_string_enum in ('FIRST', 'second', 'Third', 'fourth')),
-  some_int_enum integer check (some_int_enum in (1, 2, 3, 4)),
-  some_float_enum float check (some_float_enum in (1.5, 2.5, 3.5, 4.5))
+  categories category[]
 );
 
 CREATE TABLE book_comments (
@@ -45,6 +40,15 @@ CREATE TABLE book_comments (
   user_id INTEGER REFERENCES users,
   book_id INTEGER REFERENCES books,
   body TEXT
+);
+
+CREATE TABLE dump(
+  id SERIAL PRIMARY KEY,
+  some_string_enum text check (some_string_enum in ('FIRST', 'second', 'Third', 'fourth')),
+  some_int_enum integer check (some_int_enum in (1, 2, 3, 4)),
+  some_float_enum float check (some_float_enum in (1.5, 2.5, 3.5, 4.5)),
+  meta jsonb[],
+  big_int bigint
 );
 
 INSERT INTO users (email, user_name, first_name, last_name, age)
