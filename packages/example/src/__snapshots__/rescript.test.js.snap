@@ -51,10 +51,8 @@ exports[`select query with join and a parameter override 1`] = `
 Array [
   Object {
     "author_id": 2,
-    "big_int": undefined,
     "categories": undefined,
     "id": 2,
-    "meta": undefined,
     "name": "The Dragons Of Eden",
     "rank": 4,
   },

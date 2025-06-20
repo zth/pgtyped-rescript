@@ -5,6 +5,7 @@ services:
   db:
     image: postgres:15-alpine
     restart: always
+    container_name: pgtyped_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -18,6 +19,7 @@ services:
       context: .
       args:
         NODE_IMAGE: "node:${NODE_VERSION:-18}-alpine"
+    container_name: pgtyped_build
     environment:
       PGHOST: db
       PGUSER: postgres
@@ -32,27 +34,44 @@ services:
         condition: none
     depends_on:
       - db
-    command: sh -c "node /app/packages/cli/lib/index.js --config config.json && ./check-git-diff.sh"
+    command: sh -c "echo 'Cleaning database...' && psql -h db -U postgres -d postgres -c 'DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO postgres; GRANT ALL ON SCHEMA public TO public;' && echo 'Reingesting schema.sql...' && psql -h db -U postgres -d postgres -f sql/schema.sql && echo 'Schema ingested successfully!' && node /app/packages/cli/lib/index.js --config config.json && ./check-git-diff.sh"
 
   watch:
     <<: *build
+    container_name: pgtyped_watch
     command: npx pgtyped --watch --config config.json
 
   test:
     <<: *build
+    container_name: pgtyped_test
     depends_on:
       - build
     command: npx jest rescript.test.js
 
   test-cjs:
     <<: *build
+    container_name: pgtyped_test_cjs
     depends_on:
       - build
     command: npx jest -c jest-cjs.config.ts rescript.test.js
 
   test-update-snapshots:
     <<: *build
+    container_name: pgtyped_test_snapshots
     depends_on:
       - build
     command: npx jest rescript.test.js -u
+
+  # Persistent build container for reuse
+  build-persistent:
+    <<: *build
+    container_name: pgtyped_build_persistent
+    command: tail -f /dev/null  # Keep container running
+    restart: unless-stopped
+
+  # Helper service to reingest schema on demand
+  reingest-schema:
+    <<: *build
+    container_name: pgtyped_reingest_schema
+    command: sh -c "echo 'Cleaning database...' && psql -h db -U postgres -d postgres -c 'DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO postgres; GRANT ALL ON SCHEMA public TO public;' && echo 'Reingesting schema.sql...' && psql -h db -U postgres -d postgres -f sql/schema.sql && echo 'Schema ingested successfully!'"
 

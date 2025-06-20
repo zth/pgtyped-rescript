@@ -13,7 +13,7 @@ module Pg = {
       rows: array<'row>,
       fields: array<fieldInfo>,
       command: string,
-      rowCount: Null.t<float>,
+      rowCount: Js.Null.t<float>,
     }
   }
 

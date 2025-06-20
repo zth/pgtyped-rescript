@@ -7,8 +7,6 @@ const books__sqlJS = require('./books__sql.js');
 
 import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/PgTyped.gen';
 
-import type {t as JSON_t} from './JSON.gen';
-
 export type category = "novel" | "science-fiction" | "thriller";
 
 export type iso31661Alpha2 = 
@@ -235,8 +233,6 @@ export type iso31661Alpha2 =
   | "TL"
   | "TM";
 
-export type arrayJSON_t = JSON_t[];
-
 export type categoryArray = category[];
 
 export type intArray = number[];
@@ -249,10 +245,8 @@ export type findBookByIdParams = { readonly id?: number };
 /** 'FindBookById' return type */
 export type findBookByIdResult = {
   readonly author_id: (undefined | number); 
-  readonly big_int: (undefined | bigint); 
   readonly categories: (undefined | categoryArray); 
   readonly id: number; 
-  readonly meta: (undefined | arrayJSON_t); 
   readonly name: (undefined | string); 
   readonly rank: (undefined | number)
 };
@@ -266,10 +260,8 @@ export type findBookByCategoryParams = { readonly category?: category };
 /** 'FindBookByCategory' return type */
 export type findBookByCategoryResult = {
   readonly author_id: (undefined | number); 
-  readonly big_int: (undefined | bigint); 
   readonly categories: (undefined | categoryArray); 
   readonly id: number; 
-  readonly meta: (undefined | arrayJSON_t); 
   readonly name: (undefined | string); 
   readonly rank: (undefined | number)
 };
@@ -292,10 +284,8 @@ export type findBookUnicodeParams = void;
 /** 'FindBookUnicode' return type */
 export type findBookUnicodeResult = {
   readonly author_id: (undefined | number); 
-  readonly big_int: (undefined | bigint); 
   readonly categories: (undefined | categoryArray); 
   readonly id: number; 
-  readonly meta: (undefined | arrayJSON_t); 
   readonly name: (undefined | string); 
   readonly rank: (undefined | number)
 };
@@ -374,10 +364,8 @@ export type getBooksByAuthorNameParams = { readonly authorName: string };
 /** 'GetBooksByAuthorName' return type */
 export type getBooksByAuthorNameResult = {
   readonly author_id: (undefined | number); 
-  readonly big_int: (undefined | bigint); 
   readonly categories: (undefined | categoryArray); 
   readonly id: number; 
-  readonly meta: (undefined | arrayJSON_t); 
   readonly name: (undefined | string); 
   readonly rank: (undefined | number)
 };

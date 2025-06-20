@@ -12,6 +12,7 @@ import {
   createInitialSASLResponse,
 } from './sasl-helpers.js';
 import { DatabaseTypeKind, isEnum, MappableType } from './type.js';
+import { parse, astVisitor, Expr } from 'pgsql-ast-parser';
 
 const debugQuery = debugBase('client:query');
 
@@ -167,6 +168,7 @@ export interface IQueryTypes {
     type: MappableType;
     nullable?: boolean;
     comment?: string;
+    checkValues?: ConstraintValue[];
   }>;
 }
 
@@ -327,6 +329,48 @@ export function reduceTypeRows(
   );
 }
 
+async function getCheckConstraints(
+  fields: TypeField[],
+  queue: AsyncQueue,
+): Promise<ColumnCheck[]> {
+  const columnFields = fields.filter((f) => f.columnAttrNumber > 0);
+  if (columnFields.length === 0) {
+    return [];
+  }
+
+  const tableOids = Array.from(
+    new Set(columnFields.map((f) => f.tableOID)),
+  ).join(',');
+
+  let rows: string[][] = [];
+
+  try {
+    rows = await runQuery(
+      `
+      SELECT 
+        conrelid, unnest(conkey) AS attnum, 
+        pg_get_expr(conbin, conrelid)
+     FROM 
+        pg_constraint 
+     WHERE 
+        contype='c' AND 
+        conrelid IN (${tableOids}) AND 
+        conname NOT LIKE 'pg_%%';`,
+      queue,
+    );
+  } catch {
+    // Ignore
+  }
+
+  return rows
+    .map(([relid, attnum, def]) => ({
+      tableOID: Number(relid),
+      columnAttrNumber: Number(attnum),
+      values: parseCheckAllowedValues(def) ?? [],
+    }))
+    .filter((r) => r.values.length > 0);
+}
+
 // TODO: self-host
 async function runTypesCatalogQuery(
   typeOIDs: number[],
@@ -358,6 +402,94 @@ OR pt.oid IN (SELECT typelem FROM pg_type ptn WHERE ptn.oid IN (${concatenatedTy
       typeCategory,
     }),
   );
+}
+
+interface ColumnCheck {
+  tableOID: number;
+  columnAttrNumber: number;
+  values: ConstraintValue[];
+}
+
+export type ConstraintValue =
+  | { type: 'string'; value: string }
+  | { type: 'integer'; value: number }
+  | { type: 'float'; value: number };
+
+export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
+  try {
+    // Wrap the constraint expression in a valid SQL statement context
+    // so the AST parser can parse it properly
+    const wrappedQuery = `SELECT NULL WHERE ${def}`;
+    const ast = parse(wrappedQuery);
+    const values: ConstraintValue[] = [];
+    let hadInvalidValue = false;
+
+    const visitor = astVisitor((map) => ({
+      constant: (node) => {
+        if (node.type === 'string' && 'value' in node) {
+          values.push({ type: 'string', value: node.value });
+          /*
+        Can't represent floats as polyvariants in ReScript, so ignore for now. 
+        Unboxed variants would support this though, but we'd need a global schema
+        file probably.
+        
+        } else if (node.type === 'numeric' && 'value' in node) {
+          values.push({ type: 'float', value: node.value });*/
+        } else if (node.type === 'integer' && 'value' in node) {
+          values.push({ type: 'integer', value: node.value });
+        } else {
+          hadInvalidValue = true;
+        }
+        map.super().constant(node);
+      },
+    }));
+
+    const disallowReasons: string[] = [];
+
+    const select = ast[0];
+    const where = 'where' in select ? select.where : null;
+
+    if (where != null) {
+      if (
+        where.type === 'binary' &&
+        where.op === '=' &&
+        where.left.type === 'ref'
+      ) {
+        // TODO: Match on the ref type so it matches the column name?
+        const rhs = where.right;
+        let targetNode: Expr | null = null;
+
+        if (rhs.type === 'call' && rhs.function.name === 'any') {
+          // Check args
+          if (rhs.args.length === 1) {
+            targetNode = rhs.args[0];
+          } else {
+            disallowReasons.push('ANY with multiple args');
+          }
+        } else {
+          disallowReasons.push('NOT ANY');
+        }
+
+        if (targetNode != null) {
+          visitor.expr(targetNode);
+        }
+      } else {
+        disallowReasons.push('Check constraint too complex');
+      }
+    }
+
+    if (disallowReasons.length > 0) {
+      /*console.warn('NOT ALLOWED', {
+        disallowReasons,
+        wrappedQuery,
+      });*/
+    }
+
+    return values.length > 0 && !hadInvalidValue ? values : null;
+  } catch {
+    // Ignore
+    return null;
+  }
 }
 
 interface ColumnComment {
@@ -410,6 +542,7 @@ export async function getTypes(
   const usedTypesOIDs = paramTypeOIDs.concat(returnTypesOIDs);
   const typeRows = await runTypesCatalogQuery(usedTypesOIDs, queue);
   const commentRows = await getComments(fields, queue);
+  const checkRows = await getCheckConstraints(fields, queue);
   const typeMap = reduceTypeRows(typeRows);
 
   const attrMatcher = ({
@@ -452,10 +585,15 @@ export async function getTypes(
   for (const c of commentRows) {
     commentMap[`${c.tableOID}:${c.columnAttrNumber}`] = c.comment;
   }
+  const checkMap: { [attid: string]: ConstraintValue[] } = {};
+  for (const chk of checkRows) {
+    checkMap[`${chk.tableOID}:${chk.columnAttrNumber}`] = chk.values;
+  }
 
   const returnTypes = fields.map((f) => ({
     ...attrMap[getAttid(f)],
     ...(commentMap[getAttid(f)] ? { comment: commentMap[getAttid(f)] } : {}),
+    ...(checkMap[getAttid(f)] ? { checkValues: checkMap[getAttid(f)] } : {}),
     returnName: f.name,
     type: typeMap[f.typeOID],
   }));

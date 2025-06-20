@@ -135,31 +135,48 @@ export async function queryToTypeDeclarations(
   const paramFieldTypes: IField[] = [];
   const records: string[] = [];
 
-  returnTypes.forEach(({ returnName, type, nullable, comment }) => {
-    let tsTypeName = types.use(type, TypeScope.Return);
+  returnTypes.forEach(
+    ({ returnName, type, nullable, comment, checkValues }) => {
+      let tsTypeName = types.use(type, TypeScope.Return);
 
-    const lastCharacter = returnName[returnName.length - 1]; // Checking for type hints
-    const addNullability = lastCharacter === '?';
-    const removeNullability = lastCharacter === '!';
-    if (
-      (addNullability || nullable || nullable == null) &&
-      !removeNullability
-    ) {
-      tsTypeName = 'option<' + tsTypeName + '>';
-    }
+      if (checkValues != null && checkValues.length > 0) {
+        tsTypeName = `[${checkValues
+          .map((v) => {
+            switch (v.type) {
+              case 'string':
+                return `#"${v.value}"`;
+              case 'integer':
+                return `#${v.value}`;
+              case 'float':
+                return `#${v.value}`;
+            }
+          })
+          .join(' | ')}]`;
+      }
 
-    if (addNullability || removeNullability) {
-      returnName = returnName.slice(0, -1);
-    }
+      const lastCharacter = returnName[returnName.length - 1]; // Checking for type hints
+      const addNullability = lastCharacter === '?';
+      const removeNullability = lastCharacter === '!';
+      if (
+        (addNullability || nullable || nullable == null) &&
+        !removeNullability
+      ) {
+        tsTypeName = 'option<' + tsTypeName + '>';
+      }
 
-    returnFieldTypes.push({
-      fieldName: config.camelCaseColumnNames
-        ? camelCase(returnName)
-        : returnName,
-      fieldType: tsTypeName,
-      comment,
-    });
-  });
+      if (addNullability || removeNullability) {
+        returnName = returnName.slice(0, -1);
+      }
+
+      returnFieldTypes.push({
+        fieldName: config.camelCaseColumnNames
+          ? camelCase(returnName)
+          : returnName,
+        fieldType: tsTypeName,
+        comment,
+      });
+    },
+  );
 
   const { params } = paramMetadata;
   for (const param of paramMetadata.mapping) {

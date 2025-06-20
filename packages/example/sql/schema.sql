@@ -32,9 +32,7 @@ CREATE TABLE books (
   rank INTEGER,
   name TEXT,
   author_id INTEGER REFERENCES authors,
-  categories category[],
-  meta jsonb[],
-  big_int bigint
+  categories category[]
 );
 
 CREATE TABLE book_comments (
@@ -42,6 +40,40 @@ CREATE TABLE book_comments (
   user_id INTEGER REFERENCES users,
   book_id INTEGER REFERENCES books,
   body TEXT
+);
+
+CREATE TABLE dump(
+  id SERIAL PRIMARY KEY,
+  meta jsonb[],
+  big_int bigint,
+  
+  -- Check constraints that SHOULD be supported
+  some_string_enum text check (some_string_enum in ('FIRST', 'second', 'Third', 'fourth')),
+  some_int_enum integer check (some_int_enum in (1, 2, 3, 4)),
+  some_float_enum float check (some_float_enum in (1.5, 2.5, 3.5, 4.5)),
+  status TEXT CHECK (status IN ('published', 'draft', 'archived')),
+  format TEXT CHECK (format = ANY (ARRAY['hardcover'::text, 'paperback'::text, 'ebook'::text, 'audiobook'::text])),
+  language TEXT CHECK (language IN ('en', 'es', 'fr', 'de')),
+  page_count INTEGER CHECK (page_count IN (100, 200, 300, 400, 500)),
+  priority INTEGER CHECK (priority = ANY (ARRAY[1, 2, 3, 4, 5])),
+  price DECIMAL(10,2) CHECK (price IN (9.99, 19.99, 29.99, 39.99)),
+  rating FLOAT CHECK (rating = ANY (ARRAY[1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0])),
+  discount_rate FLOAT CHECK (discount_rate IN (0.05, 0.10, 0.15, 0.20, 0.25)),
+  weight_kg FLOAT CHECK (weight_kg IN (0.1, 0.2, 0.5, 1.0, 1.5, 2.0)),
+  binding_type TEXT CHECK (binding_type IN ('Hardcover', 'Paperback', 'SPIRAL', 'loose-leaf')),
+
+  -- ! Check constraints that can't be supported right now
+  -- Not meaningful to represent ranges in ReScript
+  edition INTEGER CHECK (edition BETWEEN 1 AND 10),
+  -- Mixed value type constraints
+  availability TEXT CHECK (availability IN ('in-stock', 'limited', 'out-of-stock') OR availability = 'special-order'),
+  -- Boolean-like constraints
+  is_featured BOOLEAN CHECK (is_featured IN (true, false)),
+  -- Range constraints with specific values
+  publication_year INTEGER CHECK (publication_year IN (2020, 2021, 2022, 2023, 2024) OR publication_year BETWEEN 1900 AND 2030),
+  -- Complex expressions
+  isbn TEXT CHECK (length(isbn) = 13 AND isbn ~ '^[0-9]+$'),
+  json_test jsonb
 );
 
 INSERT INTO users (email, user_name, first_name, last_name, age)
