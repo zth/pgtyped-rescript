@@ -19,7 +19,7 @@ type jsonQuery = {
   result: jsonResult,
 }
 
-%%private(let jsonIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT json_build_object('key', 'value') AS json_object"}`))
+%%private(let jsonIR: IR.t = %raw(`{"queryName":"Json","usedParamSet":{},"params":[],"statement":"SELECT json_build_object('key', 'value') AS json_object"}`))
 
 /**
  Runnable query:

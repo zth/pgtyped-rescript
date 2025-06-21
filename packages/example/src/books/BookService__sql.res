@@ -31,7 +31,7 @@ type findBookByIdQuery = {
   result: findBookByIdResult,
 }
 
-%%private(let findBookByIdIR: IR.t = %raw(`{"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"SELECT * FROM books WHERE id = :id"}`))
+%%private(let findBookByIdIR: IR.t = %raw(`{"queryName":"FindBookById","usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"SELECT * FROM books WHERE id = :id"}`))
 
 /**
  Runnable query:
@@ -114,7 +114,7 @@ type booksByAuthorQuery = {
   result: booksByAuthorResult,
 }
 
-%%private(let booksByAuthorIR: IR.t = %raw(`{"usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":129}]}],"statement":"SELECT b.* FROM books b\n    INNER JOIN authors a ON a.id = b.author_id\n    WHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
+%%private(let booksByAuthorIR: IR.t = %raw(`{"queryName":"BooksByAuthor","usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":129}]}],"statement":"SELECT b.* FROM books b\n    INNER JOIN authors a ON a.id = b.author_id\n    WHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
 
 /**
  Runnable query:

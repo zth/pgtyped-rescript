@@ -83,7 +83,7 @@ export async function queryToTypeDeclarations(
     queryData = processTSQueryAST(parsedQuery.ast);
   } else {
     queryName = pascalCase(parsedQuery.ast.name);
-    queryData = processSQLQueryIR(queryASTToIR(parsedQuery.ast), queryName);
+    queryData = processSQLQueryIR(queryASTToIR(parsedQuery.ast));
   }
 
   const typeData = await typeSource(queryData);
@@ -394,7 +394,7 @@ export async function generateDeclarationFile(
       `/**\n` +
       ` Runnable query:\n` +
       ` \`\`\`sql\n` +
-      `${processSQLQueryIR(typeDec.query.ir, typeDec.query.name).query}\n` +
+      `${processSQLQueryIR(typeDec.query.ir).query}\n` +
       ` \`\`\`\n\n` +
       ` */\n`;
     declarationFileContents += `@gentype

@@ -1,6 +1,10 @@
 import { queryASTToIR, parseSQLFile as parseSQLQuery } from '@pgtyped/parser';
 import { processSQLQueryIR } from './preprocessor-sql.js';
-import { ParameterTransform } from './preprocessor.js';
+import {
+  InterpolatedQuery,
+  ParameterTransform,
+  QueryParameter,
+} from './preprocessor.js';
 
 test('(SQL) no params', () => {
   const query = `
@@ -14,6 +18,7 @@ test('(SQL) no params', () => {
     query: 'SELECT id, name FROM users',
     mapping: [],
     bindings: [],
+    name: 'selectSomeUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -42,11 +47,12 @@ test('(SQL) two scalar params, one forced as non-null', () => {
     id: 'id',
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query:
       'UPDATE books\n  SET\n      rank = $1,\n      name = $2\n  WHERE id = $3',
     mapping: [],
     bindings: [123, 'name', 'id'],
+    name: 'UpdateBooksRankNotNull',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -66,10 +72,11 @@ test('(SQL) two scalar params', () => {
     age: 12,
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'SELECT id, name from users where id = $1 and age > $2',
     mapping: [],
     bindings: ['123', 12],
+    name: 'selectSomeUsers',
   };
 
   const expectedMappingResult = {
@@ -89,6 +96,7 @@ test('(SQL) two scalar params', () => {
       },
     ],
     bindings: [],
+    name: 'selectSomeUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -109,10 +117,11 @@ test('(SQL) one param used twice', () => {
     id: '123',
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'SELECT id, name from users where id = $1 or parent_id = $1',
     mapping: [],
     bindings: ['123'],
+    name: 'selectUsersAndParents',
   };
 
   const expectedMappingResult = {
@@ -126,6 +135,7 @@ test('(SQL) one param used twice', () => {
       },
     ],
     bindings: [],
+    name: 'selectUsersAndParents',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -149,13 +159,14 @@ test('(SQL) array param', () => {
     ages: [23, 27, 50],
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'SELECT FROM users WHERE age in ($1,$2,$3)',
     bindings: [23, 27, 50],
     mapping: [],
+    name: 'selectSomeUsers',
   };
 
-  const expectedMappingResult = {
+  const expectedMappingResult: InterpolatedQuery = {
     query: 'SELECT FROM users WHERE age in ($1)',
     bindings: [],
     mapping: [
@@ -166,6 +177,7 @@ test('(SQL) array param', () => {
         assignedIndex: 1,
       },
     ],
+    name: 'selectSomeUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -189,13 +201,14 @@ test('(SQL) array param used twice', () => {
     ages: [23, 27, 50],
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'SELECT FROM users WHERE age in ($1,$2,$3) or age in ($1,$2,$3)',
     bindings: [23, 27, 50],
     mapping: [],
+    name: 'selectSomeUsers',
   };
 
-  const expectedMappingResult = {
+  const expectedMappingResult: InterpolatedQuery = {
     query: 'SELECT FROM users WHERE age in ($1) or age in ($1)',
     bindings: [],
     mapping: [
@@ -206,6 +219,7 @@ test('(SQL) array param used twice', () => {
         assignedIndex: 1,
       },
     ],
+    name: 'selectSomeUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -230,13 +244,14 @@ test('(SQL) array and scalar param', () => {
     userId: 'some-id',
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'SELECT FROM users WHERE age in ($1,$2,$3) and id = $4',
     bindings: [23, 27, 50, 'some-id'],
     mapping: [],
+    name: 'selectSomeUsers',
   };
 
-  const expectedMappingResult = {
+  const expectedMappingResult: InterpolatedQuery = {
     query: 'SELECT FROM users WHERE age in ($1) and id = $2',
     bindings: [],
     mapping: [
@@ -253,6 +268,7 @@ test('(SQL) array and scalar param', () => {
         assignedIndex: 2,
       },
     ],
+    name: 'selectSomeUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -276,13 +292,14 @@ test('(SQL) pick param', () => {
     user: { name: 'Bob', age: 12 },
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1,$2) RETURNING id',
     bindings: ['Bob', 12],
     mapping: [],
+    name: 'insertUsers',
   };
 
-  const expectedMappingResult = {
+  const expectedMappingResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1,$2) RETURNING id',
     bindings: [],
     mapping: [
@@ -305,6 +322,7 @@ test('(SQL) pick param', () => {
         },
       },
     ],
+    name: 'insertUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -328,13 +346,14 @@ test('(SQL) pick param used twice', () => {
     user: { name: 'Bob', age: 12 },
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1,$2), ($1,$2) RETURNING id',
     bindings: ['Bob', 12],
     mapping: [],
+    name: 'insertUsersTwice',
   };
 
-  const expectedMappingResult = {
+  const expectedMappingResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1,$2), ($1,$2) RETURNING id',
     bindings: [],
     mapping: [
@@ -357,6 +376,7 @@ test('(SQL) pick param used twice', () => {
         },
       },
     ],
+    name: 'insertUsersTwice',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -383,10 +403,11 @@ test('(SQL) pickSpread param', () => {
     ],
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1,$2),($3,$4) RETURNING id',
     bindings: ['Bob', 12, 'Tom', 22],
     mapping: [],
+    name: 'insertUsers',
   };
 
   const expectedMapping = [
@@ -414,6 +435,7 @@ test('(SQL) pickSpread param', () => {
     query: 'INSERT INTO users (name, age) VALUES ($1,$2) RETURNING id',
     bindings: [],
     mapping: expectedMapping,
+    name: 'insertUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -440,14 +462,15 @@ test('(SQL) pickSpread param used twice', () => {
     ],
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query:
       'INSERT INTO users (name, age) VALUES ($1,$2),($3,$4), ($1,$2),($3,$4) RETURNING id',
     bindings: ['Bob', 12, 'Tom', 22],
     mapping: [],
+    name: 'insertUsers',
   };
 
-  const expectedMapping = [
+  const expectedMapping: QueryParameter[] = [
     {
       name: 'users',
       type: ParameterTransform.PickSpread,
@@ -468,10 +491,11 @@ test('(SQL) pickSpread param used twice', () => {
     },
   ];
 
-  const expectedMappingResult = {
+  const expectedMappingResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1,$2), ($1,$2) RETURNING id',
     bindings: [],
     mapping: expectedMapping,
+    name: 'insertUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -492,13 +516,14 @@ test('(SQL) scalar param required and optional', () => {
     id: '123',
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'SELECT id, name from users where id = $1 and user_id = $1',
     mapping: [],
     bindings: ['123'],
+    name: 'selectSomeUsers',
   };
 
-  const expectedMappingResult = {
+  const expectedMappingResult: InterpolatedQuery = {
     query: 'SELECT id, name from users where id = $1 and user_id = $1',
     mapping: [
       {
@@ -509,6 +534,7 @@ test('(SQL) scalar param required and optional', () => {
       },
     ],
     bindings: [],
+    name: 'selectSomeUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -532,13 +558,14 @@ test('(SQL) pick param required', () => {
     user: { name: 'Bob', age: 12 },
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1,$2) RETURNING id',
     bindings: ['Bob', 12],
     mapping: [],
+    name: 'insertUsers',
   };
 
-  const expectedMappingResult = {
+  const expectedMappingResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1,$2) RETURNING id',
     bindings: [],
     mapping: [
@@ -561,6 +588,7 @@ test('(SQL) pick param required', () => {
         },
       },
     ],
+    name: 'insertUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);
@@ -584,13 +612,14 @@ test('(SQL) array param required', () => {
     ages: [23, 27, 50],
   };
 
-  const expectedInterpolationResult = {
+  const expectedInterpolationResult: InterpolatedQuery = {
     query: 'SELECT FROM users WHERE age in ($1,$2,$3)',
     bindings: [23, 27, 50],
     mapping: [],
+    name: 'selectSomeUsers',
   };
 
-  const expectedMappingResult = {
+  const expectedMappingResult: InterpolatedQuery = {
     query: 'SELECT FROM users WHERE age in ($1)',
     bindings: [],
     mapping: [
@@ -601,6 +630,7 @@ test('(SQL) array param required', () => {
         assignedIndex: 1,
       },
     ],
+    name: 'selectSomeUsers',
   };
 
   const queryIR = queryASTToIR(fileAST.queries[0]);

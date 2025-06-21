@@ -36,7 +36,7 @@ type keywordsQuery = {
   result: keywordsResult,
 }
 
-%%private(let keywordsIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select * from rescript_keywords_need_to_be_escaped"}`))
+%%private(let keywordsIR: IR.t = %raw(`{"queryName":"Keywords","usedParamSet":{},"params":[],"statement":"select * from rescript_keywords_need_to_be_escaped"}`))
 
 /**
  Runnable query:

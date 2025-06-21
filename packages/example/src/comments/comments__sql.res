@@ -24,7 +24,7 @@ type getAllCommentsQuery = {
   result: getAllCommentsResult,
 }
 
-%%private(let getAllCommentsIR: IR.t = %raw(`{"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":39,"b":42},{"a":57,"b":59}]}],"statement":"SELECT * FROM book_comments WHERE id = :id! OR user_id = :id                                      "}`))
+%%private(let getAllCommentsIR: IR.t = %raw(`{"queryName":"GetAllComments","usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":39,"b":42},{"a":57,"b":59}]}],"statement":"SELECT * FROM book_comments WHERE id = :id! OR user_id = :id                                      "}`))
 
 /**
  Runnable query:
@@ -106,7 +106,7 @@ type getAllCommentsByIdsQuery = {
   result: getAllCommentsByIdsResult,
 }
 
-%%private(let getAllCommentsByIdsIR: IR.t = %raw(`{"usedParamSet":{"ids":true},"params":[{"name":"ids","required":true,"transform":{"type":"array_spread"},"locs":[{"a":40,"b":43},{"a":55,"b":59}]}],"statement":"SELECT * FROM book_comments WHERE id in :ids AND id in :ids!"}`))
+%%private(let getAllCommentsByIdsIR: IR.t = %raw(`{"queryName":"GetAllCommentsByIds","usedParamSet":{"ids":true},"params":[{"name":"ids","required":true,"transform":{"type":"array_spread"},"locs":[{"a":40,"b":43},{"a":55,"b":59}]}],"statement":"SELECT * FROM book_comments WHERE id in :ids AND id in :ids!"}`))
 
 /**
  Runnable query:
@@ -193,7 +193,7 @@ type insertCommentQuery = {
   result: insertCommentResult,
 }
 
-%%private(let insertCommentIR: IR.t = %raw(`{"usedParamSet":{"comments":true},"params":[{"name":"comments","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"userId","required":true},{"name":"commentBody","required":true}]},"locs":[{"a":73,"b":81}]}],"statement":"INSERT INTO book_comments (user_id, body)\n-- NOTE: this is a note\nVALUES :comments RETURNING *"}`))
+%%private(let insertCommentIR: IR.t = %raw(`{"queryName":"InsertComment","usedParamSet":{"comments":true},"params":[{"name":"comments","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"userId","required":true},{"name":"commentBody","required":true}]},"locs":[{"a":73,"b":81}]}],"statement":"INSERT INTO book_comments (user_id, body)\n-- NOTE: this is a note\nVALUES :comments RETURNING *"}`))
 
 /**
  Runnable query:
@@ -272,7 +272,7 @@ type selectExistsTestQuery = {
   result: selectExistsTestResult,
 }
 
-%%private(let selectExistsTestIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT EXISTS ( SELECT 1 WHERE true ) AS \"isTransactionExists\""}`))
+%%private(let selectExistsTestIR: IR.t = %raw(`{"queryName":"SelectExistsTest","usedParamSet":{},"params":[],"statement":"SELECT EXISTS ( SELECT 1 WHERE true ) AS \"isTransactionExists\""}`))
 
 /**
  Runnable query:

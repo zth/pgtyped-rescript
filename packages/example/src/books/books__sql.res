@@ -40,7 +40,7 @@ type findBookByIdQuery = {
   result: findBookByIdResult,
 }
 
-%%private(let findBookByIdIR: IR.t = %raw(`{"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"SELECT * FROM books WHERE id = :id"}`))
+%%private(let findBookByIdIR: IR.t = %raw(`{"queryName":"FindBookById","usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"SELECT * FROM books WHERE id = :id"}`))
 
 /**
  Runnable query:
@@ -123,7 +123,7 @@ type findBookByCategoryQuery = {
   result: findBookByCategoryResult,
 }
 
-%%private(let findBookByCategoryIR: IR.t = %raw(`{"usedParamSet":{"category":true},"params":[{"name":"category","required":false,"transform":{"type":"scalar"},"locs":[{"a":26,"b":34}]}],"statement":"SELECT * FROM books WHERE :category = ANY(categories)"}`))
+%%private(let findBookByCategoryIR: IR.t = %raw(`{"queryName":"FindBookByCategory","usedParamSet":{"category":true},"params":[{"name":"category","required":false,"transform":{"type":"scalar"},"locs":[{"a":26,"b":34}]}],"statement":"SELECT * FROM books WHERE :category = ANY(categories)"}`))
 
 /**
  Runnable query:
@@ -204,7 +204,7 @@ type findBookNameOrRankQuery = {
   result: findBookNameOrRankResult,
 }
 
-%%private(let findBookNameOrRankIR: IR.t = %raw(`{"usedParamSet":{"name":true,"rank":true},"params":[{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":41,"b":45}]},{"name":"rank","required":false,"transform":{"type":"scalar"},"locs":[{"a":57,"b":61}]}],"statement":"SELECT id, name\nFROM books\nWHERE (name = :name OR rank = :rank)"}`))
+%%private(let findBookNameOrRankIR: IR.t = %raw(`{"queryName":"FindBookNameOrRank","usedParamSet":{"name":true,"rank":true},"params":[{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":41,"b":45}]},{"name":"rank","required":false,"transform":{"type":"scalar"},"locs":[{"a":57,"b":61}]}],"statement":"SELECT id, name\nFROM books\nWHERE (name = :name OR rank = :rank)"}`))
 
 /**
  Runnable query:
@@ -287,7 +287,7 @@ type findBookUnicodeQuery = {
   result: findBookUnicodeResult,
 }
 
-%%private(let findBookUnicodeIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT * FROM books WHERE name = 'שקל'"}`))
+%%private(let findBookUnicodeIR: IR.t = %raw(`{"queryName":"FindBookUnicode","usedParamSet":{},"params":[],"statement":"SELECT * FROM books WHERE name = 'שקל'"}`))
 
 /**
  Runnable query:
@@ -373,7 +373,7 @@ type insertBooksQuery = {
   result: insertBooksResult,
 }
 
-%%private(let insertBooksIR: IR.t = %raw(`{"usedParamSet":{"books":true},"params":[{"name":"books","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"rank","required":true},{"name":"name","required":true},{"name":"authorId","required":true},{"name":"categories","required":false}]},"locs":[{"a":61,"b":66}]}],"statement":"INSERT INTO books (rank, name, author_id, categories)\nVALUES :books RETURNING id as book_id"}`))
+%%private(let insertBooksIR: IR.t = %raw(`{"queryName":"InsertBooks","usedParamSet":{"books":true},"params":[{"name":"books","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"rank","required":true},{"name":"name","required":true},{"name":"authorId","required":true},{"name":"categories","required":false}]},"locs":[{"a":61,"b":66}]}],"statement":"INSERT INTO books (rank, name, author_id, categories)\nVALUES :books RETURNING id as book_id"}`))
 
 /**
  Runnable query:
@@ -456,7 +456,7 @@ type insertBookQuery = {
   result: insertBookResult,
 }
 
-%%private(let insertBookIR: IR.t = %raw(`{"usedParamSet":{"rank":true,"name":true,"author_id":true,"categories":true},"params":[{"name":"rank","required":true,"transform":{"type":"scalar"},"locs":[{"a":62,"b":67}]},{"name":"name","required":true,"transform":{"type":"scalar"},"locs":[{"a":70,"b":75}]},{"name":"author_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":88}]},{"name":"categories","required":false,"transform":{"type":"scalar"},"locs":[{"a":91,"b":101}]}],"statement":"INSERT INTO books (rank, name, author_id, categories)\nVALUES (:rank!, :name!, :author_id!, :categories) RETURNING id as book_id"}`))
+%%private(let insertBookIR: IR.t = %raw(`{"queryName":"InsertBook","usedParamSet":{"rank":true,"name":true,"author_id":true,"categories":true},"params":[{"name":"rank","required":true,"transform":{"type":"scalar"},"locs":[{"a":62,"b":67}]},{"name":"name","required":true,"transform":{"type":"scalar"},"locs":[{"a":70,"b":75}]},{"name":"author_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":88}]},{"name":"categories","required":false,"transform":{"type":"scalar"},"locs":[{"a":91,"b":101}]}],"statement":"INSERT INTO books (rank, name, author_id, categories)\nVALUES (:rank!, :name!, :author_id!, :categories) RETURNING id as book_id"}`))
 
 /**
  Runnable query:
@@ -535,7 +535,7 @@ type updateBooksCustomQuery = {
   result: updateBooksCustomResult,
 }
 
-%%private(let updateBooksCustomIR: IR.t = %raw(`{"usedParamSet":{"rank":true,"id":true},"params":[{"name":"rank","required":false,"transform":{"type":"scalar"},"locs":[{"a":49,"b":53},{"a":95,"b":99}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":161,"b":164}]}],"statement":"UPDATE books\nSET\n    rank = (\n        CASE WHEN (:rank::int IS NOT NULL)\n                 THEN :rank\n             ELSE rank\n            END\n        )\nWHERE id = :id!"}`))
+%%private(let updateBooksCustomIR: IR.t = %raw(`{"queryName":"UpdateBooksCustom","usedParamSet":{"rank":true,"id":true},"params":[{"name":"rank","required":false,"transform":{"type":"scalar"},"locs":[{"a":49,"b":53},{"a":95,"b":99}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":161,"b":164}]}],"statement":"UPDATE books\nSET\n    rank = (\n        CASE WHEN (:rank::int IS NOT NULL)\n                 THEN :rank\n             ELSE rank\n            END\n        )\nWHERE id = :id!"}`))
 
 /**
  Runnable query:
@@ -622,7 +622,7 @@ type updateBooksQuery = {
   result: updateBooksResult,
 }
 
-%%private(let updateBooksIR: IR.t = %raw(`{"usedParamSet":{"name":true,"rank":true,"id":true},"params":[{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":50,"b":54}]},{"name":"rank","required":false,"transform":{"type":"scalar"},"locs":[{"a":68,"b":72}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":85,"b":88}]}],"statement":"UPDATE books\n                     \nSET\n    name = :name,\n    rank = :rank\nWHERE id = :id!"}`))
+%%private(let updateBooksIR: IR.t = %raw(`{"queryName":"UpdateBooks","usedParamSet":{"name":true,"rank":true,"id":true},"params":[{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":50,"b":54}]},{"name":"rank","required":false,"transform":{"type":"scalar"},"locs":[{"a":68,"b":72}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":85,"b":88}]}],"statement":"UPDATE books\n                     \nSET\n    name = :name,\n    rank = :rank\nWHERE id = :id!"}`))
 
 /**
  Runnable query:
@@ -706,7 +706,7 @@ type updateBooksRankNotNullQuery = {
   result: updateBooksRankNotNullResult,
 }
 
-%%private(let updateBooksRankNotNullIR: IR.t = %raw(`{"usedParamSet":{"rank":true,"name":true,"id":true},"params":[{"name":"rank","required":true,"transform":{"type":"scalar"},"locs":[{"a":28,"b":33}]},{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":47,"b":51}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":64,"b":67}]}],"statement":"UPDATE books\nSET\n    rank = :rank!,\n    name = :name\nWHERE id = :id!"}`))
+%%private(let updateBooksRankNotNullIR: IR.t = %raw(`{"queryName":"UpdateBooksRankNotNull","usedParamSet":{"rank":true,"name":true,"id":true},"params":[{"name":"rank","required":true,"transform":{"type":"scalar"},"locs":[{"a":28,"b":33}]},{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":47,"b":51}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":64,"b":67}]}],"statement":"UPDATE books\nSET\n    rank = :rank!,\n    name = :name\nWHERE id = :id!"}`))
 
 /**
  Runnable query:
@@ -793,7 +793,7 @@ type getBooksByAuthorNameQuery = {
   result: getBooksByAuthorNameResult,
 }
 
-%%private(let getBooksByAuthorNameIR: IR.t = %raw(`{"usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":110,"b":121}]}],"statement":"SELECT b.* FROM books b\nINNER JOIN authors a ON a.id = b.author_id\nWHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
+%%private(let getBooksByAuthorNameIR: IR.t = %raw(`{"queryName":"GetBooksByAuthorName","usedParamSet":{"authorName":true},"params":[{"name":"authorName","required":true,"transform":{"type":"scalar"},"locs":[{"a":110,"b":121}]}],"statement":"SELECT b.* FROM books b\nINNER JOIN authors a ON a.id = b.author_id\nWHERE a.first_name || ' ' || a.last_name = :authorName!"}`))
 
 /**
  Runnable query:
@@ -875,7 +875,7 @@ type aggregateEmailsAndTestQuery = {
   result: aggregateEmailsAndTestResult,
 }
 
-%%private(let aggregateEmailsAndTestIR: IR.t = %raw(`{"usedParamSet":{"testAges":true},"params":[{"name":"testAges","required":false,"transform":{"type":"scalar"},"locs":[{"a":55,"b":63}]}],"statement":"SELECT array_agg(email) as \"emails!\", array_agg(age) = :testAges as ageTest FROM users"}`))
+%%private(let aggregateEmailsAndTestIR: IR.t = %raw(`{"queryName":"AggregateEmailsAndTest","usedParamSet":{"testAges":true},"params":[{"name":"testAges","required":false,"transform":{"type":"scalar"},"locs":[{"a":55,"b":63}]}],"statement":"SELECT array_agg(email) as \"emails!\", array_agg(age) = :testAges as ageTest FROM users"}`))
 
 /**
  Runnable query:
@@ -953,7 +953,7 @@ type getBooksQuery = {
   result: getBooksResult,
 }
 
-%%private(let getBooksIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT id, name as \"name!\" FROM books"}`))
+%%private(let getBooksIR: IR.t = %raw(`{"queryName":"GetBooks","usedParamSet":{},"params":[],"statement":"SELECT id, name as \"name!\" FROM books"}`))
 
 /**
  Runnable query:
@@ -1030,7 +1030,7 @@ type countBooksQuery = {
   result: countBooksResult,
 }
 
-%%private(let countBooksIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT count(*) as book_count FROM books"}`))
+%%private(let countBooksIR: IR.t = %raw(`{"queryName":"CountBooks","usedParamSet":{},"params":[],"statement":"SELECT count(*) as book_count FROM books"}`))
 
 /**
  Runnable query:
@@ -1108,7 +1108,7 @@ type getBookCountriesQuery = {
   result: getBookCountriesResult,
 }
 
-%%private(let getBookCountriesIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT * FROM book_country"}`))
+%%private(let getBookCountriesIR: IR.t = %raw(`{"queryName":"GetBookCountries","usedParamSet":{},"params":[],"statement":"SELECT * FROM book_country"}`))
 
 /**
  Runnable query:

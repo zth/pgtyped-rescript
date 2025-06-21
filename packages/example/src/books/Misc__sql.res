@@ -21,7 +21,7 @@ type literalsQuery = {
   result: literalsResult,
 }
 
-%%private(let literalsIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select\n    'literal' as test_string_literal,\n    1 as test_integer_literal,\n    'hello ' || 'world' as test_regular_string"}`))
+%%private(let literalsIR: IR.t = %raw(`{"queryName":"Literals","usedParamSet":{},"params":[],"statement":"select\n    'literal' as test_string_literal,\n    1 as test_integer_literal,\n    'hello ' || 'world' as test_regular_string"}`))
 
 /**
  Runnable query:
@@ -110,7 +110,7 @@ type moreLiteralsQuery = {
   result: moreLiteralsResult,
 }
 
-%%private(let moreLiteralsIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select\n    'success' as status,\n    'error' as error_status,\n    'pending' as pending_status,\n    42 as magic_number,\n    0 as zero_value,\n    -1 as negative_one,\n    100 as max_percentage,\n    'admin' as admin_role,\n    'user' as user_role,\n    'guest' as guest_role"}`))
+%%private(let moreLiteralsIR: IR.t = %raw(`{"queryName":"MoreLiterals","usedParamSet":{},"params":[],"statement":"select\n    'success' as status,\n    'error' as error_status,\n    'pending' as pending_status,\n    42 as magic_number,\n    0 as zero_value,\n    -1 as negative_one,\n    100 as max_percentage,\n    'admin' as admin_role,\n    'user' as user_role,\n    'guest' as guest_role"}`))
 
 /**
  Runnable query:
@@ -199,7 +199,7 @@ type duplicateAliasTestQuery = {
   result: duplicateAliasTestResult,
 }
 
-%%private(let duplicateAliasTestIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select\n    'main' as status,\n    1 as priority,\n    (select 'sub' as status) as sub_status"}`))
+%%private(let duplicateAliasTestIR: IR.t = %raw(`{"queryName":"DuplicateAliasTest","usedParamSet":{},"params":[],"statement":"select\n    'main' as status,\n    1 as priority,\n    (select 'sub' as status) as sub_status"}`))
 
 /**
  Runnable query:
@@ -280,7 +280,7 @@ type unionTestQuery = {
   result: unionTestResult,
 }
 
-%%private(let unionTestIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select 'draft' as document_status, 1 as version\n  union all\n  select 'published' as document_status, 2 as version"}`))
+%%private(let unionTestIR: IR.t = %raw(`{"queryName":"UnionTest","usedParamSet":{},"params":[],"statement":"select 'draft' as document_status, 1 as version\n  union all\n  select 'published' as document_status, 2 as version"}`))
 
 /**
  Runnable query:
@@ -360,7 +360,7 @@ type unionTestWithStringQuery = {
   result: unionTestWithStringResult,
 }
 
-%%private(let unionTestWithStringIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select 'draft' as document_status, 1 as version\n  union all\n  select 'published' as document_status, 2 as version\n  union all\n  select 'draft' || 'two' as document_status, 3 as version"}`))
+%%private(let unionTestWithStringIR: IR.t = %raw(`{"queryName":"UnionTestWithString","usedParamSet":{},"params":[],"statement":"select 'draft' as document_status, 1 as version\n  union all\n  select 'published' as document_status, 2 as version\n  union all\n  select 'draft' || 'two' as document_status, 3 as version"}`))
 
 /**
  Runnable query:
@@ -443,7 +443,7 @@ type singleLiteralsQuery = {
   result: singleLiteralsResult,
 }
 
-%%private(let singleLiteralsIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select\n    'confirmed' as booking_status,\n    5 as rating_stars,\n    'premium' as subscription_tier"}`))
+%%private(let singleLiteralsIR: IR.t = %raw(`{"queryName":"SingleLiterals","usedParamSet":{},"params":[],"statement":"select\n    'confirmed' as booking_status,\n    5 as rating_stars,\n    'premium' as subscription_tier"}`))
 
 /**
  Runnable query:
@@ -530,7 +530,7 @@ type edgeCasesQuery = {
   result: edgeCasesResult,
 }
 
-%%private(let edgeCasesIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select\n    '' as empty_string,\n    -999 as negative_number,\n    0 as zero,\n    'null' as null_string,\n    123456789 as large_number,\n    'a' as single_char,\n    'with spaces' as string_with_spaces,\n    -1 as minus_one"}`))
+%%private(let edgeCasesIR: IR.t = %raw(`{"queryName":"EdgeCases","usedParamSet":{},"params":[],"statement":"select\n    '' as empty_string,\n    -999 as negative_number,\n    0 as zero,\n    'null' as null_string,\n    123456789 as large_number,\n    'a' as single_char,\n    'with spaces' as string_with_spaces,\n    -1 as minus_one"}`))
 
 /**
  Runnable query:
@@ -617,7 +617,7 @@ type contextTestQuery = {
   result: contextTestResult,
 }
 
-%%private(let contextTestIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select \n    'outer_result' as status,\n    'final_value' as result_type,\n    (\n      select count(*)\n      from (\n        select 'inner_result' as status,  -- Same alias but different context\n               'internal_value' as result_type  -- Same alias but different context\n        from generate_series(1,3)\n      ) inner_table\n      where inner_table.status = 'inner_result'  -- This literal is used for filtering\n    ) as nested_count"}`))
+%%private(let contextTestIR: IR.t = %raw(`{"queryName":"ContextTest","usedParamSet":{},"params":[],"statement":"select \n    'outer_result' as status,\n    'final_value' as result_type,\n    (\n      select count(*)\n      from (\n        select 'inner_result' as status,  -- Same alias but different context\n               'internal_value' as result_type  -- Same alias but different context\n        from generate_series(1,3)\n      ) inner_table\n      where inner_table.status = 'inner_result'  -- This literal is used for filtering\n    ) as nested_count"}`))
 
 /**
  Runnable query:
