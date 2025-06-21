@@ -598,6 +598,12 @@ export async function getTypes(
     type: typeMap[f.typeOID],
   }));
 
+  if (queryData.query.includes('@name Literals')) {
+    console.log({
+      returnTypes,
+    });
+  }
+
   const paramMetadata = {
     params: params.map(({ oid }) => typeMap[oid]),
     mapping: queryData.mapping,

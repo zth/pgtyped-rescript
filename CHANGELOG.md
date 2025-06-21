@@ -1,5 +1,6 @@
 # main
 
+- Auto-escape all ReScript keywords in generated record field names.
 - Add automatic parsing of PostgreSQL check constraints to generate ReScript polyvariant types for enumeration-style constraints. Supports both `column IN (value1, value2, ...)` and `column = ANY (ARRAY[value1, value2, ...])` patterns with string and integer values.
 - Remove dependency on `@rescript/core` since it's not really used.
 
