@@ -170,6 +170,78 @@ let books = await client->GetBooksByStatus.many({
 
 This feature works seamlessly with both separate SQL files and SQL-in-ReScript modes.
 
+## Literal Type Inference
+
+`pgtyped-rescript` automatically infers specific polyvariant types for literal values in your SQL queries, providing enhanced type safety and better development experience.
+
+### How It Works
+
+When your SQL queries return literal values with aliases, `pgtyped-rescript` generates specific polyvariant types instead of generic `string`, `int`, etc. This works for both simple SELECT queries and UNION queries where literals are consistent across all branches.
+
+### Examples
+
+**Simple literals:**
+
+```sql
+/* @name getStatus */
+SELECT
+  'success' as status,
+  200 as code,
+  'active' as state
+```
+
+Generated ReScript type:
+
+```rescript
+type getStatusResult = {
+  status: [#"success"],
+  code: [#200],
+  state: [#"active"],
+}
+```
+
+**Union queries with consistent literals:**
+
+```sql
+/* @name getDocumentStatus */
+SELECT 'draft' as status, 1 as version
+UNION ALL
+SELECT 'published' as status, 2 as version
+```
+
+Generated ReScript type:
+
+```rescript
+type getDocumentStatusResult = {
+  status: [#"draft" | #"published"],
+  version: [#1 | #2],
+}
+```
+
+**SQL-in-ReScript example:**
+
+```rescript
+let getOrderStatus = %sql.many(`
+  SELECT
+    'pending' as status,
+    0 as priority
+  UNION ALL
+  SELECT
+    'shipped' as status,
+    1 as priority
+`)
+
+// Returns: array<{status: [#"pending" | #"shipped"], priority: [#0 | #1]}>
+let statuses = await client->getOrderStatus()
+```
+
+### Smart Inference Rules
+
+- **Consistent literals**: Only infers polyvariants when all literal values for the same alias are actual literals (not expressions)
+- **Context-aware**: Handles nested queries correctly, only inferring from the top-level SELECT
+- **Duplicate handling**: Automatically deduplicates identical literals in UNION queries
+- **Mixed expressions**: Falls back to generic types when mixing literals with expressions (e.g., `'draft' || 'suffix'`)
+
 ## API
 
 ### `PgTyped`

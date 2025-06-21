@@ -2,6 +2,7 @@
 
 - Auto-escape all ReScript keywords in generated record field names.
 - Add automatic parsing of PostgreSQL check constraints to generate ReScript polyvariant types for enumeration-style constraints. Supports both `column IN (value1, value2, ...)` and `column = ANY (ARRAY[value1, value2, ...])` patterns with string and integer values.
+- Add top-level literal inference for SELECT queries. When a query returns literal values with aliases (e.g., `SELECT 'success' as status, 42 as code`), PgTyped now automatically infers specific polyvariant types like `[#"success"]` and `[#42]` instead of generic `string` and `int` types. This provides better type safety and autocompletion. Also works with UNION queries where literals are consistent across all branches.
 - Remove dependency on `@rescript/core` since it's not really used.
 
 # 2.6.0
