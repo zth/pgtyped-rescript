@@ -556,7 +556,7 @@ export function getAliasedLiterals(
     const unionContext = 'union';
 
     const collectFromSelect = (selectNode: SelectStatement) => {
-      const visitor = astVisitor((map) => ({
+      const visitor = astVisitor((v) => ({
         selectionColumn: (node) => {
           const { alias, expr } = node;
           if (alias != null) {
@@ -582,7 +582,7 @@ export function getAliasedLiterals(
               aliasesWithInvalidValues.add(alias.name);
             }
           }
-          map.super().selectionColumn(node);
+          v.super().selectionColumn(node);
         },
       }));
       visitor.select(selectNode);
@@ -644,7 +644,7 @@ export function getAliasedLiterals(
       if (sameContext) {
         // Only add if the value isn't already present (avoid true duplicates)
         const isDuplicate = existing.some(
-          (existing) => existing.type === v.type && existing.value === v.value,
+          (e) => e.type === v.type && e.value === v.value,
         );
         if (!isDuplicate) {
           existing.push(v);
