@@ -124,7 +124,12 @@ module Pg = {
 }
 
 module IR = {
-  type t
+  type t = private {
+    queryName: option<string>,
+    statement: string,
+    usedParamSet: dict<bool>,
+    params: array<Js.Json.t>, // This can be more thoroughly typed if wanted
+  }
 }
 
 module PreparedStatement = {
