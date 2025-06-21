@@ -76,6 +76,37 @@ CREATE TABLE dump(
   json_test jsonb
 );
 
+-- Commented out fields are already Postgres keywords
+create table rescript_keywords_need_to_be_escaped(
+  id SERIAL PRIMARY KEY,
+  -- and text,
+  -- as text,
+  assert text,
+  await text,
+  -- constraint text,
+  -- else text, 
+  exception text,
+  external text,
+  -- false text,
+  -- for text,  
+  if text,
+  -- in text,
+  include text,
+  let text,
+  module text,
+  mutable text,
+  of text,
+  open text,
+  private text,
+  rec text,
+  switch text,
+  -- true text,
+  try text,
+  type text,
+  -- when text,
+  while text
+);
+
 INSERT INTO users (email, user_name, first_name, last_name, age)
 VALUES ('alex.doe@example.com', 'alexd', 'Alex', 'Doe', 35),
        ('jane.holmes@example.com', 'jane67', 'Jane', 'Holmes', 23),

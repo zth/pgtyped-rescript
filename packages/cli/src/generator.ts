@@ -479,7 +479,34 @@ function toRescriptName(name: string): string {
   return `${name[0]?.toLowerCase() ?? ''}${name.slice(1)}`;
 }
 
-const reservedReScriptWords = ['type'];
+const reservedReScriptWords = [
+  'and',
+  'as',
+  'assert',
+  'await',
+  'constraint',
+  'else',
+  'exception',
+  'external',
+  'false',
+  'for',
+  'if',
+  'in',
+  'include',
+  'let',
+  'module',
+  'mutable',
+  'of',
+  'open',
+  'private',
+  'rec',
+  'switch',
+  'true',
+  'try',
+  'type',
+  'when',
+  'while',
+];
 
 function getFieldName(fieldName: string): string {
   if (reservedReScriptWords.includes(fieldName)) {
