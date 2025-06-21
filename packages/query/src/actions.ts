@@ -12,7 +12,13 @@ import {
   createInitialSASLResponse,
 } from './sasl-helpers.js';
 import { DatabaseTypeKind, isEnum, MappableType } from './type.js';
-import { parse, astVisitor, Expr, Statement } from 'pgsql-ast-parser';
+import {
+  parse,
+  astVisitor,
+  Expr,
+  Statement,
+  SelectStatement,
+} from 'pgsql-ast-parser';
 
 const debugQuery = debugBase('client:query');
 
@@ -415,11 +421,13 @@ export type ConstraintValue =
       type: 'string';
       value: string;
       alias?: string;
+      context?: string;
     }
   | {
       type: 'integer';
       value: number;
       alias?: string;
+      context?: string;
     };
 
 export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
@@ -539,45 +547,122 @@ async function getComments(
 
 export function getAliasedLiterals(
   ast: Statement[],
-): Map<string, ConstraintValue> {
+): Map<string, ConstraintValue[]> {
   const values: ConstraintValue[] = [];
+  const aliasesWithInvalidValues = new Set<string>();
+  const topStatement = ast[0];
 
-  const visitor = astVisitor((map) => ({
-    selectionColumn: (node) => {
-      const { alias, expr } = node;
-      if (alias != null) {
-        if (expr.type === 'string' && 'value' in expr) {
-          values.push({
-            type: 'string',
-            value: expr.value,
-            alias: alias.name,
-          });
-        } else if (
-          expr.type === 'integer' &&
-          'value' in expr &&
-          expr.value >= 0
-        ) {
-          values.push({
-            type: 'integer',
-            value: expr.value,
-            alias: alias.name,
-          });
+  if (topStatement.type === 'union' || topStatement.type === 'union all') {
+    const unionContext = 'union';
+
+    const collectFromSelect = (selectNode: SelectStatement) => {
+      const visitor = astVisitor((map) => ({
+        selectionColumn: (node) => {
+          const { alias, expr } = node;
+          if (alias != null) {
+            if (expr.type === 'string' && 'value' in expr) {
+              values.push({
+                type: 'string',
+                value: expr.value,
+                alias: alias.name,
+                context: unionContext,
+              });
+            } else if (
+              expr.type === 'integer' &&
+              'value' in expr &&
+              expr.value >= 0
+            ) {
+              values.push({
+                type: 'integer',
+                value: expr.value,
+                alias: alias.name,
+                context: unionContext,
+              });
+            } else {
+              aliasesWithInvalidValues.add(alias.name);
+            }
+          }
+          map.super().selectionColumn(node);
+        },
+      }));
+      visitor.select(selectNode);
+    };
+
+    // Helper to traverse union nodes
+    const traverseUnion = (node: Expr) => {
+      if (node.type === 'select') {
+        collectFromSelect(node);
+      } else if (node.type === 'union' || node.type === 'union all') {
+        traverseUnion(node.left);
+        traverseUnion(node.right);
+      }
+    };
+
+    traverseUnion(topStatement);
+  } else {
+    if (topStatement.type === 'select') {
+      // Do not traverse any nested structure.
+      const columns = topStatement.columns || [];
+      for (const column of columns) {
+        if (column.alias && column.expr) {
+          const { alias, expr } = column;
+          if (expr.type === 'string' && 'value' in expr) {
+            values.push({
+              type: 'string',
+              value: expr.value,
+              alias: alias.name,
+              context: 'select',
+            });
+          } else if (
+            expr.type === 'integer' &&
+            'value' in expr &&
+            expr.value >= 0
+          ) {
+            values.push({
+              type: 'integer',
+              value: expr.value,
+              alias: alias.name,
+              context: 'select',
+            });
+          } else {
+            aliasesWithInvalidValues.add(alias.name);
+          }
         }
       }
-      map.super().selectionColumn(node);
-    },
-  }));
-
-  visitor.statement(ast[0]);
-
-  const map = new Map<string, ConstraintValue>();
-  for (const v of values) {
-    // Duplicates means something is fishy, so we opt out for now
-    if (map.has(v.alias!)) {
-      map.delete(v.alias!);
-    } else {
-      map.set(v.alias!, v);
     }
+  }
+
+  const map = new Map<string, ConstraintValue[]>();
+  for (const v of values) {
+    const key = v.alias!;
+    if (map.has(key)) {
+      const existing = map.get(key)!;
+
+      // Only accumulate if from the same context (same logical level)
+      const sameContext =
+        existing.length > 0 && existing[0].context === v.context;
+      if (sameContext) {
+        // Only add if the value isn't already present (avoid true duplicates)
+        const isDuplicate = existing.some(
+          (existing) => existing.type === v.type && existing.value === v.value,
+        );
+        if (!isDuplicate) {
+          existing.push(v);
+        }
+      } else {
+        // Different contexts means different logical meanings, skip inference
+        map.delete(key);
+      }
+    } else {
+      map.set(key, [v]);
+    }
+  }
+
+  // Opt out of literal inference for aliases with some non-literal values.
+  // In the future this could be extended to use unboxed variants, and we could capture the
+  // "other" value efficiently as a catch-all.
+  for (const alias of aliasesWithInvalidValues) {
+    map.delete(alias);
   }
 
   return map;
@@ -658,11 +743,11 @@ export async function getTypes(
       type: typeMap[f.typeOID],
     }))
     .map((f) => {
-      const aliased = aliasedLiterals.get(f.returnName);
-      if (aliased != null) {
+      const aliasedValues = aliasedLiterals.get(f.returnName);
+      if (aliasedValues != null) {
         // Aliased literals are not nullable by definition
         f.nullable = false;
-        f.checkValues = [aliased];
+        f.checkValues = aliasedValues;
         return f;
       } else {
         return f;

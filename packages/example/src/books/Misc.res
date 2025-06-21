@@ -31,13 +31,20 @@ let duplicateAliasTest = %sql.one(`
     (select 'sub' as status) as sub_status
 `)
 
-// Test with UNION - another case where same alias might appear
-// Same aliases should prevent inference
 let unionTest = %sql.many(`
   /* @name UnionTest */
   select 'draft' as document_status, 1 as version
   union all
   select 'published' as document_status, 2 as version
+`)
+
+let unionTestWithString = %sql.many(`
+  /* @name UnionTestWithString */
+  select 'draft' as document_status, 1 as version
+  union all
+  select 'published' as document_status, 2 as version
+  union all
+  select 'draft' || 'two' as document_status, 3 as version
 `)
 
 // Test with single literals that should work
@@ -61,4 +68,21 @@ let edgeCases = %sql.one(`
     'a' as single_char,
     'with spaces' as string_with_spaces,
     -1 as minus_one
+`)
+
+// Test context tracking - literals in nested contexts shouldn't interfere
+let contextTest = %sql.one(`
+  /* @name ContextTest */
+  select 
+    'outer_result' as status,
+    'final_value' as result_type,
+    (
+      select count(*)
+      from (
+        select 'inner_result' as status,  -- Same alias but different context
+               'internal_value' as result_type  -- Same alias but different context
+        from generate_series(1,3)
+      ) inner_table
+      where inner_table.status = 'inner_result'  -- This literal is used for filtering
+    ) as nested_count
 `)

@@ -188,7 +188,7 @@ type duplicateAliasTestParams = unit
 @gentype
 type duplicateAliasTestResult = {
   priority: [#1],
-  status: option<string>,
+  status: [#"main"],
   sub_status: option<string>,
 }
 
@@ -269,8 +269,8 @@ type unionTestParams = unit
 /** 'UnionTest' return type */
 @gentype
 type unionTestResult = {
-  document_status: option<string>,
-  version: option<int>,
+  document_status: [#"draft" | #"published"],
+  version: [#1 | #2],
 }
 
 /** 'UnionTest' query type */
@@ -340,6 +340,88 @@ module UnionTest: {
 @gentype
 @deprecated("Use 'UnionTest.many' directly instead")
 let unionTest = (params, ~client) => UnionTest.many(client, params)
+
+
+/** 'UnionTestWithString' parameters type */
+@gentype
+type unionTestWithStringParams = unit
+
+/** 'UnionTestWithString' return type */
+@gentype
+type unionTestWithStringResult = {
+  document_status: option<string>,
+  version: [#1 | #2 | #3],
+}
+
+/** 'UnionTestWithString' query type */
+@gentype
+type unionTestWithStringQuery = {
+  params: unionTestWithStringParams,
+  result: unionTestWithStringResult,
+}
+
+%%private(let unionTestWithStringIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select 'draft' as document_status, 1 as version\n  union all\n  select 'published' as document_status, 2 as version\n  union all\n  select 'draft' || 'two' as document_status, 3 as version"}`))
+
+/**
+ Runnable query:
+ ```sql
+select 'draft' as document_status, 1 as version
+  union all
+  select 'published' as document_status, 2 as version
+  union all
+  select 'draft' || 'two' as document_status, 3 as version
+ ```
+
+ */
+@gentype
+module UnionTestWithString: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, unionTestWithStringParams) => promise<array<unionTestWithStringResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, unionTestWithStringParams) => promise<option<unionTestWithStringResult>>
+  
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    unionTestWithStringParams,
+    ~errorMessage: string=?
+  ) => promise<unionTestWithStringResult>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, unionTestWithStringParams) => promise<unit>
+} = {
+  @module("pgtyped-rescript-runtime") @new external unionTestWithString: IR.t => PreparedStatement.t<unionTestWithStringParams, unionTestWithStringResult> = "PreparedQuery";
+  let query = unionTestWithString(unionTestWithStringIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
+
+@gentype
+@deprecated("Use 'UnionTestWithString.many' directly instead")
+let unionTestWithString = (params, ~client) => UnionTestWithString.many(client, params)
 
 
 /** 'SingleLiterals' parameters type */
@@ -514,5 +596,95 @@ module EdgeCases: {
 @gentype
 @deprecated("Use 'EdgeCases.many' directly instead")
 let edgeCases = (params, ~client) => EdgeCases.many(client, params)
+
+
+/** 'ContextTest' parameters type */
+@gentype
+type contextTestParams = unit
+
+/** 'ContextTest' return type */
+@gentype
+type contextTestResult = {
+  nested_count: option<bigint>,
+  result_type: [#"final_value"],
+  status: [#"outer_result"],
+}
+
+/** 'ContextTest' query type */
+@gentype
+type contextTestQuery = {
+  params: contextTestParams,
+  result: contextTestResult,
+}
+
+%%private(let contextTestIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"select \n    'outer_result' as status,\n    'final_value' as result_type,\n    (\n      select count(*)\n      from (\n        select 'inner_result' as status,  -- Same alias but different context\n               'internal_value' as result_type  -- Same alias but different context\n        from generate_series(1,3)\n      ) inner_table\n      where inner_table.status = 'inner_result'  -- This literal is used for filtering\n    ) as nested_count"}`))
+
+/**
+ Runnable query:
+ ```sql
+select 
+    'outer_result' as status,
+    'final_value' as result_type,
+    (
+      select count(*)
+      from (
+        select 'inner_result' as status,  -- Same alias but different context
+               'internal_value' as result_type  -- Same alias but different context
+        from generate_series(1,3)
+      ) inner_table
+      where inner_table.status = 'inner_result'  -- This literal is used for filtering
+    ) as nested_count
+ ```
+
+ */
+@gentype
+module ContextTest: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, contextTestParams) => promise<array<contextTestResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, contextTestParams) => promise<option<contextTestResult>>
+  
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    contextTestParams,
+    ~errorMessage: string=?
+  ) => promise<contextTestResult>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, contextTestParams) => promise<unit>
+} = {
+  @module("pgtyped-rescript-runtime") @new external contextTest: IR.t => PreparedStatement.t<contextTestParams, contextTestResult> = "PreparedQuery";
+  let query = contextTest(contextTestIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
+
+@gentype
+@deprecated("Use 'ContextTest.many' directly instead")
+let contextTest = (params, ~client) => ContextTest.many(client, params)
 
 
