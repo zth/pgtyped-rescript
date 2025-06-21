@@ -14,6 +14,7 @@ import {
 /* Processes query AST formed by new parser from pure SQL files */
 export const processSQLQueryIR = (
   queryIR: SQLQueryIR,
+  queryName: string | undefined,
   passedParams?: QueryParameters,
 ): InterpolatedQuery => {
   const bindings: Scalar[] = [];
@@ -169,5 +170,6 @@ export const processSQLQueryIR = (
     mapping: paramMapping,
     query: flatStr,
     bindings,
+    name: queryName,
   };
 };

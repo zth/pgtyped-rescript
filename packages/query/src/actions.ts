@@ -12,7 +12,7 @@ import {
   createInitialSASLResponse,
 } from './sasl-helpers.js';
 import { DatabaseTypeKind, isEnum, MappableType } from './type.js';
-import { parse, astVisitor, Expr } from 'pgsql-ast-parser';
+import { parse, astVisitor, Expr, Statement } from 'pgsql-ast-parser';
 
 const debugQuery = debugBase('client:query');
 
@@ -411,9 +411,16 @@ interface ColumnCheck {
 }
 
 export type ConstraintValue =
-  | { type: 'string'; value: string }
-  | { type: 'integer'; value: number }
-  | { type: 'float'; value: number };
+  | {
+      type: 'string';
+      value: string;
+      alias?: string;
+    }
+  | {
+      type: 'integer';
+      value: number;
+      alias?: string;
+    };
 
 export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
   try {
@@ -435,7 +442,11 @@ export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
         
         } else if (node.type === 'numeric' && 'value' in node) {
           values.push({ type: 'float', value: node.value });*/
-        } else if (node.type === 'integer' && 'value' in node) {
+        } else if (
+          node.type === 'integer' &&
+          'value' in node &&
+          node.value >= 0
+        ) {
           values.push({ type: 'integer', value: node.value });
         } else {
           hadInvalidValue = true;
@@ -526,6 +537,52 @@ async function getComments(
   }));
 }
 
+export function getAliasedLiterals(
+  ast: Statement[],
+): Map<string, ConstraintValue> {
+  const values: ConstraintValue[] = [];
+
+  const visitor = astVisitor((map) => ({
+    selectionColumn: (node) => {
+      const { alias, expr } = node;
+      if (alias != null) {
+        if (expr.type === 'string' && 'value' in expr) {
+          values.push({
+            type: 'string',
+            value: expr.value,
+            alias: alias.name,
+          });
+        } else if (
+          expr.type === 'integer' &&
+          'value' in expr &&
+          expr.value >= 0
+        ) {
+          values.push({
+            type: 'integer',
+            value: expr.value,
+            alias: alias.name,
+          });
+        }
+      }
+      map.super().selectionColumn(node);
+    },
+  }));
+
+  visitor.statement(ast[0]);
+
+  const map = new Map<string, ConstraintValue>();
+  for (const v of values) {
+    // Duplicates means something is fishy, so we opt out for now
+    if (map.has(v.alias!)) {
+      map.delete(v.alias!);
+    } else {
+      map.set(v.alias!, v);
+    }
+  }
+
+  return map;
+}
+
 export async function getTypes(
   queryData: InterpolatedQuery,
   queue: AsyncQueue,
@@ -544,6 +601,8 @@ export async function getTypes(
   const commentRows = await getComments(fields, queue);
   const checkRows = await getCheckConstraints(fields, queue);
   const typeMap = reduceTypeRows(typeRows);
+  const parsedQuery = parse(queryData.query);
+  const aliasedLiterals = getAliasedLiterals(parsedQuery);
 
   const attrMatcher = ({
     tableOID,
@@ -590,13 +649,25 @@ export async function getTypes(
     checkMap[`${chk.tableOID}:${chk.columnAttrNumber}`] = chk.values;
   }
 
-  const returnTypes = fields.map((f) => ({
-    ...attrMap[getAttid(f)],
-    ...(commentMap[getAttid(f)] ? { comment: commentMap[getAttid(f)] } : {}),
-    ...(checkMap[getAttid(f)] ? { checkValues: checkMap[getAttid(f)] } : {}),
-    returnName: f.name,
-    type: typeMap[f.typeOID],
-  }));
+  const returnTypes = fields
+    .map((f) => ({
+      ...attrMap[getAttid(f)],
+      ...(commentMap[getAttid(f)] ? { comment: commentMap[getAttid(f)] } : {}),
+      ...(checkMap[getAttid(f)] ? { checkValues: checkMap[getAttid(f)] } : {}),
+      returnName: f.name,
+      type: typeMap[f.typeOID],
+    }))
+    .map((f) => {
+      const aliased = aliasedLiterals.get(f.returnName);
+      if (aliased != null) {
+        // Aliased literals are not nullable by definition
+        f.nullable = false;
+        f.checkValues = [aliased];
+        return f;
+      } else {
+        return f;
+      }
+    });
 
   const paramMetadata = {
     params: params.map(({ oid }) => typeMap[oid]),

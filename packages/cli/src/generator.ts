@@ -83,7 +83,7 @@ export async function queryToTypeDeclarations(
     queryData = processTSQueryAST(parsedQuery.ast);
   } else {
     queryName = pascalCase(parsedQuery.ast.name);
-    queryData = processSQLQueryIR(queryASTToIR(parsedQuery.ast));
+    queryData = processSQLQueryIR(queryASTToIR(parsedQuery.ast), queryName);
   }
 
   const typeData = await typeSource(queryData);
@@ -100,7 +100,7 @@ export async function queryToTypeDeclarations(
   if (typeError || hasAnonymousColumns) {
     // tslint:disable:no-console
     if (typeError) {
-      console.error('Error in query. Details: %o', typeData);
+      console.error(`Error in query "${queryName}". Details: %o`, typeData);
       if (config.failOnError) {
         throw new Error(
           `Query "${queryName}" is invalid. Can't generate types.`,
@@ -146,8 +146,6 @@ export async function queryToTypeDeclarations(
               case 'string':
                 return `#"${v.value}"`;
               case 'integer':
-                return `#${v.value}`;
-              case 'float':
                 return `#${v.value}`;
             }
           })
@@ -396,7 +394,7 @@ export async function generateDeclarationFile(
       `/**\n` +
       ` Runnable query:\n` +
       ` \`\`\`sql\n` +
-      `${processSQLQueryIR(typeDec.query.ir).query}\n` +
+      `${processSQLQueryIR(typeDec.query.ir, typeDec.query.name).query}\n` +
       ` \`\`\`\n\n` +
       ` */\n`;
     declarationFileContents += `@gentype
