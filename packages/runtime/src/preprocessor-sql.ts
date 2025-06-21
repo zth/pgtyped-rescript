@@ -169,5 +169,6 @@ export const processSQLQueryIR = (
     mapping: paramMapping,
     query: flatStr,
     bindings,
+    name: queryIR.queryName,
   };
 };

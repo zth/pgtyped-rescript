@@ -46,6 +46,7 @@ export interface InterpolatedQuery {
   query: string;
   mapping: QueryParameter[];
   bindings: Scalar[];
+  name: string | undefined;
 }
 
 export interface NestedParameters {

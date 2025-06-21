@@ -12,7 +12,13 @@ import {
   createInitialSASLResponse,
 } from './sasl-helpers.js';
 import { DatabaseTypeKind, isEnum, MappableType } from './type.js';
-import { parse, astVisitor, Expr } from 'pgsql-ast-parser';
+import {
+  parse,
+  astVisitor,
+  Expr,
+  Statement,
+  SelectStatement,
+} from 'pgsql-ast-parser';
 
 const debugQuery = debugBase('client:query');
 
@@ -411,9 +417,18 @@ interface ColumnCheck {
 }
 
 export type ConstraintValue =
-  | { type: 'string'; value: string }
-  | { type: 'integer'; value: number }
-  | { type: 'float'; value: number };
+  | {
+      type: 'string';
+      value: string;
+      alias?: string;
+      context?: string;
+    }
+  | {
+      type: 'integer';
+      value: number;
+      alias?: string;
+      context?: string;
+    };
 
 export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
   try {
@@ -435,7 +450,11 @@ export function parseCheckAllowedValues(def: string): ConstraintValue[] | null {
         
         } else if (node.type === 'numeric' && 'value' in node) {
           values.push({ type: 'float', value: node.value });*/
-        } else if (node.type === 'integer' && 'value' in node) {
+        } else if (
+          node.type === 'integer' &&
+          'value' in node &&
+          node.value >= 0
+        ) {
           values.push({ type: 'integer', value: node.value });
         } else {
           hadInvalidValue = true;
@@ -526,6 +545,129 @@ async function getComments(
   }));
 }
 
+export function getAliasedLiterals(
+  ast: Statement[],
+): Map<string, ConstraintValue[]> {
+  const values: ConstraintValue[] = [];
+  const aliasesWithInvalidValues = new Set<string>();
+  const topStatement = ast[0];
+
+  if (topStatement.type === 'union' || topStatement.type === 'union all') {
+    const unionContext = 'union';
+
+    const collectFromSelect = (selectNode: SelectStatement) => {
+      const visitor = astVisitor((v) => ({
+        selectionColumn: (node) => {
+          const { alias, expr } = node;
+          if (alias != null) {
+            if (expr.type === 'string' && 'value' in expr) {
+              values.push({
+                type: 'string',
+                value: expr.value,
+                alias: alias.name,
+                context: unionContext,
+              });
+            } else if (
+              expr.type === 'integer' &&
+              'value' in expr &&
+              expr.value >= 0
+            ) {
+              values.push({
+                type: 'integer',
+                value: expr.value,
+                alias: alias.name,
+                context: unionContext,
+              });
+            } else {
+              aliasesWithInvalidValues.add(alias.name);
+            }
+          }
+          v.super().selectionColumn(node);
+        },
+      }));
+      visitor.select(selectNode);
+    };
+
+    // Helper to traverse union nodes
+    const traverseUnion = (node: Expr) => {
+      if (node.type === 'select') {
+        collectFromSelect(node);
+      } else if (node.type === 'union' || node.type === 'union all') {
+        traverseUnion(node.left);
+        traverseUnion(node.right);
+      }
+    };
+
+    traverseUnion(topStatement);
+  } else {
+    if (topStatement.type === 'select') {
+      // Do not traverse any nested structure.
+      const columns = topStatement.columns || [];
+      for (const column of columns) {
+        if (column.alias && column.expr) {
+          const { alias, expr } = column;
+          if (expr.type === 'string' && 'value' in expr) {
+            values.push({
+              type: 'string',
+              value: expr.value,
+              alias: alias.name,
+              context: 'select',
+            });
+          } else if (
+            expr.type === 'integer' &&
+            'value' in expr &&
+            expr.value >= 0
+          ) {
+            values.push({
+              type: 'integer',
+              value: expr.value,
+              alias: alias.name,
+              context: 'select',
+            });
+          } else {
+            aliasesWithInvalidValues.add(alias.name);
+          }
+        }
+      }
+    }
+  }
+
+  const map = new Map<string, ConstraintValue[]>();
+  for (const v of values) {
+    const key = v.alias!;
+    if (map.has(key)) {
+      const existing = map.get(key)!;
+
+      // Only accumulate if from the same context (same logical level)
+      const sameContext =
+        existing.length > 0 && existing[0].context === v.context;
+      if (sameContext) {
+        // Only add if the value isn't already present (avoid true duplicates)
+        const isDuplicate = existing.some(
+          (e) => e.type === v.type && e.value === v.value,
+        );
+        if (!isDuplicate) {
+          existing.push(v);
+        }
+      } else {
+        // Different contexts means different logical meanings, skip inference
+        map.delete(key);
+      }
+    } else {
+      map.set(key, [v]);
+    }
+  }
+
+  // Opt out of literal inference for aliases with some non-literal values.
+  // In the future this could be extended to use unboxed variants, and we could capture the
+  // "other" value efficiently as a catch-all.
+  for (const alias of aliasesWithInvalidValues) {
+    map.delete(alias);
+  }
+
+  return map;
+}
+
 export async function getTypes(
   queryData: InterpolatedQuery,
   queue: AsyncQueue,
@@ -544,6 +686,8 @@ export async function getTypes(
   const commentRows = await getComments(fields, queue);
   const checkRows = await getCheckConstraints(fields, queue);
   const typeMap = reduceTypeRows(typeRows);
+  const parsedQuery = parse(queryData.query);
+  const aliasedLiterals = getAliasedLiterals(parsedQuery);
 
   const attrMatcher = ({
     tableOID,
@@ -590,13 +734,25 @@ export async function getTypes(
     checkMap[`${chk.tableOID}:${chk.columnAttrNumber}`] = chk.values;
   }
 
-  const returnTypes = fields.map((f) => ({
-    ...attrMap[getAttid(f)],
-    ...(commentMap[getAttid(f)] ? { comment: commentMap[getAttid(f)] } : {}),
-    ...(checkMap[getAttid(f)] ? { checkValues: checkMap[getAttid(f)] } : {}),
-    returnName: f.name,
-    type: typeMap[f.typeOID],
-  }));
+  const returnTypes = fields
+    .map((f) => ({
+      ...attrMap[getAttid(f)],
+      ...(commentMap[getAttid(f)] ? { comment: commentMap[getAttid(f)] } : {}),
+      ...(checkMap[getAttid(f)] ? { checkValues: checkMap[getAttid(f)] } : {}),
+      returnName: f.name,
+      type: typeMap[f.typeOID],
+    }))
+    .map((f) => {
+      const aliasedValues = aliasedLiterals.get(f.returnName);
+      if (aliasedValues != null) {
+        // Aliased literals are not nullable by definition
+        f.nullable = false;
+        f.checkValues = aliasedValues;
+        return f;
+      } else {
+        return f;
+      }
+    });
 
   const paramMetadata = {
     params: params.map(({ oid }) => typeMap[oid]),

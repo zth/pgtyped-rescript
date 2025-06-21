@@ -84,6 +84,7 @@ export interface QueryIR {
   params: ParamIR[];
   statement: string;
   usedParamSet: QueryAST['usedParamSet'];
+  queryName: string;
 }
 
 interface ParseTree {
@@ -295,6 +296,7 @@ export function queryASTToIR(query: SQLQueryAST): SQLQueryIR {
   const { a: statementStart } = query.statement.loc;
 
   return {
+    queryName: query.name,
     usedParamSet: query.usedParamSet,
     params: query.params.map((param) => ({
       name: param.name,

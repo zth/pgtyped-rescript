@@ -1,5 +1,5 @@
 import { parseTSQuery } from '@pgtyped/parser';
-import { ParameterTransform } from './preprocessor.js';
+import { InterpolatedQuery, ParameterTransform } from './preprocessor.js';
 import { processTSQueryAST } from './preprocessor-ts.js';
 
 test('(TS) name parameter interpolation', () => {
@@ -10,10 +10,11 @@ test('(TS) name parameter interpolation', () => {
     age: 12,
   };
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: 'SELECT id, name from users where id = $1 and age > $2',
     mapping: [],
     bindings: ['123', 12],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, parameters);
@@ -41,6 +42,7 @@ test('(TS) pick parameter interpolation (multiline)', () => {
     VALUES ($1, $2, $3)`,
     mapping: [],
     bindings: [{ num_frogs: 1002 }, 1, 'reminder'],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, parameters as any);
@@ -70,6 +72,7 @@ test('(TS) pick array parameter interpolation (multiline)', () => {
     VALUES ($1, $2, $3)`,
     mapping: [],
     bindings: [{ num_frogs: 1002 }, 1, 'reminder'],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, parameters as any);
@@ -84,10 +87,11 @@ test('(TS) scalar param used twice', () => {
     id: '123',
   };
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: 'SELECT id, name from users where id = $1 and parent_id = $1',
     mapping: [],
     bindings: ['123'],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, parameters);
@@ -100,11 +104,12 @@ test('(TS) name parameter mapping', () => {
     'SELECT id, name from users where id = $id and age > $age and parent_id = $id';
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query:
       'SELECT id, name from users where id = $1 and age > $2 and parent_id = $1',
     mapping: [],
     bindings: ['1234-1235', 33],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, {
@@ -120,7 +125,7 @@ test('(TS) single value list parameter interpolation', () => {
     'INSERT INTO users (name, age) VALUES $user(name, age) RETURNING id';
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1, $2) RETURNING id',
     mapping: [
       {
@@ -143,6 +148,7 @@ test('(TS) single value list parameter interpolation', () => {
       },
     ],
     bindings: [],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query);
@@ -163,11 +169,12 @@ test('(TS) single value list parameter interpolation twice', () => {
     },
   };
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query:
       'INSERT INTO users (name, age) VALUES ($1, $2) BOGUS ($1, $3) RETURNING id',
     mapping: [],
     bindings: ['Bob', 12, '1234-123-1233'],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, parameters);
@@ -180,7 +187,7 @@ test('(TS) multiple value list (array) parameter mapping', () => {
     'SELECT FROM users where (age in $$ages and age in $$ages) or (age in $$otherAges)';
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query:
       'SELECT FROM users where (age in ($1) and age in ($1)) or (age in ($2))',
     mapping: [
@@ -198,6 +205,7 @@ test('(TS) multiple value list (array) parameter mapping', () => {
       },
     ],
     bindings: [],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query);
@@ -213,11 +221,12 @@ test('(TS) multiple value list (array) parameter interpolation', () => {
     ages: [23, 27, 50],
   };
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query:
       'SELECT FROM users where age in ($1, $2, $3) or parent_age in ($1, $2, $3)',
     bindings: [23, 27, 50],
     mapping: [],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, parameters);
@@ -230,7 +239,7 @@ test('(TS) multiple value list parameter mapping', () => {
     'INSERT INTO users (name, age) VALUES $$users(name, age) RETURNING id';
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1, $2) RETURNING id',
     bindings: [],
     mapping: [
@@ -253,6 +262,7 @@ test('(TS) multiple value list parameter mapping', () => {
         },
       },
     ],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query);
@@ -265,7 +275,7 @@ test('(TS) multiple value list parameter mapping twice', () => {
     'INSERT INTO users (name, age) VALUES $$users(name, age), $$users(name) RETURNING id';
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: 'INSERT INTO users (name, age) VALUES ($1, $2), ($1) RETURNING id',
     bindings: [],
     mapping: [
@@ -288,6 +298,7 @@ test('(TS) multiple value list parameter mapping twice', () => {
         },
       },
     ],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query);
@@ -307,11 +318,12 @@ test('(TS) multiple value list parameter interpolation', () => {
     ],
   };
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query:
       'INSERT INTO users (name, age) VALUES ($1, $2), ($3, $4) RETURNING id',
     bindings: ['Bob', 12, 'Tom', 22],
     mapping: [],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, parameters);
@@ -331,11 +343,12 @@ test('(TS) multiple value list parameter interpolation twice', () => {
     ],
   };
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query:
       'INSERT INTO users (name, age) VALUES ($1, $2), ($3, $4), ($5, $6), ($7, $8) RETURNING id',
     bindings: ['Bob', 12, 'Tom', 22, 'Bob', 12, 'Tom', 22],
     mapping: [],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, parameters);
@@ -347,10 +360,11 @@ test('(TS) query with no params', () => {
   const query = `UPDATE notifications SET payload = '{"a": "b"}'::jsonb`;
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: `UPDATE notifications SET payload = '{"a": "b"}'::jsonb`,
     bindings: [],
     mapping: [],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query);
@@ -362,10 +376,11 @@ test('(TS) query with empty spread params', () => {
   const query = `SELECT * FROM users WHERE id IN $$ids`;
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: `SELECT * FROM users WHERE id IN ()`,
     bindings: [],
     mapping: [],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, { ids: [] });
@@ -377,10 +392,11 @@ test('(TS) query with empty spread params', () => {
   const query = `INSERT INTO data.action_log (id, name) VALUES $$params(id, name)`;
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: `INSERT INTO data.action_log (id, name) VALUES ()`,
     bindings: [],
     mapping: [],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, { params: [] });
@@ -392,10 +408,11 @@ test('(TS) query with underscores in key names and param names', () => {
   const query = `INSERT INTO data.action_log (_id, _name) VALUES $$_params(_id, _name)`;
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: `INSERT INTO data.action_log (_id, _name) VALUES ($1, $2)`,
     bindings: ['one', 'two'],
     mapping: [],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query, {
@@ -410,7 +427,7 @@ test('(TS) all kinds mapping ', () => {
     'SELECT $userId $age! $userId $$users $age $user(id) $$users $user(id, parentId, age) $$comments(id!, text) $user(age!)';
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: 'SELECT $1 $2 $1 ($3) $2 ($4) ($3) ($4, $5, $6) ($7, $8) ($6)',
     bindings: [],
     mapping: [
@@ -475,6 +492,7 @@ test('(TS) all kinds mapping ', () => {
         },
       },
     ],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query);
@@ -486,7 +504,7 @@ test('(TS) required spread', () => {
   const query = 'SELECT $$users!';
   const parsedQuery = parseTSQuery(query);
 
-  const expectedResult = {
+  const expectedResult: InterpolatedQuery = {
     query: 'SELECT ($1)',
     bindings: [],
     mapping: [
@@ -497,6 +515,7 @@ test('(TS) required spread', () => {
         assignedIndex: [1],
       },
     ],
+    name: 'query',
   };
 
   const result = processTSQueryAST(parsedQuery.query);

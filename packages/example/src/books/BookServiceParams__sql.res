@@ -28,7 +28,7 @@ type query1Query = {
   result: query1Result,
 }
 
-%%private(let query1IR: IR.t = %raw(`{"usedParamSet":{"notification":true},"params":[{"name":"notification","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"payload","required":false},{"name":"user_id","required":false},{"name":"type","required":false}]},"locs":[{"a":58,"b":70}]}],"statement":"INSERT INTO notifications (payload, user_id, type) VALUES :notification"}`))
+%%private(let query1IR: IR.t = %raw(`{"queryName":"Query1","usedParamSet":{"notification":true},"params":[{"name":"notification","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"payload","required":false},{"name":"user_id","required":false},{"name":"type","required":false}]},"locs":[{"a":58,"b":70}]}],"statement":"INSERT INTO notifications (payload, user_id, type) VALUES :notification"}`))
 
 /**
  Runnable query:

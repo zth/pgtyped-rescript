@@ -11,21 +11,6 @@ export type category = "novel" | "science-fiction" | "thriller";
 
 export type categoryArray = category[];
 
-/** 'BooksByAuthor' parameters type */
-export type booksByAuthorParams = { readonly authorName: string };
-
-/** 'BooksByAuthor' return type */
-export type booksByAuthorResult = {
-  readonly author_id: (undefined | number); 
-  readonly categories: (undefined | categoryArray); 
-  readonly id: number; 
-  readonly name: (undefined | string); 
-  readonly rank: (undefined | number)
-};
-
-/** 'BooksByAuthor' query type */
-export type booksByAuthorQuery = { readonly params: booksByAuthorParams; readonly result: booksByAuthorResult };
-
 /** 'FindBookById' parameters type */
 export type findBookByIdParams = { readonly id?: number };
 
@@ -41,19 +26,20 @@ export type findBookByIdResult = {
 /** 'FindBookById' query type */
 export type findBookByIdQuery = { readonly params: findBookByIdParams; readonly result: findBookByIdResult };
 
-/** Returns an array of all matched results. */
-export const BooksByAuthor_many: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams) => Promise<booksByAuthorResult[]> = BookService__sqlJS.BooksByAuthor.many as any;
+/** 'BooksByAuthor' parameters type */
+export type booksByAuthorParams = { readonly authorName: string };
 
-/** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
-export const BooksByAuthor_one: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams) => Promise<(undefined | booksByAuthorResult)> = BookService__sqlJS.BooksByAuthor.one as any;
+/** 'BooksByAuthor' return type */
+export type booksByAuthorResult = {
+  readonly author_id: (undefined | number); 
+  readonly categories: (undefined | categoryArray); 
+  readonly id: number; 
+  readonly name: (undefined | string); 
+  readonly rank: (undefined | number)
+};
 
-/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
-export const BooksByAuthor_expectOne: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams, errorMessage:(undefined | string)) => Promise<booksByAuthorResult> = BookService__sqlJS.BooksByAuthor.expectOne as any;
-
-/** Executes the query, but ignores whatever is returned by it. */
-export const BooksByAuthor_execute: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams) => Promise<void> = BookService__sqlJS.BooksByAuthor.execute as any;
-
-export const booksByAuthor: (params:booksByAuthorParams, client:PgTyped_Pg_Client_t) => Promise<booksByAuthorResult[]> = BookService__sqlJS.booksByAuthor as any;
+/** 'BooksByAuthor' query type */
+export type booksByAuthorQuery = { readonly params: booksByAuthorParams; readonly result: booksByAuthorResult };
 
 /** Returns an array of all matched results. */
 export const FindBookById_many: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams) => Promise<findBookByIdResult[]> = BookService__sqlJS.FindBookById.many as any;
@@ -68,6 +54,20 @@ export const FindBookById_expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookByIdPar
 export const FindBookById_execute: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams) => Promise<void> = BookService__sqlJS.FindBookById.execute as any;
 
 export const findBookById: (params:findBookByIdParams, client:PgTyped_Pg_Client_t) => Promise<findBookByIdResult[]> = BookService__sqlJS.findBookById as any;
+
+/** Returns an array of all matched results. */
+export const BooksByAuthor_many: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams) => Promise<booksByAuthorResult[]> = BookService__sqlJS.BooksByAuthor.many as any;
+
+/** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+export const BooksByAuthor_one: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams) => Promise<(undefined | booksByAuthorResult)> = BookService__sqlJS.BooksByAuthor.one as any;
+
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const BooksByAuthor_expectOne: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams, errorMessage:(undefined | string)) => Promise<booksByAuthorResult> = BookService__sqlJS.BooksByAuthor.expectOne as any;
+
+/** Executes the query, but ignores whatever is returned by it. */
+export const BooksByAuthor_execute: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams) => Promise<void> = BookService__sqlJS.BooksByAuthor.execute as any;
+
+export const booksByAuthor: (params:booksByAuthorParams, client:PgTyped_Pg_Client_t) => Promise<booksByAuthorResult[]> = BookService__sqlJS.booksByAuthor as any;
 
 export const FindBookById: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */

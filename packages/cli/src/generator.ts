@@ -100,7 +100,7 @@ export async function queryToTypeDeclarations(
   if (typeError || hasAnonymousColumns) {
     // tslint:disable:no-console
     if (typeError) {
-      console.error('Error in query. Details: %o', typeData);
+      console.error(`Error in query "${queryName}". Details: %o`, typeData);
       if (config.failOnError) {
         throw new Error(
           `Query "${queryName}" is invalid. Can't generate types.`,
@@ -146,8 +146,6 @@ export async function queryToTypeDeclarations(
               case 'string':
                 return `#"${v.value}"`;
               case 'integer':
-                return `#${v.value}`;
-              case 'float':
                 return `#${v.value}`;
             }
           })

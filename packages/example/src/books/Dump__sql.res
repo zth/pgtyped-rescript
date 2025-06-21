@@ -43,7 +43,7 @@ type dumpQuery = {
   result: dumpResult,
 }
 
-%%private(let dumpIR: IR.t = %raw(`{"usedParamSet":{},"params":[],"statement":"SELECT * FROM dump LIMIT 1"}`))
+%%private(let dumpIR: IR.t = %raw(`{"queryName":"Dump","usedParamSet":{},"params":[],"statement":"SELECT * FROM dump LIMIT 1"}`))
 
 /**
  Runnable query:

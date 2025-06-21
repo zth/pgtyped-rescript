@@ -271,5 +271,6 @@ export const processTSQueryAST = (
     mapping: parameters ? [] : Object.values(baseMap),
     query: flatStr,
     bindings,
+    name: query.name,
   };
 };
