@@ -300,3 +300,16 @@ testAsync("insert query with json_populate_recordset", async () => {
   | None => panic("Unexpected result fetching newly inserted book")
   }
 })
+
+testAsync("json array inputs work", async () => {
+  let result = await getClient()->Json.JsonExtract.one({
+    jsonData: JSON.Array([
+      JSON.Object(Dict.fromArray([("id", JSON.String("1")), ("name", JSON.String("John"))])),
+    ]),
+  })
+
+  expect(result)->Expect.toEqual({
+    "user_id": "1",
+    "user_name": "John",
+  })
+})

@@ -82,6 +82,86 @@ module Json: {
 }
 
 
+
+/** 'JsonExtract' parameters type */
+@gentype
+type jsonExtractParams = {
+  jsonData: JSON.t,
+}
+
+/** 'JsonExtract' return type */
+@gentype
+type jsonExtractResult = {
+  user_id: option<string>,
+  user_name: option<string>,
+}
+
+/** 'JsonExtract' query type */
+@gentype
+type jsonExtractQuery = {
+  params: jsonExtractParams,
+  result: jsonExtractResult,
+}
+
+%%private(let jsonExtractIR: IR.t = %raw(`{"queryName":"JsonExtract","inputParamTransforms":{"1":{"type":"stringify"}},"usedParamSet":{"jsonData":true},"params":[{"name":"jsonData","required":true,"transform":{"type":"scalar"},"locs":[{"a":96,"b":105}]}],"statement":"SELECT \n    value->>'name' AS user_name,\n    value->>'id' AS user_id\n  FROM json_array_elements(:jsonData!::json) AS value"}`))
+
+/**
+ Runnable query:
+ ```sql
+SELECT 
+    value->>'name' AS user_name,
+    value->>'id' AS user_id
+  FROM json_array_elements($1::json) AS value
+ ```
+
+ */
+@gentype
+module JsonExtract: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, jsonExtractParams) => promise<array<jsonExtractResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, jsonExtractParams) => promise<option<jsonExtractResult>>
+  
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    jsonExtractParams,
+    ~errorMessage: string=?
+  ) => promise<jsonExtractResult>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, jsonExtractParams) => promise<unit>
+} = {
+  @module("pgtyped-rescript-runtime") @new external jsonExtract: IR.t => PreparedStatement.t<jsonExtractParams, jsonExtractResult> = "PreparedQuery";
+  let query = jsonExtract(jsonExtractIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
+
+
 @gentype
 type jsonPopulateRecord_booksInputType = {
   author_id?: int,
@@ -307,7 +387,7 @@ type jsonPopulateRecordsetJsonCastQuery = {
   result: jsonPopulateRecordsetJsonCastResult,
 }
 
-%%private(let jsonPopulateRecordsetJsonCastIR: IR.t = %raw(`{"queryName":"JsonPopulateRecordsetJsonCast","usedParamSet":{"books":true},"params":[{"name":"books","required":true,"transform":{"type":"scalar"},"locs":[{"a":223,"b":229}]}],"statement":"insert into books (\n    name, \n    author_id, \n    categories, \n    rank\n  )\n    select\n      event.name,\n      event.author_id,\n      event.categories,\n      event.rank\n  from json_populate_recordset(\n    null::books,\n    :books!::json\n  ) as event\n  on conflict (id) do update set \n    name = excluded.name,\n    author_id = excluded.author_id,\n    categories = excluded.categories,\n    rank = excluded.rank\n  returning *"}`))
+%%private(let jsonPopulateRecordsetJsonCastIR: IR.t = %raw(`{"queryName":"JsonPopulateRecordsetJsonCast","inputParamTransforms":{"1":{"type":"stringify"}},"usedParamSet":{"books":true},"params":[{"name":"books","required":true,"transform":{"type":"scalar"},"locs":[{"a":223,"b":229}]}],"statement":"insert into books (\n    name, \n    author_id, \n    categories, \n    rank\n  )\n    select\n      event.name,\n      event.author_id,\n      event.categories,\n      event.rank\n  from json_populate_recordset(\n    null::books,\n    :books!::json\n  ) as event\n  on conflict (id) do update set \n    name = excluded.name,\n    author_id = excluded.author_id,\n    categories = excluded.categories,\n    rank = excluded.rank\n  returning *"}`))
 
 /**
  Runnable query:

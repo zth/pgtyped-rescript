@@ -3,6 +3,14 @@ let query = %sql.one(`
   SELECT json_build_object('key', 'value') AS json_object;
 `)
 
+module JsonExtract = %sql(`
+  /* @name JsonExtract */
+  SELECT 
+    value->>'name' AS user_name,
+    value->>'id' AS user_id
+  FROM json_array_elements(:jsonData!::json) AS value
+`)
+
 let jsonPopulateRecordQuery = %sql.one(`
   /* @name JsonPopulateRecord */
   SELECT * FROM json_populate_record(

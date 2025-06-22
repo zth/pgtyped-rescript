@@ -888,7 +888,6 @@ export async function getTypes(
         tableName: paramInfo.recordName,
         assignedIndex: param.assignedIndex,
         name: param.name,
-        stringify: paramInfo.stringify,
       };
     }
     return param;

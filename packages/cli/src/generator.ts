@@ -353,6 +353,14 @@ export async function queryToTypeDeclarations(
 
       tsTypeName = wrapInArray(tsTypeName, isArray);
 
+      // Make sure any JSON.t or array of JSON is stringified, since Postgres otherwise might
+      // treat it as a Postgres array.
+      if (tsTypeName === 'JSON.t' || tsTypeName === 'array<JSON.t>') {
+        inputParamTransforms[param.assignedIndex.toString()] = {
+          type: 'stringify',
+        };
+      }
+
       paramFieldTypes.push({
         optional,
         fieldName: param.name,
