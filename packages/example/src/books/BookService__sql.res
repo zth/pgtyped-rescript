@@ -8,6 +8,7 @@ type category = [#"novel" | #"science-fiction" | #"thriller"]
 @gentype
 type categoryArray = array<category>
 
+
 /** 'FindBookById' parameters type */
 @gentype
 type findBookByIdParams = {
@@ -86,9 +87,6 @@ module FindBookById: {
   }
 }
 
-@gentype
-@deprecated("Use 'FindBookById.many' directly instead")
-let findBookById = (params, ~client) => FindBookById.many(client, params)
 
 
 /** 'BooksByAuthor' parameters type */
@@ -171,8 +169,113 @@ module BooksByAuthor: {
   }
 }
 
+
 @gentype
-@deprecated("Use 'BooksByAuthor.many' directly instead")
-let booksByAuthor = (params, ~client) => BooksByAuthor.many(client, params)
+type insertBooks_booksInputType = {
+  author_id?: int,
+  categories?: categoryArray,
+  id?: int,
+  name?: string,
+  rank?: int,
+}
+
+
+/** 'InsertBooks' parameters type */
+@gentype
+type insertBooksParams = {
+  books: array<insertBooks_booksInputType>,
+}
+
+/** 'InsertBooks' return type */
+@gentype
+type insertBooksResult = {
+  author_id: option<int>,
+  categories: option<categoryArray>,
+  id: int,
+  name: option<string>,
+  rank: option<int>,
+}
+
+/** 'InsertBooks' query type */
+@gentype
+type insertBooksQuery = {
+  params: insertBooksParams,
+  result: insertBooksResult,
+}
+
+%%private(let insertBooksIR: IR.t = %raw(`{"queryName":"InsertBooks","inputParamTransforms":{"1":{"type":"stringify"}},"usedParamSet":{"books":true},"params":[{"name":"books","required":true,"transform":{"type":"scalar"},"locs":[{"a":249,"b":255}]}],"statement":"insert into books (\n      name, \n      author_id, \n      categories, \n      rank\n    )\n      select\n        event.name,\n        event.author_id,\n        event.categories,\n        event.rank\n    from json_populate_recordset(\n      null::books,\n      :books!\n    ) as event\n    on conflict (id) do update set \n      name = excluded.name,\n      author_id = excluded.author_id,\n      categories = excluded.categories,\n      rank = excluded.rank\n    returning *"}`))
+
+/**
+ Runnable query:
+ ```sql
+insert into books (
+      name, 
+      author_id, 
+      categories, 
+      rank
+    )
+      select
+        event.name,
+        event.author_id,
+        event.categories,
+        event.rank
+    from json_populate_recordset(
+      null::books,
+      $1
+    ) as event
+    on conflict (id) do update set 
+      name = excluded.name,
+      author_id = excluded.author_id,
+      categories = excluded.categories,
+      rank = excluded.rank
+    returning *
+ ```
+
+ */
+@gentype
+module InsertBooks: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, insertBooksParams) => promise<array<insertBooksResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, insertBooksParams) => promise<option<insertBooksResult>>
+  
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    insertBooksParams,
+    ~errorMessage: string=?
+  ) => promise<insertBooksResult>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, insertBooksParams) => promise<unit>
+} = {
+  @module("pgtyped-rescript-runtime") @new external insertBooks: IR.t => PreparedStatement.t<insertBooksParams, insertBooksResult> = "PreparedQuery";
+  let query = insertBooks(insertBooksIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
 
 

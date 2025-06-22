@@ -38,8 +38,6 @@ export const Query1_expectOne: (_1:PgTyped_Pg_Client_t, _2:query1Params, errorMe
 /** Executes the query, but ignores whatever is returned by it. */
 export const Query1_execute: (_1:PgTyped_Pg_Client_t, _2:query1Params) => Promise<void> = BookServiceParams__sqlJS.Query1.execute as any;
 
-export const query1: (params:query1Params, client:PgTyped_Pg_Client_t) => Promise<query1Result[]> = BookServiceParams__sqlJS.query1 as any;
-
 export const Query1: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   expectOne: (_1:PgTyped_Pg_Client_t, _2:query1Params, errorMessage:(undefined | string)) => Promise<query1Result>; 

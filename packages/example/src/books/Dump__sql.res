@@ -5,6 +5,7 @@ open PgTyped
 @gentype
 type arrayJSON_t = array<JSON.t>
 
+
 /** 'Dump' parameters type */
 @gentype
 type dumpParams = unit
@@ -97,9 +98,5 @@ module Dump: {
     let _ = await query(params, ~client)
   }
 }
-
-@gentype
-@deprecated("Use 'Dump.many' directly instead")
-let dump = (params, ~client) => Dump.many(client, params)
 
 

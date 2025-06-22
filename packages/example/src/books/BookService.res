@@ -17,3 +17,32 @@ let booksByAuthor = (client, ~authorName) => {
 
   client->query({authorName: authorName})
 }
+
+let insertBooks = (client, ~books) => {
+  let query = %sql.many(`
+    /* @name InsertBooks */
+      insert into books (
+      name, 
+      author_id, 
+      categories, 
+      rank
+    )
+      select
+        event.name,
+        event.author_id,
+        event.categories,
+        event.rank
+    from json_populate_recordset(
+      null::books,
+      :books!
+    ) as event
+    on conflict (id) do update set 
+      name = excluded.name,
+      author_id = excluded.author_id,
+      categories = excluded.categories,
+      rank = excluded.rank
+    returning *
+  `)
+
+  client->query({books: books})
+}

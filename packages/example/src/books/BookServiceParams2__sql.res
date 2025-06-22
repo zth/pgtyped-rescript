@@ -83,8 +83,4 @@ module Query1: {
   }
 }
 
-@gentype
-@deprecated("Use 'Query1.many' directly instead")
-let query1 = (params, ~client) => Query1.many(client, params)
-
 

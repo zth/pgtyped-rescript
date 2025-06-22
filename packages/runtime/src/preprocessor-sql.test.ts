@@ -21,7 +21,7 @@ test('(SQL) no params', () => {
     name: 'selectSomeUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 
@@ -55,7 +55,7 @@ test('(SQL) two scalar params, one forced as non-null', () => {
     name: 'UpdateBooksRankNotNull',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
 
   expect(interpolationResult).toEqual(expectedInterpolationResult);
@@ -99,7 +99,7 @@ test('(SQL) two scalar params', () => {
     name: 'selectSomeUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 
@@ -138,7 +138,7 @@ test('(SQL) one param used twice', () => {
     name: 'selectUsersAndParents',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 
@@ -180,7 +180,7 @@ test('(SQL) array param', () => {
     name: 'selectSomeUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 
@@ -222,7 +222,7 @@ test('(SQL) array param used twice', () => {
     name: 'selectSomeUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 
@@ -271,7 +271,7 @@ test('(SQL) array and scalar param', () => {
     name: 'selectSomeUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 
@@ -325,7 +325,7 @@ test('(SQL) pick param', () => {
     name: 'insertUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   expect(interpolationResult).toEqual(expectedInterpolationResult);
 
@@ -379,7 +379,7 @@ test('(SQL) pick param used twice', () => {
     name: 'insertUsersTwice',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   expect(interpolationResult).toEqual(expectedInterpolationResult);
 
@@ -438,7 +438,7 @@ test('(SQL) pickSpread param', () => {
     name: 'insertUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 
@@ -498,7 +498,7 @@ test('(SQL) pickSpread param used twice', () => {
     name: 'insertUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 
@@ -537,7 +537,7 @@ test('(SQL) scalar param required and optional', () => {
     name: 'selectSomeUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 
@@ -591,7 +591,7 @@ test('(SQL) pick param required', () => {
     name: 'insertUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   expect(interpolationResult).toEqual(expectedInterpolationResult);
 
@@ -633,7 +633,7 @@ test('(SQL) array param required', () => {
     name: 'selectSomeUsers',
   };
 
-  const queryIR = queryASTToIR(fileAST.queries[0]);
+  const queryIR = queryASTToIR(fileAST.queries[0], null);
   const interpolationResult = processSQLQueryIR(queryIR, parameters);
   const mappingResult = processSQLQueryIR(queryIR);
 

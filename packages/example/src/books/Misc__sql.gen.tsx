@@ -151,8 +151,6 @@ export const Literals_expectOne: (_1:PgTyped_Pg_Client_t, _2:literalsParams, err
 /** Executes the query, but ignores whatever is returned by it. */
 export const Literals_execute: (_1:PgTyped_Pg_Client_t, _2:literalsParams) => Promise<void> = Misc__sqlJS.Literals.execute as any;
 
-export const literals: (params:literalsParams, client:PgTyped_Pg_Client_t) => Promise<literalsResult[]> = Misc__sqlJS.literals as any;
-
 /** Returns an array of all matched results. */
 export const MoreLiterals_many: (_1:PgTyped_Pg_Client_t, _2:moreLiteralsParams) => Promise<moreLiteralsResult[]> = Misc__sqlJS.MoreLiterals.many as any;
 
@@ -164,8 +162,6 @@ export const MoreLiterals_expectOne: (_1:PgTyped_Pg_Client_t, _2:moreLiteralsPar
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const MoreLiterals_execute: (_1:PgTyped_Pg_Client_t, _2:moreLiteralsParams) => Promise<void> = Misc__sqlJS.MoreLiterals.execute as any;
-
-export const moreLiterals: (params:moreLiteralsParams, client:PgTyped_Pg_Client_t) => Promise<moreLiteralsResult[]> = Misc__sqlJS.moreLiterals as any;
 
 /** Returns an array of all matched results. */
 export const DuplicateAliasTest_many: (_1:PgTyped_Pg_Client_t, _2:duplicateAliasTestParams) => Promise<duplicateAliasTestResult[]> = Misc__sqlJS.DuplicateAliasTest.many as any;
@@ -179,8 +175,6 @@ export const DuplicateAliasTest_expectOne: (_1:PgTyped_Pg_Client_t, _2:duplicate
 /** Executes the query, but ignores whatever is returned by it. */
 export const DuplicateAliasTest_execute: (_1:PgTyped_Pg_Client_t, _2:duplicateAliasTestParams) => Promise<void> = Misc__sqlJS.DuplicateAliasTest.execute as any;
 
-export const duplicateAliasTest: (params:duplicateAliasTestParams, client:PgTyped_Pg_Client_t) => Promise<duplicateAliasTestResult[]> = Misc__sqlJS.duplicateAliasTest as any;
-
 /** Returns an array of all matched results. */
 export const UnionTest_many: (_1:PgTyped_Pg_Client_t, _2:unionTestParams) => Promise<unionTestResult[]> = Misc__sqlJS.UnionTest.many as any;
 
@@ -192,8 +186,6 @@ export const UnionTest_expectOne: (_1:PgTyped_Pg_Client_t, _2:unionTestParams, e
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const UnionTest_execute: (_1:PgTyped_Pg_Client_t, _2:unionTestParams) => Promise<void> = Misc__sqlJS.UnionTest.execute as any;
-
-export const unionTest: (params:unionTestParams, client:PgTyped_Pg_Client_t) => Promise<unionTestResult[]> = Misc__sqlJS.unionTest as any;
 
 /** Returns an array of all matched results. */
 export const UnionTestWithString_many: (_1:PgTyped_Pg_Client_t, _2:unionTestWithStringParams) => Promise<unionTestWithStringResult[]> = Misc__sqlJS.UnionTestWithString.many as any;
@@ -207,8 +199,6 @@ export const UnionTestWithString_expectOne: (_1:PgTyped_Pg_Client_t, _2:unionTes
 /** Executes the query, but ignores whatever is returned by it. */
 export const UnionTestWithString_execute: (_1:PgTyped_Pg_Client_t, _2:unionTestWithStringParams) => Promise<void> = Misc__sqlJS.UnionTestWithString.execute as any;
 
-export const unionTestWithString: (params:unionTestWithStringParams, client:PgTyped_Pg_Client_t) => Promise<unionTestWithStringResult[]> = Misc__sqlJS.unionTestWithString as any;
-
 /** Returns an array of all matched results. */
 export const SingleLiterals_many: (_1:PgTyped_Pg_Client_t, _2:singleLiteralsParams) => Promise<singleLiteralsResult[]> = Misc__sqlJS.SingleLiterals.many as any;
 
@@ -220,8 +210,6 @@ export const SingleLiterals_expectOne: (_1:PgTyped_Pg_Client_t, _2:singleLiteral
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const SingleLiterals_execute: (_1:PgTyped_Pg_Client_t, _2:singleLiteralsParams) => Promise<void> = Misc__sqlJS.SingleLiterals.execute as any;
-
-export const singleLiterals: (params:singleLiteralsParams, client:PgTyped_Pg_Client_t) => Promise<singleLiteralsResult[]> = Misc__sqlJS.singleLiterals as any;
 
 /** Returns an array of all matched results. */
 export const EdgeCases_many: (_1:PgTyped_Pg_Client_t, _2:edgeCasesParams) => Promise<edgeCasesResult[]> = Misc__sqlJS.EdgeCases.many as any;
@@ -235,8 +223,6 @@ export const EdgeCases_expectOne: (_1:PgTyped_Pg_Client_t, _2:edgeCasesParams, e
 /** Executes the query, but ignores whatever is returned by it. */
 export const EdgeCases_execute: (_1:PgTyped_Pg_Client_t, _2:edgeCasesParams) => Promise<void> = Misc__sqlJS.EdgeCases.execute as any;
 
-export const edgeCases: (params:edgeCasesParams, client:PgTyped_Pg_Client_t) => Promise<edgeCasesResult[]> = Misc__sqlJS.edgeCases as any;
-
 /** Returns an array of all matched results. */
 export const ContextTest_many: (_1:PgTyped_Pg_Client_t, _2:contextTestParams) => Promise<contextTestResult[]> = Misc__sqlJS.ContextTest.many as any;
 
@@ -248,8 +234,6 @@ export const ContextTest_expectOne: (_1:PgTyped_Pg_Client_t, _2:contextTestParam
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const ContextTest_execute: (_1:PgTyped_Pg_Client_t, _2:contextTestParams) => Promise<void> = Misc__sqlJS.ContextTest.execute as any;
-
-export const contextTest: (params:contextTestParams, client:PgTyped_Pg_Client_t) => Promise<contextTestResult[]> = Misc__sqlJS.contextTest as any;
 
 export const MoreLiterals: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */

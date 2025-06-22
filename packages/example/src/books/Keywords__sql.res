@@ -2,6 +2,7 @@
 open PgTyped
 
 
+
 /** 'Keywords' parameters type */
 @gentype
 type keywordsParams = unit
@@ -90,9 +91,5 @@ module Keywords: {
     let _ = await query(params, ~client)
   }
 }
-
-@gentype
-@deprecated("Use 'Keywords.many' directly instead")
-let keywords = (params, ~client) => Keywords.many(client, params)
 
 

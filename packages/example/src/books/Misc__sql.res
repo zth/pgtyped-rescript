@@ -2,6 +2,7 @@
 open PgTyped
 
 
+
 /** 'Literals' parameters type */
 @gentype
 type literalsParams = unit
@@ -79,9 +80,6 @@ module Literals: {
   }
 }
 
-@gentype
-@deprecated("Use 'Literals.many' directly instead")
-let literals = (params, ~client) => Literals.many(client, params)
 
 
 /** 'MoreLiterals' parameters type */
@@ -175,9 +173,6 @@ module MoreLiterals: {
   }
 }
 
-@gentype
-@deprecated("Use 'MoreLiterals.many' directly instead")
-let moreLiterals = (params, ~client) => MoreLiterals.many(client, params)
 
 
 /** 'DuplicateAliasTest' parameters type */
@@ -257,9 +252,6 @@ module DuplicateAliasTest: {
   }
 }
 
-@gentype
-@deprecated("Use 'DuplicateAliasTest.many' directly instead")
-let duplicateAliasTest = (params, ~client) => DuplicateAliasTest.many(client, params)
 
 
 /** 'UnionTest' parameters type */
@@ -337,9 +329,6 @@ module UnionTest: {
   }
 }
 
-@gentype
-@deprecated("Use 'UnionTest.many' directly instead")
-let unionTest = (params, ~client) => UnionTest.many(client, params)
 
 
 /** 'UnionTestWithString' parameters type */
@@ -419,9 +408,6 @@ module UnionTestWithString: {
   }
 }
 
-@gentype
-@deprecated("Use 'UnionTestWithString.many' directly instead")
-let unionTestWithString = (params, ~client) => UnionTestWithString.many(client, params)
 
 
 /** 'SingleLiterals' parameters type */
@@ -501,9 +487,6 @@ module SingleLiterals: {
   }
 }
 
-@gentype
-@deprecated("Use 'SingleLiterals.many' directly instead")
-let singleLiterals = (params, ~client) => SingleLiterals.many(client, params)
 
 
 /** 'EdgeCases' parameters type */
@@ -593,9 +576,6 @@ module EdgeCases: {
   }
 }
 
-@gentype
-@deprecated("Use 'EdgeCases.many' directly instead")
-let edgeCases = (params, ~client) => EdgeCases.many(client, params)
 
 
 /** 'ContextTest' parameters type */
@@ -682,9 +662,5 @@ module ContextTest: {
     let _ = await query(params, ~client)
   }
 }
-
-@gentype
-@deprecated("Use 'ContextTest.many' directly instead")
-let contextTest = (params, ~client) => ContextTest.many(client, params)
 
 

@@ -14,6 +14,13 @@ export interface ScalarParameter {
   assignedIndex: number;
 }
 
+export interface InputTypeReferenceParameter {
+  type: 'inputTypeReference';
+  name: string;
+  tableName: string;
+  assignedIndex: number;
+}
+
 export interface DictParameter {
   name: string;
   type: ParameterTransform.Pick;
@@ -40,7 +47,8 @@ export type QueryParameter =
   | ScalarParameter
   | ScalarArrayParameter
   | DictParameter
-  | DictArrayParameter;
+  | DictArrayParameter
+  | InputTypeReferenceParameter;
 
 export interface InterpolatedQuery {
   query: string;

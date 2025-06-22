@@ -11,6 +11,7 @@ import {
   SQLQueryAST,
   SQLQueryIR,
   TSQueryAST,
+  InputParamTransforms,
 } from '@pgtyped/parser';
 
 import { getTypes, TypeSource } from 'pgtyped-rescript-query';
@@ -20,7 +21,10 @@ import path from 'path';
 import { ParsedConfig } from './config.js';
 import { TypeAllocator, TypeMapping, TypeScope } from './types.js';
 import { parseCode as parseRescriptFile } from './parseRescript.js';
-import { IQueryTypes } from 'pgtyped-rescript-query/lib/actions';
+import {
+  IQueryTypes,
+  ConstraintValue,
+} from 'pgtyped-rescript-query/lib/actions';
 
 export enum ProcessingMode {
   SQL = 'sql-file',
@@ -34,16 +38,54 @@ export interface IField {
   comment?: string;
 }
 
-const interfaceGen = (interfaceName: string, contents: string) =>
-  `@gentype\ntype ${interfaceName} = {
-${contents}
-}\n\n`;
-
-export function escapeComment(comment: string) {
-  return comment.replace(/\*\//g, '*\\/');
+/**
+ * Generates a ReScript polyvariant type from check values
+ * e.g., [#"value1" | #"value2" | #42]
+ */
+function generatePolyvariant(checkValues: ConstraintValue[]): string {
+  return `[${checkValues
+    .map((v) => {
+      switch (v.type) {
+        case 'string':
+          return `#"${v.value}"`;
+        case 'integer':
+          return `#${v.value}`;
+      }
+    })
+    .join(' | ')}]`;
 }
 
-export const generateInterface = (interfaceName: string, fields: IField[]) => {
+/**
+ * Wraps a type in option<> if needed
+ */
+function wrapInOption(typeName: string, shouldWrap: boolean): string {
+  return shouldWrap ? `option<${typeName}>` : typeName;
+}
+
+/**
+ * Wraps a type in array<> if needed
+ */
+function wrapInArray(typeName: string, shouldWrap: boolean): string {
+  return shouldWrap ? `array<${typeName}>` : typeName;
+}
+
+/**
+ * Generates a ReScript record type from fields
+ */
+function generateRecordType(
+  fields: Array<{ name: string; type: string; required?: boolean }>,
+): string {
+  const fieldStrings = fields.map((field) => {
+    const optional = field.required === false ? '?' : '';
+    return `  ${getFieldName(field.name)}${optional}: ${field.type}`;
+  });
+  return `{\n${fieldStrings.join(',\n')}\n}`;
+}
+
+/**
+ * Generates a complete ReScript record interface with @gentype annotation
+ */
+function generateInterface(interfaceName: string, fields: IField[]): string {
   const sortedFields = fields
     .slice()
     .sort((a, b) => a.fieldName.localeCompare(b.fieldName));
@@ -54,11 +96,84 @@ export const generateInterface = (interfaceName: string, fields: IField[]) => {
         `  ${getFieldName(fieldName)}${optional ? '?' : ''}: ${fieldType},`,
     )
     .join('\n');
-  return interfaceGen(interfaceName, contents);
-};
+  return `@gentype\ntype ${interfaceName} = {\n${contents}\n}\n\n`;
+}
 
-export const generateTypeAlias = (typeName: string, alias: string) =>
-  `@gentype\ntype ${typeName} = ${alias}\n\n`;
+/**
+ * Generates a ReScript type alias with @gentype annotation
+ */
+function generateTypeAlias(typeName: string, alias: string): string {
+  return `@gentype\ntype ${typeName} = ${alias}\n\n`;
+}
+
+/**
+ * Processes a type with check values, returning either the original type or a polyvariant
+ */
+function processTypeWithCheckValues(
+  baseTypeName: string,
+  checkValues?: ConstraintValue[],
+): string {
+  if (checkValues != null && checkValues.length > 0) {
+    return generatePolyvariant(checkValues);
+  }
+  return baseTypeName;
+}
+
+/**
+ * Converts a name to ReScript naming convention (camelCase starting with lowercase)
+ */
+function toRescriptName(name: string): string {
+  if (name == null || name.length === 0) {
+    return name;
+  }
+  return `${name[0]?.toLowerCase() ?? ''}${name.slice(1)}`;
+}
+
+/**
+ * Handles ReScript reserved words by adding @as annotation
+ */
+function getFieldName(fieldName: string): string {
+  if (reservedReScriptWords.includes(fieldName)) {
+    return `@as("${fieldName}") ${fieldName}_`;
+  }
+  return fieldName;
+}
+
+/**
+ * Escapes comments for ReScript
+ */
+function escapeComment(comment: string): string {
+  return comment.replace(/\*\//g, '*\\/');
+}
+
+const reservedReScriptWords = [
+  'and',
+  'as',
+  'assert',
+  'await',
+  'constraint',
+  'else',
+  'exception',
+  'external',
+  'false',
+  'for',
+  'if',
+  'in',
+  'include',
+  'let',
+  'module',
+  'mutable',
+  'of',
+  'open',
+  'private',
+  'rec',
+  'switch',
+  'true',
+  'try',
+  'type',
+  'when',
+  'while',
+];
 
 type ParsedQuery =
   | {
@@ -75,7 +190,10 @@ export async function queryToTypeDeclarations(
   typeSource: TypeSource,
   types: TypeAllocator,
   config: ParsedConfig,
-): Promise<string> {
+): Promise<{
+  result: string;
+  inputParamTransforms: InputParamTransforms | null;
+}> {
   let queryData;
   let queryName;
   if (parsedQuery.mode === ProcessingMode.TS) {
@@ -83,12 +201,11 @@ export async function queryToTypeDeclarations(
     queryData = processTSQueryAST(parsedQuery.ast);
   } else {
     queryName = pascalCase(parsedQuery.ast.name);
-    queryData = processSQLQueryIR(queryASTToIR(parsedQuery.ast));
+    queryData = processSQLQueryIR(queryASTToIR(parsedQuery.ast, null));
   }
 
   const typeData = await typeSource(queryData);
   const interfaceName = toRescriptName(pascalCase(queryName));
-  const interfacePrefix = '';
 
   const typeError = 'errorCode' in typeData;
   const hasAnonymousColumns =
@@ -116,51 +233,69 @@ export async function queryToTypeDeclarations(
       explanation = `Query contains an anonymous column. Consider giving the column an explicit name.`;
     }
 
-    const returnInterface = generateTypeAlias(
-      `${interfacePrefix}${interfaceName}Result`,
-      'unit',
-    );
-    const paramInterface = generateTypeAlias(
-      `${interfacePrefix}${interfaceName}Params`,
-      'unit',
-    );
+    const returnInterface = generateTypeAlias(`${interfaceName}Result`, 'unit');
+    const paramInterface = generateTypeAlias(`${interfaceName}Params`, 'unit');
     const resultErrorComment = `/** Query '${queryName}' is invalid, so its result is assigned type 'unit'.\n * ${explanation} */\n`;
     const paramErrorComment = `/** Query '${queryName}' is invalid, so its parameters are assigned type 'unit'.\n * ${explanation} */\n`;
-    return `${resultErrorComment}${returnInterface}${paramErrorComment}${paramInterface}`;
+    return {
+      result: `${resultErrorComment}${returnInterface}${paramErrorComment}${paramInterface}`,
+      inputParamTransforms: null,
+    };
   }
 
-  const { returnTypes, paramMetadata } = typeData;
+  const { returnTypes, paramMetadata, inputTypes } = typeData;
 
   const returnFieldTypes: IField[] = [];
   const paramFieldTypes: IField[] = [];
   const records: string[] = [];
 
+  // Generate input type records
+  const inputTypeNames: Record<number, string> = {};
+  const inputParamTransforms: InputParamTransforms = {};
+  for (const [_, inputTypeInfo] of Object.entries(inputTypes || {})) {
+    const recordTypeName = `${interfaceName}_${inputTypeInfo.tableName}InputType`;
+    inputTypeNames[inputTypeInfo.assignedIndex] = recordTypeName;
+    if (inputTypeInfo.stringify) {
+      inputParamTransforms[inputTypeInfo.assignedIndex] = {
+        type: 'stringify',
+      };
+    }
+
+    const inputFieldTypes: IField[] = [];
+
+    for (const field of inputTypeInfo.fields) {
+      const baseTypeName = types.use(field.type, TypeScope.Parameter);
+      const tsTypeName = processTypeWithCheckValues(
+        baseTypeName,
+        field.checkValues,
+      );
+
+      inputFieldTypes.push({
+        fieldName: config.camelCaseColumnNames
+          ? camelCase(field.columnName)
+          : field.columnName,
+        fieldType: tsTypeName,
+        optional: field.optional,
+        comment: field.comment,
+      });
+    }
+
+    const inputRecord = generateInterface(recordTypeName, inputFieldTypes);
+    records.push(inputRecord);
+  }
+
   returnTypes.forEach(
     ({ returnName, type, nullable, comment, checkValues }) => {
-      let tsTypeName = types.use(type, TypeScope.Return);
-
-      if (checkValues != null && checkValues.length > 0) {
-        tsTypeName = `[${checkValues
-          .map((v) => {
-            switch (v.type) {
-              case 'string':
-                return `#"${v.value}"`;
-              case 'integer':
-                return `#${v.value}`;
-            }
-          })
-          .join(' | ')}]`;
-      }
+      const baseTypeName = types.use(type, TypeScope.Return);
+      let tsTypeName = processTypeWithCheckValues(baseTypeName, checkValues);
 
       const lastCharacter = returnName[returnName.length - 1]; // Checking for type hints
       const addNullability = lastCharacter === '?';
       const removeNullability = lastCharacter === '!';
-      if (
-        (addNullability || nullable || nullable == null) &&
-        !removeNullability
-      ) {
-        tsTypeName = 'option<' + tsTypeName + '>';
-      }
+      const shouldWrapInOption =
+        (addNullability || nullable || nullable == null) && !removeNullability;
+
+      tsTypeName = wrapInOption(tsTypeName, shouldWrapInOption);
 
       if (addNullability || removeNullability) {
         returnName = returnName.slice(0, -1);
@@ -178,11 +313,29 @@ export async function queryToTypeDeclarations(
 
   const { params } = paramMetadata;
   for (const param of paramMetadata.mapping) {
-    if (
+    if (param.type === 'inputTypeReference') {
+      const inputTypeInfo = inputTypes?.[param.assignedIndex];
+      if (inputTypeInfo) {
+        const recordTypeName = inputTypeNames[param.assignedIndex];
+        if (recordTypeName) {
+          paramFieldTypes.push({
+            fieldName: param.name,
+            fieldType: wrapInArray(recordTypeName, inputTypeInfo.multi),
+          });
+          continue;
+        }
+      }
+      // Fallback if input type info is not available
+      paramFieldTypes.push({
+        fieldName: param.name,
+        fieldType: 'unknown',
+      });
+    } else if (
       param.type === ParameterTransform.Scalar ||
       param.type === ParameterTransform.Spread
     ) {
       const isArray = param.type === ParameterTransform.Spread;
+
       const assignedIndex =
         param.assignedIndex instanceof Array
           ? param.assignedIndex[0]
@@ -198,31 +351,27 @@ export async function queryToTypeDeclarations(
       const optional =
         param.type === ParameterTransform.Scalar && !param.required;
 
+      tsTypeName = wrapInArray(tsTypeName, isArray);
+
       paramFieldTypes.push({
         optional,
         fieldName: param.name,
-        fieldType: isArray ? `array<${tsTypeName}>` : tsTypeName,
+        fieldType: tsTypeName,
       });
     } else {
       const isArray = param.type === ParameterTransform.PickSpread;
-      let fieldType = Object.values(param.dict)
-        .map((p) => {
-          const paramType = types.use(
-            params[p.assignedIndex - 1],
-            TypeScope.Parameter,
-          );
-          return p.required
-            ? `  ${getFieldName(p.name)}: ${paramType}`
-            : `  ${getFieldName(p.name)}?: ${paramType}`;
-        })
-        .join(',\n');
-      fieldType = `{\n${fieldType}\n}\n`;
-      const name = `${interfacePrefix}${interfaceName}Params_${param.name}`;
+      const recordFields = Object.values(param.dict).map((p) => ({
+        name: p.name,
+        type: types.use(params[p.assignedIndex - 1], TypeScope.Parameter),
+        required: p.required,
+      }));
+
+      let fieldType = generateRecordType(recordFields);
+      const name = `${interfaceName}Params_${param.name}`;
       records.push(`@gentype\ntype ${name} = ${fieldType}`);
       fieldType = name;
-      if (isArray) {
-        fieldType = `array<${fieldType}>`;
-      }
+      fieldType = wrapInArray(fieldType, isArray);
+
       paramFieldTypes.push({
         fieldName: param.name,
         fieldType,
@@ -236,36 +385,36 @@ export async function queryToTypeDeclarations(
   // tslint:disable-next-line:no-console
   types.errors.forEach((err) => console.log(err));
 
-  const resultInterfaceName = `${interfacePrefix}${interfaceName}Result`;
+  const resultInterfaceName = `${interfaceName}Result`;
   const returnTypesInterface =
     `/** '${queryName}' return type */\n` +
     (returnFieldTypes.length > 0
-      ? generateInterface(
-          `${interfacePrefix}${interfaceName}Result`,
-          returnFieldTypes,
-        )
+      ? generateInterface(`${interfaceName}Result`, returnFieldTypes)
       : generateTypeAlias(resultInterfaceName, 'unit'));
 
-  const paramInterfaceName = `${interfacePrefix}${interfaceName}Params`;
+  const paramInterfaceName = `${interfaceName}Params`;
   const paramTypesInterface =
-    `${records.join('\n')}/** '${queryName}' parameters type */\n` +
+    `${records.join('\n')}\n/** '${queryName}' parameters type */\n` +
     (paramFieldTypes.length > 0
-      ? generateInterface(
-          `${interfacePrefix}${interfaceName}Params`,
-          paramFieldTypes,
-        )
+      ? generateInterface(`${interfaceName}Params`, paramFieldTypes)
       : generateTypeAlias(paramInterfaceName, 'unit'));
 
   const typePairInterface =
     `/** '${queryName}' query type */\n` +
-    generateInterface(`${interfacePrefix}${interfaceName}Query`, [
+    generateInterface(`${interfaceName}Query`, [
       { fieldName: 'params', fieldType: paramInterfaceName },
       { fieldName: 'result', fieldType: resultInterfaceName },
     ]);
 
-  return [paramTypesInterface, returnTypesInterface, typePairInterface].join(
-    '',
-  );
+  return {
+    result: [paramTypesInterface, returnTypesInterface, typePairInterface].join(
+      '',
+    ),
+    inputParamTransforms:
+      Object.keys(inputParamTransforms).length > 0
+        ? inputParamTransforms
+        : null,
+  };
 }
 
 type ITypedQuery =
@@ -317,18 +466,19 @@ async function generateTypedecsFromFile(
     let typedQuery: ITypedQuery;
 
     const sqlQueryAST = queryAST as SQLQueryAST;
-    const result = await queryToTypeDeclarations(
+    const { result, inputParamTransforms } = await queryToTypeDeclarations(
       { ast: sqlQueryAST, mode: ProcessingMode.SQL },
       typeSource,
       types,
       config,
     );
+    const ir = queryASTToIR(sqlQueryAST, inputParamTransforms);
     typedQuery = {
       mode: 'sql' as const,
       query: {
         name: camelCase(sqlQueryAST.name),
         ast: sqlQueryAST,
-        ir: queryASTToIR(sqlQueryAST),
+        ir,
         paramTypeAlias: toRescriptName(
           `${interfacePrefix}${pascalCase(sqlQueryAST.name)}Params`,
         ),
@@ -455,61 +605,8 @@ module ${
   }
 }
 
-@gentype
-@deprecated("Use '${
-      typeDec.query.name.slice(0, 1).toUpperCase() + typeDec.query.name.slice(1)
-    }.many' directly instead")
-let ${typeDec.query.name} = (params, ~client) => ${
-      typeDec.query.name.slice(0, 1).toUpperCase() + typeDec.query.name.slice(1)
-    }.many(client, params)
-
 
 `;
   }
   return { declarationFileContents, typeDecs };
-}
-
-function toRescriptName(name: string): string {
-  if (name == null || name.length === 0) {
-    return name;
-  }
-
-  return `${name[0]?.toLowerCase() ?? ''}${name.slice(1)}`;
-}
-
-const reservedReScriptWords = [
-  'and',
-  'as',
-  'assert',
-  'await',
-  'constraint',
-  'else',
-  'exception',
-  'external',
-  'false',
-  'for',
-  'if',
-  'in',
-  'include',
-  'let',
-  'module',
-  'mutable',
-  'of',
-  'open',
-  'private',
-  'rec',
-  'switch',
-  'true',
-  'try',
-  'type',
-  'when',
-  'while',
-];
-
-function getFieldName(fieldName: string): string {
-  if (reservedReScriptWords.includes(fieldName)) {
-    return `@as("${fieldName}") ${fieldName}_`;
-  }
-
-  return fieldName;
 }

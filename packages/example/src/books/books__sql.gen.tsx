@@ -421,8 +421,6 @@ export const FindBookById_expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookByIdPar
 /** Executes the query, but ignores whatever is returned by it. */
 export const FindBookById_execute: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams) => Promise<void> = books__sqlJS.FindBookById.execute as any;
 
-export const findBookById: (params:findBookByIdParams, client:PgTyped_Pg_Client_t) => Promise<findBookByIdResult[]> = books__sqlJS.findBookById as any;
-
 /** Returns an array of all matched results. */
 export const FindBookByCategory_many: (_1:PgTyped_Pg_Client_t, _2:findBookByCategoryParams) => Promise<findBookByCategoryResult[]> = books__sqlJS.FindBookByCategory.many as any;
 
@@ -434,8 +432,6 @@ export const FindBookByCategory_expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookB
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const FindBookByCategory_execute: (_1:PgTyped_Pg_Client_t, _2:findBookByCategoryParams) => Promise<void> = books__sqlJS.FindBookByCategory.execute as any;
-
-export const findBookByCategory: (params:findBookByCategoryParams, client:PgTyped_Pg_Client_t) => Promise<findBookByCategoryResult[]> = books__sqlJS.findBookByCategory as any;
 
 /** Returns an array of all matched results. */
 export const FindBookNameOrRank_many: (_1:PgTyped_Pg_Client_t, _2:findBookNameOrRankParams) => Promise<findBookNameOrRankResult[]> = books__sqlJS.FindBookNameOrRank.many as any;
@@ -449,8 +445,6 @@ export const FindBookNameOrRank_expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookN
 /** Executes the query, but ignores whatever is returned by it. */
 export const FindBookNameOrRank_execute: (_1:PgTyped_Pg_Client_t, _2:findBookNameOrRankParams) => Promise<void> = books__sqlJS.FindBookNameOrRank.execute as any;
 
-export const findBookNameOrRank: (params:findBookNameOrRankParams, client:PgTyped_Pg_Client_t) => Promise<findBookNameOrRankResult[]> = books__sqlJS.findBookNameOrRank as any;
-
 /** Returns an array of all matched results. */
 export const FindBookUnicode_many: (_1:PgTyped_Pg_Client_t, _2:findBookUnicodeParams) => Promise<findBookUnicodeResult[]> = books__sqlJS.FindBookUnicode.many as any;
 
@@ -462,8 +456,6 @@ export const FindBookUnicode_expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookUnic
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const FindBookUnicode_execute: (_1:PgTyped_Pg_Client_t, _2:findBookUnicodeParams) => Promise<void> = books__sqlJS.FindBookUnicode.execute as any;
-
-export const findBookUnicode: (params:findBookUnicodeParams, client:PgTyped_Pg_Client_t) => Promise<findBookUnicodeResult[]> = books__sqlJS.findBookUnicode as any;
 
 /** Returns an array of all matched results. */
 export const InsertBooks_many: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams) => Promise<insertBooksResult[]> = books__sqlJS.InsertBooks.many as any;
@@ -477,8 +469,6 @@ export const InsertBooks_expectOne: (_1:PgTyped_Pg_Client_t, _2:insertBooksParam
 /** Executes the query, but ignores whatever is returned by it. */
 export const InsertBooks_execute: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams) => Promise<void> = books__sqlJS.InsertBooks.execute as any;
 
-export const insertBooks: (params:insertBooksParams, client:PgTyped_Pg_Client_t) => Promise<insertBooksResult[]> = books__sqlJS.insertBooks as any;
-
 /** Returns an array of all matched results. */
 export const InsertBook_many: (_1:PgTyped_Pg_Client_t, _2:insertBookParams) => Promise<insertBookResult[]> = books__sqlJS.InsertBook.many as any;
 
@@ -490,8 +480,6 @@ export const InsertBook_expectOne: (_1:PgTyped_Pg_Client_t, _2:insertBookParams,
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const InsertBook_execute: (_1:PgTyped_Pg_Client_t, _2:insertBookParams) => Promise<void> = books__sqlJS.InsertBook.execute as any;
-
-export const insertBook: (params:insertBookParams, client:PgTyped_Pg_Client_t) => Promise<insertBookResult[]> = books__sqlJS.insertBook as any;
 
 /** Returns an array of all matched results. */
 export const UpdateBooksCustom_many: (_1:PgTyped_Pg_Client_t, _2:updateBooksCustomParams) => Promise<updateBooksCustomResult[]> = books__sqlJS.UpdateBooksCustom.many as any;
@@ -505,8 +493,6 @@ export const UpdateBooksCustom_expectOne: (_1:PgTyped_Pg_Client_t, _2:updateBook
 /** Executes the query, but ignores whatever is returned by it. */
 export const UpdateBooksCustom_execute: (_1:PgTyped_Pg_Client_t, _2:updateBooksCustomParams) => Promise<void> = books__sqlJS.UpdateBooksCustom.execute as any;
 
-export const updateBooksCustom: (params:updateBooksCustomParams, client:PgTyped_Pg_Client_t) => Promise<updateBooksCustomResult[]> = books__sqlJS.updateBooksCustom as any;
-
 /** Returns an array of all matched results. */
 export const UpdateBooks_many: (_1:PgTyped_Pg_Client_t, _2:updateBooksParams) => Promise<updateBooksResult[]> = books__sqlJS.UpdateBooks.many as any;
 
@@ -518,8 +504,6 @@ export const UpdateBooks_expectOne: (_1:PgTyped_Pg_Client_t, _2:updateBooksParam
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const UpdateBooks_execute: (_1:PgTyped_Pg_Client_t, _2:updateBooksParams) => Promise<void> = books__sqlJS.UpdateBooks.execute as any;
-
-export const updateBooks: (params:updateBooksParams, client:PgTyped_Pg_Client_t) => Promise<updateBooksResult[]> = books__sqlJS.updateBooks as any;
 
 /** Returns an array of all matched results. */
 export const UpdateBooksRankNotNull_many: (_1:PgTyped_Pg_Client_t, _2:updateBooksRankNotNullParams) => Promise<updateBooksRankNotNullResult[]> = books__sqlJS.UpdateBooksRankNotNull.many as any;
@@ -533,8 +517,6 @@ export const UpdateBooksRankNotNull_expectOne: (_1:PgTyped_Pg_Client_t, _2:updat
 /** Executes the query, but ignores whatever is returned by it. */
 export const UpdateBooksRankNotNull_execute: (_1:PgTyped_Pg_Client_t, _2:updateBooksRankNotNullParams) => Promise<void> = books__sqlJS.UpdateBooksRankNotNull.execute as any;
 
-export const updateBooksRankNotNull: (params:updateBooksRankNotNullParams, client:PgTyped_Pg_Client_t) => Promise<updateBooksRankNotNullResult[]> = books__sqlJS.updateBooksRankNotNull as any;
-
 /** Returns an array of all matched results. */
 export const GetBooksByAuthorName_many: (_1:PgTyped_Pg_Client_t, _2:getBooksByAuthorNameParams) => Promise<getBooksByAuthorNameResult[]> = books__sqlJS.GetBooksByAuthorName.many as any;
 
@@ -546,8 +528,6 @@ export const GetBooksByAuthorName_expectOne: (_1:PgTyped_Pg_Client_t, _2:getBook
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const GetBooksByAuthorName_execute: (_1:PgTyped_Pg_Client_t, _2:getBooksByAuthorNameParams) => Promise<void> = books__sqlJS.GetBooksByAuthorName.execute as any;
-
-export const getBooksByAuthorName: (params:getBooksByAuthorNameParams, client:PgTyped_Pg_Client_t) => Promise<getBooksByAuthorNameResult[]> = books__sqlJS.getBooksByAuthorName as any;
 
 /** Returns an array of all matched results. */
 export const AggregateEmailsAndTest_many: (_1:PgTyped_Pg_Client_t, _2:aggregateEmailsAndTestParams) => Promise<aggregateEmailsAndTestResult[]> = books__sqlJS.AggregateEmailsAndTest.many as any;
@@ -561,8 +541,6 @@ export const AggregateEmailsAndTest_expectOne: (_1:PgTyped_Pg_Client_t, _2:aggre
 /** Executes the query, but ignores whatever is returned by it. */
 export const AggregateEmailsAndTest_execute: (_1:PgTyped_Pg_Client_t, _2:aggregateEmailsAndTestParams) => Promise<void> = books__sqlJS.AggregateEmailsAndTest.execute as any;
 
-export const aggregateEmailsAndTest: (params:aggregateEmailsAndTestParams, client:PgTyped_Pg_Client_t) => Promise<aggregateEmailsAndTestResult[]> = books__sqlJS.aggregateEmailsAndTest as any;
-
 /** Returns an array of all matched results. */
 export const GetBooks_many: (_1:PgTyped_Pg_Client_t, _2:getBooksParams) => Promise<getBooksResult[]> = books__sqlJS.GetBooks.many as any;
 
@@ -574,8 +552,6 @@ export const GetBooks_expectOne: (_1:PgTyped_Pg_Client_t, _2:getBooksParams, err
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const GetBooks_execute: (_1:PgTyped_Pg_Client_t, _2:getBooksParams) => Promise<void> = books__sqlJS.GetBooks.execute as any;
-
-export const getBooks: (params:getBooksParams, client:PgTyped_Pg_Client_t) => Promise<getBooksResult[]> = books__sqlJS.getBooks as any;
 
 /** Returns an array of all matched results. */
 export const CountBooks_many: (_1:PgTyped_Pg_Client_t, _2:countBooksParams) => Promise<countBooksResult[]> = books__sqlJS.CountBooks.many as any;
@@ -589,8 +565,6 @@ export const CountBooks_expectOne: (_1:PgTyped_Pg_Client_t, _2:countBooksParams,
 /** Executes the query, but ignores whatever is returned by it. */
 export const CountBooks_execute: (_1:PgTyped_Pg_Client_t, _2:countBooksParams) => Promise<void> = books__sqlJS.CountBooks.execute as any;
 
-export const countBooks: (params:countBooksParams, client:PgTyped_Pg_Client_t) => Promise<countBooksResult[]> = books__sqlJS.countBooks as any;
-
 /** Returns an array of all matched results. */
 export const GetBookCountries_many: (_1:PgTyped_Pg_Client_t, _2:getBookCountriesParams) => Promise<getBookCountriesResult[]> = books__sqlJS.GetBookCountries.many as any;
 
@@ -602,8 +576,6 @@ export const GetBookCountries_expectOne: (_1:PgTyped_Pg_Client_t, _2:getBookCoun
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const GetBookCountries_execute: (_1:PgTyped_Pg_Client_t, _2:getBookCountriesParams) => Promise<void> = books__sqlJS.GetBookCountries.execute as any;
-
-export const getBookCountries: (params:getBookCountriesParams, client:PgTyped_Pg_Client_t) => Promise<getBookCountriesResult[]> = books__sqlJS.getBookCountries as any;
 
 export const FindBookNameOrRank: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */

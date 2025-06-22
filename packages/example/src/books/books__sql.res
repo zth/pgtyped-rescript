@@ -17,6 +17,7 @@ type intArray = array<int>
 @gentype
 type stringArray = array<string>
 
+
 /** 'FindBookById' parameters type */
 @gentype
 type findBookByIdParams = {
@@ -95,9 +96,6 @@ module FindBookById: {
   }
 }
 
-@gentype
-@deprecated("Use 'FindBookById.many' directly instead")
-let findBookById = (params, ~client) => FindBookById.many(client, params)
 
 
 /** 'FindBookByCategory' parameters type */
@@ -178,9 +176,6 @@ module FindBookByCategory: {
   }
 }
 
-@gentype
-@deprecated("Use 'FindBookByCategory.many' directly instead")
-let findBookByCategory = (params, ~client) => FindBookByCategory.many(client, params)
 
 
 /** 'FindBookNameOrRank' parameters type */
@@ -261,9 +256,6 @@ module FindBookNameOrRank: {
   }
 }
 
-@gentype
-@deprecated("Use 'FindBookNameOrRank.many' directly instead")
-let findBookNameOrRank = (params, ~client) => FindBookNameOrRank.many(client, params)
 
 
 /** 'FindBookUnicode' parameters type */
@@ -341,10 +333,6 @@ module FindBookUnicode: {
     let _ = await query(params, ~client)
   }
 }
-
-@gentype
-@deprecated("Use 'FindBookUnicode.many' directly instead")
-let findBookUnicode = (params, ~client) => FindBookUnicode.many(client, params)
 
 
 @gentype
@@ -429,9 +417,6 @@ module InsertBooks: {
   }
 }
 
-@gentype
-@deprecated("Use 'InsertBooks.many' directly instead")
-let insertBooks = (params, ~client) => InsertBooks.many(client, params)
 
 
 /** 'InsertBook' parameters type */
@@ -512,9 +497,6 @@ module InsertBook: {
   }
 }
 
-@gentype
-@deprecated("Use 'InsertBook.many' directly instead")
-let insertBook = (params, ~client) => InsertBook.many(client, params)
 
 
 /** 'UpdateBooksCustom' parameters type */
@@ -598,9 +580,6 @@ module UpdateBooksCustom: {
   }
 }
 
-@gentype
-@deprecated("Use 'UpdateBooksCustom.many' directly instead")
-let updateBooksCustom = (params, ~client) => UpdateBooksCustom.many(client, params)
 
 
 /** 'UpdateBooks' parameters type */
@@ -682,9 +661,6 @@ module UpdateBooks: {
   }
 }
 
-@gentype
-@deprecated("Use 'UpdateBooks.many' directly instead")
-let updateBooks = (params, ~client) => UpdateBooks.many(client, params)
 
 
 /** 'UpdateBooksRankNotNull' parameters type */
@@ -765,9 +741,6 @@ module UpdateBooksRankNotNull: {
   }
 }
 
-@gentype
-@deprecated("Use 'UpdateBooksRankNotNull.many' directly instead")
-let updateBooksRankNotNull = (params, ~client) => UpdateBooksRankNotNull.many(client, params)
 
 
 /** 'GetBooksByAuthorName' parameters type */
@@ -850,9 +823,6 @@ module GetBooksByAuthorName: {
   }
 }
 
-@gentype
-@deprecated("Use 'GetBooksByAuthorName.many' directly instead")
-let getBooksByAuthorName = (params, ~client) => GetBooksByAuthorName.many(client, params)
 
 
 /** 'AggregateEmailsAndTest' parameters type */
@@ -930,9 +900,6 @@ module AggregateEmailsAndTest: {
   }
 }
 
-@gentype
-@deprecated("Use 'AggregateEmailsAndTest.many' directly instead")
-let aggregateEmailsAndTest = (params, ~client) => AggregateEmailsAndTest.many(client, params)
 
 
 /** 'GetBooks' parameters type */
@@ -1008,9 +975,6 @@ module GetBooks: {
   }
 }
 
-@gentype
-@deprecated("Use 'GetBooks.many' directly instead")
-let getBooks = (params, ~client) => GetBooks.many(client, params)
 
 
 /** 'CountBooks' parameters type */
@@ -1085,9 +1049,6 @@ module CountBooks: {
   }
 }
 
-@gentype
-@deprecated("Use 'CountBooks.many' directly instead")
-let countBooks = (params, ~client) => CountBooks.many(client, params)
 
 
 /** 'GetBookCountries' parameters type */
@@ -1162,9 +1123,5 @@ module GetBookCountries: {
     let _ = await query(params, ~client)
   }
 }
-
-@gentype
-@deprecated("Use 'GetBookCountries.many' directly instead")
-let getBookCountries = (params, ~client) => GetBookCountries.many(client, params)
 
 
