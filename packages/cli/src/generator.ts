@@ -355,7 +355,11 @@ export async function queryToTypeDeclarations(
 
       // Make sure any JSON.t or array of JSON is stringified, since Postgres otherwise might
       // treat it as a Postgres array.
-      if (tsTypeName === 'JSON.t' || tsTypeName === 'array<JSON.t>') {
+      if (
+        tsTypeName === 'JSON.t' ||
+        tsTypeName === 'array<JSON.t>' ||
+        tsTypeName === 'arrayJSON_t' // TODO(rescript) Should get rid of these intermediate types if possible.
+      ) {
         inputParamTransforms[param.assignedIndex.toString()] = {
           type: 'stringify',
         };

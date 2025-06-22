@@ -6,6 +6,9 @@ open PgTyped
 type category = [#"novel" | #"science-fiction" | #"thriller"]
 
 @gentype
+type arrayJSON_t = array<JSON.t>
+
+@gentype
 type categoryArray = array<category>
 
 
@@ -138,6 +141,82 @@ module JsonExtract: {
 } = {
   @module("pgtyped-rescript-runtime") @new external jsonExtract: IR.t => PreparedStatement.t<jsonExtractParams, jsonExtractResult> = "PreparedQuery";
   let query = jsonExtract(jsonExtractIR)
+  let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
+
+  @gentype
+  let many = (client, params) => query(params, ~client)
+
+  @gentype
+  let one = async (client, params) => switch await query(params, ~client) {
+  | [item] => Some(item)
+  | _ => None
+  }
+
+  @gentype
+  let expectOne = async (client, params, ~errorMessage=?) => switch await query(params, ~client) {
+  | [item] => item
+  | _ => panic(errorMessage->Option.getOr("More or less than one item was returned"))
+  }
+
+  @gentype
+  let execute = async (client, params) => {
+    let _ = await query(params, ~client)
+  }
+}
+
+
+
+/** 'JsonUnnestCast' parameters type */
+@gentype
+type jsonUnnestCastParams = {
+  jsonData: arrayJSON_t,
+}
+
+/** 'JsonUnnestCast' return type */
+@gentype
+type jsonUnnestCastResult = {
+  json_arr: option<JSON.t>,
+}
+
+/** 'JsonUnnestCast' query type */
+@gentype
+type jsonUnnestCastQuery = {
+  params: jsonUnnestCastParams,
+  result: jsonUnnestCastResult,
+}
+
+%%private(let jsonUnnestCastIR: IR.t = %raw(`{"queryName":"JsonUnnestCast","inputParamTransforms":{"1":{"type":"stringify"}},"usedParamSet":{"jsonData":true},"params":[{"name":"jsonData","required":true,"transform":{"type":"scalar"},"locs":[{"a":14,"b":23}]}],"statement":"SELECT unnest(:jsonData!::json[]) AS json_arr"}`))
+
+/**
+ Runnable query:
+ ```sql
+SELECT unnest($1::json[]) AS json_arr
+ ```
+
+ */
+@gentype
+module JsonUnnestCast: {
+  /** Returns an array of all matched results. */
+  @gentype
+  let many: (PgTyped.Pg.Client.t, jsonUnnestCastParams) => promise<array<jsonUnnestCastResult>>
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  @gentype
+  let one: (PgTyped.Pg.Client.t, jsonUnnestCastParams) => promise<option<jsonUnnestCastResult>>
+  
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  @gentype
+  let expectOne: (
+    PgTyped.Pg.Client.t,
+    jsonUnnestCastParams,
+    ~errorMessage: string=?
+  ) => promise<jsonUnnestCastResult>
+
+  /** Executes the query, but ignores whatever is returned by it. */
+  @gentype
+  let execute: (PgTyped.Pg.Client.t, jsonUnnestCastParams) => promise<unit>
+} = {
+  @module("pgtyped-rescript-runtime") @new external jsonUnnestCast: IR.t => PreparedStatement.t<jsonUnnestCastParams, jsonUnnestCastResult> = "PreparedQuery";
+  let query = jsonUnnestCast(jsonUnnestCastIR)
   let query = (params, ~client) => query->PreparedStatement.run(params, ~client)
 
   @gentype

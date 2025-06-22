@@ -11,6 +11,11 @@ module JsonExtract = %sql(`
   FROM json_array_elements(:jsonData!::json) AS value
 `)
 
+let jsonUnnestCast = %sql.one(`
+  /* @name JsonUnnestCast */
+  SELECT unnest(:jsonData!::json[]) AS json_arr;
+`)
+
 let jsonPopulateRecordQuery = %sql.one(`
   /* @name JsonPopulateRecord */
   SELECT * FROM json_populate_record(
