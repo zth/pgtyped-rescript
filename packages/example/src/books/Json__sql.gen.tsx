@@ -11,6 +11,8 @@ import type {t as JSON_t} from './JSON.gen';
 
 export type category = "novel" | "science-fiction" | "thriller";
 
+export type arrayJSON_t = JSON_t[];
+
 export type categoryArray = category[];
 
 /** 'Json' parameters type */
@@ -30,6 +32,15 @@ export type jsonExtractResult = { readonly user_id: (undefined | string); readon
 
 /** 'JsonExtract' query type */
 export type jsonExtractQuery = { readonly params: jsonExtractParams; readonly result: jsonExtractResult };
+
+/** 'JsonUnnestCast' parameters type */
+export type jsonUnnestCastParams = { readonly jsonData: arrayJSON_t };
+
+/** 'JsonUnnestCast' return type */
+export type jsonUnnestCastResult = { readonly json_arr: (undefined | JSON_t) };
+
+/** 'JsonUnnestCast' query type */
+export type jsonUnnestCastQuery = { readonly params: jsonUnnestCastParams; readonly result: jsonUnnestCastResult };
 
 export type jsonPopulateRecord_booksInputType = {
   readonly author_id?: number; 
@@ -163,6 +174,18 @@ export const JsonExtract_expectOne: (_1:PgTyped_Pg_Client_t, _2:jsonExtractParam
 export const JsonExtract_execute: (_1:PgTyped_Pg_Client_t, _2:jsonExtractParams) => Promise<void> = Json__sqlJS.JsonExtract.execute as any;
 
 /** Returns an array of all matched results. */
+export const JsonUnnestCast_many: (_1:PgTyped_Pg_Client_t, _2:jsonUnnestCastParams) => Promise<jsonUnnestCastResult[]> = Json__sqlJS.JsonUnnestCast.many as any;
+
+/** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+export const JsonUnnestCast_one: (_1:PgTyped_Pg_Client_t, _2:jsonUnnestCastParams) => Promise<(undefined | jsonUnnestCastResult)> = Json__sqlJS.JsonUnnestCast.one as any;
+
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const JsonUnnestCast_expectOne: (_1:PgTyped_Pg_Client_t, _2:jsonUnnestCastParams, errorMessage:(undefined | string)) => Promise<jsonUnnestCastResult> = Json__sqlJS.JsonUnnestCast.expectOne as any;
+
+/** Executes the query, but ignores whatever is returned by it. */
+export const JsonUnnestCast_execute: (_1:PgTyped_Pg_Client_t, _2:jsonUnnestCastParams) => Promise<void> = Json__sqlJS.JsonUnnestCast.execute as any;
+
+/** Returns an array of all matched results. */
 export const JsonPopulateRecord_many: (_1:PgTyped_Pg_Client_t, _2:jsonPopulateRecordParams) => Promise<jsonPopulateRecordResult[]> = Json__sqlJS.JsonPopulateRecord.many as any;
 
 /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
@@ -287,6 +310,17 @@ export const Json: {
   /** Executes the query, but ignores whatever is returned by it. */
   execute: (_1:PgTyped_Pg_Client_t, _2:jsonParams) => Promise<void>
 } = Json__sqlJS.Json as any;
+
+export const JsonUnnestCast: {
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:jsonUnnestCastParams, errorMessage:(undefined | string)) => Promise<jsonUnnestCastResult>; 
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  one: (_1:PgTyped_Pg_Client_t, _2:jsonUnnestCastParams) => Promise<(undefined | jsonUnnestCastResult)>; 
+  /** Returns an array of all matched results. */
+  many: (_1:PgTyped_Pg_Client_t, _2:jsonUnnestCastParams) => Promise<jsonUnnestCastResult[]>; 
+  /** Executes the query, but ignores whatever is returned by it. */
+  execute: (_1:PgTyped_Pg_Client_t, _2:jsonUnnestCastParams) => Promise<void>
+} = Json__sqlJS.JsonUnnestCast as any;
 
 export const JsonPopulateRecordsetJsonCast: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
