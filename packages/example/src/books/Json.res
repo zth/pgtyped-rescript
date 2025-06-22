@@ -3,6 +3,14 @@ let query = %sql.one(`
   SELECT json_build_object('key', 'value') AS json_object;
 `)
 
+let jsonPopulateRecordQuery = %sql.one(`
+  /* @name JsonPopulateRecord */
+  SELECT * FROM json_populate_record(
+    null::books,
+    :book!
+  );
+`)
+
 let jsonPopulateRecordsetQuery = %sql.one(`
   /* @name JsonPopulateRecordset */
   insert into books (
@@ -51,4 +59,20 @@ let jsonPopulateRecordsetJsonCastQuery = %sql.one(`
     categories = excluded.categories,
     rank = excluded.rank
   returning *
+`)
+
+let jsonbPopulateRecordQuery = %sql.one(`
+  /* @name JsonbPopulateRecord */
+  SELECT * FROM jsonb_populate_record(
+    null::books,
+    :book!
+  );
+`)
+
+let jsonbPopulateRecordsetQuery = %sql.one(`
+  /* @name JsonbPopulateRecordset */
+  SELECT * FROM jsonb_populate_recordset(
+    null::books,
+    :books!
+  );
 `)

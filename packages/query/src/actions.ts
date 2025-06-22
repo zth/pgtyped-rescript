@@ -735,42 +735,35 @@ async function extraParameterInfo(query: Statement[]) {
   >();
 
   const visitor = astVisitor((v) => ({
-    select: async (s) => {
-      if ('from' in s) {
-        const from = s.from;
-        if (Array.isArray(from) && from.length === 1) {
-          const frm = from[0];
-          if (
-            frm.type === 'call' &&
-            (frm.function.name === 'json_populate_recordset' ||
-              frm.function.name === 'jsonb_populate_recordset' ||
-              frm.function.name === 'json_populate_record' ||
-              frm.function.name === 'jsonb_populate_record')
-          ) {
-            const [arg1, arg2] = frm.args;
-            if (
-              arg1.type === 'cast' &&
-              arg1.operand.type === 'null' &&
-              'name' in arg1.to &&
-              arg2.type === 'parameter' &&
-              'name' in arg2
-            ) {
-              const assignedIndex = parseInt(arg2.name.slice(1), 10);
-              const name = arg1.to.name;
-              paramsInfo.set(assignedIndex, {
-                recordName: name,
-                assignedIndex,
-                multi:
-                  frm.function.name === 'json_populate_recordset' ||
-                  frm.function.name === 'jsonb_populate_recordset',
-                stringify: true,
-              });
-            }
-          }
+    call: async (c) => {
+      if (
+        c.function.name === 'json_populate_recordset' ||
+        c.function.name === 'jsonb_populate_recordset' ||
+        c.function.name === 'json_populate_record' ||
+        c.function.name === 'jsonb_populate_record'
+      ) {
+        const [arg1, arg2] = c.args;
+        if (
+          arg1.type === 'cast' &&
+          arg1.operand.type === 'null' &&
+          'name' in arg1.to &&
+          arg2.type === 'parameter' &&
+          'name' in arg2
+        ) {
+          const assignedIndex = parseInt(arg2.name.slice(1), 10);
+          const name = arg1.to.name;
+          paramsInfo.set(assignedIndex, {
+            recordName: name,
+            assignedIndex,
+            multi:
+              c.function.name === 'json_populate_recordset' ||
+              c.function.name === 'jsonb_populate_recordset',
+            stringify: true,
+          });
         }
       }
 
-      v.super().select(s);
+      v.super().call(c);
     },
   }));
 
