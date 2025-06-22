@@ -41,6 +41,29 @@ export type booksByAuthorResult = {
 /** 'BooksByAuthor' query type */
 export type booksByAuthorQuery = { readonly params: booksByAuthorParams; readonly result: booksByAuthorResult };
 
+export type insertBooks_booksInputType = {
+  readonly author_id?: number; 
+  readonly categories?: categoryArray; 
+  readonly id?: number; 
+  readonly name?: string; 
+  readonly rank?: number
+};
+
+/** 'InsertBooks' parameters type */
+export type insertBooksParams = { readonly books: insertBooks_booksInputType[] };
+
+/** 'InsertBooks' return type */
+export type insertBooksResult = {
+  readonly author_id: (undefined | number); 
+  readonly categories: (undefined | categoryArray); 
+  readonly id: number; 
+  readonly name: (undefined | string); 
+  readonly rank: (undefined | number)
+};
+
+/** 'InsertBooks' query type */
+export type insertBooksQuery = { readonly params: insertBooksParams; readonly result: insertBooksResult };
+
 /** Returns an array of all matched results. */
 export const FindBookById_many: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams) => Promise<findBookByIdResult[]> = BookService__sqlJS.FindBookById.many as any;
 
@@ -52,8 +75,6 @@ export const FindBookById_expectOne: (_1:PgTyped_Pg_Client_t, _2:findBookByIdPar
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const FindBookById_execute: (_1:PgTyped_Pg_Client_t, _2:findBookByIdParams) => Promise<void> = BookService__sqlJS.FindBookById.execute as any;
-
-export const findBookById: (params:findBookByIdParams, client:PgTyped_Pg_Client_t) => Promise<findBookByIdResult[]> = BookService__sqlJS.findBookById as any;
 
 /** Returns an array of all matched results. */
 export const BooksByAuthor_many: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams) => Promise<booksByAuthorResult[]> = BookService__sqlJS.BooksByAuthor.many as any;
@@ -67,7 +88,17 @@ export const BooksByAuthor_expectOne: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorP
 /** Executes the query, but ignores whatever is returned by it. */
 export const BooksByAuthor_execute: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams) => Promise<void> = BookService__sqlJS.BooksByAuthor.execute as any;
 
-export const booksByAuthor: (params:booksByAuthorParams, client:PgTyped_Pg_Client_t) => Promise<booksByAuthorResult[]> = BookService__sqlJS.booksByAuthor as any;
+/** Returns an array of all matched results. */
+export const InsertBooks_many: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams) => Promise<insertBooksResult[]> = BookService__sqlJS.InsertBooks.many as any;
+
+/** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+export const InsertBooks_one: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams) => Promise<(undefined | insertBooksResult)> = BookService__sqlJS.InsertBooks.one as any;
+
+/** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+export const InsertBooks_expectOne: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams, errorMessage:(undefined | string)) => Promise<insertBooksResult> = BookService__sqlJS.InsertBooks.expectOne as any;
+
+/** Executes the query, but ignores whatever is returned by it. */
+export const InsertBooks_execute: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams) => Promise<void> = BookService__sqlJS.InsertBooks.execute as any;
 
 export const FindBookById: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
@@ -90,3 +121,14 @@ export const BooksByAuthor: {
   /** Executes the query, but ignores whatever is returned by it. */
   execute: (_1:PgTyped_Pg_Client_t, _2:booksByAuthorParams) => Promise<void>
 } = BookService__sqlJS.BooksByAuthor as any;
+
+export const InsertBooks: {
+  /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
+  expectOne: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams, errorMessage:(undefined | string)) => Promise<insertBooksResult>; 
+  /** Returns exactly 1 result. Returns `None` if more or less than exactly 1 result is returned. */
+  one: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams) => Promise<(undefined | insertBooksResult)>; 
+  /** Returns an array of all matched results. */
+  many: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams) => Promise<insertBooksResult[]>; 
+  /** Executes the query, but ignores whatever is returned by it. */
+  execute: (_1:PgTyped_Pg_Client_t, _2:insertBooksParams) => Promise<void>
+} = BookService__sqlJS.InsertBooks as any;

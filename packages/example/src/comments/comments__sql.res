@@ -2,6 +2,7 @@
 open PgTyped
 
 
+
 /** 'GetAllComments' parameters type */
 @gentype
 type getAllCommentsParams = {
@@ -79,9 +80,6 @@ module GetAllComments: {
   }
 }
 
-@gentype
-@deprecated("Use 'GetAllComments.many' directly instead")
-let getAllComments = (params, ~client) => GetAllComments.many(client, params)
 
 
 /** 'GetAllCommentsByIds' parameters type */
@@ -160,10 +158,6 @@ module GetAllCommentsByIds: {
     let _ = await query(params, ~client)
   }
 }
-
-@gentype
-@deprecated("Use 'GetAllCommentsByIds.many' directly instead")
-let getAllCommentsByIds = (params, ~client) => GetAllCommentsByIds.many(client, params)
 
 
 @gentype
@@ -250,9 +244,6 @@ module InsertComment: {
   }
 }
 
-@gentype
-@deprecated("Use 'InsertComment.many' directly instead")
-let insertComment = (params, ~client) => InsertComment.many(client, params)
 
 
 /** 'SelectExistsTest' parameters type */
@@ -326,9 +317,5 @@ module SelectExistsTest: {
     let _ = await query(params, ~client)
   }
 }
-
-@gentype
-@deprecated("Use 'SelectExistsTest.many' directly instead")
-let selectExistsTest = (params, ~client) => SelectExistsTest.many(client, params)
 
 

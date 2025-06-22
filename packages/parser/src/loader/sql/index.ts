@@ -71,6 +71,14 @@ export interface QueryAST {
   usedParamSet: { [paramName: string]: true };
 }
 
+export type InputParamTransformStringify = {
+  type: 'stringify';
+};
+
+export type InputParamTransform = InputParamTransformStringify;
+
+export type InputParamTransforms = Record<string, InputParamTransform>;
+
 export interface ParamIR {
   name: string;
   transform: ParamTransform;
@@ -85,6 +93,7 @@ export interface QueryIR {
   statement: string;
   usedParamSet: QueryAST['usedParamSet'];
   queryName: string;
+  inputParamTransforms: InputParamTransforms | undefined;
 }
 
 interface ParseTree {
@@ -292,11 +301,15 @@ function parseText(text: string): SQLParseResult {
   };
 }
 
-export function queryASTToIR(query: SQLQueryAST): SQLQueryIR {
+export function queryASTToIR(
+  query: SQLQueryAST,
+  inputParamTransforms: InputParamTransforms | null,
+): SQLQueryIR {
   const { a: statementStart } = query.statement.loc;
 
   return {
     queryName: query.name,
+    inputParamTransforms: inputParamTransforms ?? undefined,
     usedParamSet: query.usedParamSet,
     params: query.params.map((param) => ({
       name: param.name,

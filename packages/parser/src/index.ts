@@ -14,4 +14,6 @@ export {
   queryASTToIR,
   assert,
   TransformType,
+  InputParamTransforms,
+  InputParamTransform,
 } from './loader/sql/index.js';

@@ -88,8 +88,6 @@ export const Dump_expectOne: (_1:PgTyped_Pg_Client_t, _2:dumpParams, errorMessag
 /** Executes the query, but ignores whatever is returned by it. */
 export const Dump_execute: (_1:PgTyped_Pg_Client_t, _2:dumpParams) => Promise<void> = Dump__sqlJS.Dump.execute as any;
 
-export const dump: (params:dumpParams, client:PgTyped_Pg_Client_t) => Promise<dumpResult[]> = Dump__sqlJS.dump as any;
-
 export const Dump: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   expectOne: (_1:PgTyped_Pg_Client_t, _2:dumpParams, errorMessage:(undefined | string)) => Promise<dumpResult>; 

@@ -72,8 +72,6 @@ export const GetAllComments_expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllComment
 /** Executes the query, but ignores whatever is returned by it. */
 export const GetAllComments_execute: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsParams) => Promise<void> = comments__sqlJS.GetAllComments.execute as any;
 
-export const getAllComments: (params:getAllCommentsParams, client:PgTyped_Pg_Client_t) => Promise<getAllCommentsResult[]> = comments__sqlJS.getAllComments as any;
-
 /** Returns an array of all matched results. */
 export const GetAllCommentsByIds_many: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsByIdsParams) => Promise<getAllCommentsByIdsResult[]> = comments__sqlJS.GetAllCommentsByIds.many as any;
 
@@ -85,8 +83,6 @@ export const GetAllCommentsByIds_expectOne: (_1:PgTyped_Pg_Client_t, _2:getAllCo
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const GetAllCommentsByIds_execute: (_1:PgTyped_Pg_Client_t, _2:getAllCommentsByIdsParams) => Promise<void> = comments__sqlJS.GetAllCommentsByIds.execute as any;
-
-export const getAllCommentsByIds: (params:getAllCommentsByIdsParams, client:PgTyped_Pg_Client_t) => Promise<getAllCommentsByIdsResult[]> = comments__sqlJS.getAllCommentsByIds as any;
 
 /** Returns an array of all matched results. */
 export const InsertComment_many: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams) => Promise<insertCommentResult[]> = comments__sqlJS.InsertComment.many as any;
@@ -100,8 +96,6 @@ export const InsertComment_expectOne: (_1:PgTyped_Pg_Client_t, _2:insertCommentP
 /** Executes the query, but ignores whatever is returned by it. */
 export const InsertComment_execute: (_1:PgTyped_Pg_Client_t, _2:insertCommentParams) => Promise<void> = comments__sqlJS.InsertComment.execute as any;
 
-export const insertComment: (params:insertCommentParams, client:PgTyped_Pg_Client_t) => Promise<insertCommentResult[]> = comments__sqlJS.insertComment as any;
-
 /** Returns an array of all matched results. */
 export const SelectExistsTest_many: (_1:PgTyped_Pg_Client_t, _2:selectExistsTestParams) => Promise<selectExistsTestResult[]> = comments__sqlJS.SelectExistsTest.many as any;
 
@@ -113,8 +107,6 @@ export const SelectExistsTest_expectOne: (_1:PgTyped_Pg_Client_t, _2:selectExist
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const SelectExistsTest_execute: (_1:PgTyped_Pg_Client_t, _2:selectExistsTestParams) => Promise<void> = comments__sqlJS.SelectExistsTest.execute as any;
-
-export const selectExistsTest: (params:selectExistsTestParams, client:PgTyped_Pg_Client_t) => Promise<selectExistsTestResult[]> = comments__sqlJS.selectExistsTest as any;
 
 export const SelectExistsTest: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */

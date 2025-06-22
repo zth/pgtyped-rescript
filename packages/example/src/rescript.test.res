@@ -262,3 +262,54 @@ testAsync("`expectOne` works in fail case", async () => {
 
   expect(result)->Expect.toBe(true)
 })
+
+testAsync("insert query with json_populate_recordset", async () => {
+  let (insertedBookId1, insertedBookId2) = switch await getClient()->BookService.insertBooks(
+    ~books=[
+      {
+        author_id: 1,
+        name: "A Brief History of Time: From the Big Bang to Black Holes",
+        rank: 1,
+        categories: [#novel, #"science-fiction"],
+      },
+      {
+        author_id: 1,
+        name: "A Brief History of Time: From the Big Bang to Black Holes 2",
+        rank: 2,
+        categories: [#"science-fiction"],
+      },
+    ],
+  ) {
+  | [{id: id1}, {id: id2}] => (id1, id2)
+  | _ => panic("Unexpected result inserting books")
+  }
+
+  switch await getClient()->Books.FindBookById.one({id: insertedBookId1}) {
+  | Some(insertedBook) =>
+    expect(insertedBook.name)->Expect.toEqual(
+      "A Brief History of Time: From the Big Bang to Black Holes",
+    )
+  | None => panic("Unexpected result fetching newly inserted book")
+  }
+
+  switch await getClient()->Books.FindBookById.one({id: insertedBookId2}) {
+  | Some(insertedBook) =>
+    expect(insertedBook.name)->Expect.toEqual(
+      "A Brief History of Time: From the Big Bang to Black Holes 2",
+    )
+  | None => panic("Unexpected result fetching newly inserted book")
+  }
+})
+
+testAsync("json array inputs work", async () => {
+  let result = await getClient()->Json.JsonExtract.one({
+    jsonData: JSON.Array([
+      JSON.Object(Dict.fromArray([("id", JSON.String("1")), ("name", JSON.String("John"))])),
+    ]),
+  })
+
+  expect(result)->Expect.toEqual({
+    "user_id": "1",
+    "user_name": "John",
+  })
+})

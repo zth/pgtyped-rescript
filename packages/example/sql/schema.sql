@@ -13,6 +13,11 @@ COMMENT ON COLUMN users.age IS 'Age (in years)';
 CREATE TYPE notification_type AS ENUM ('notification', 'reminder', 'deadline');
 CREATE TYPE category AS ENUM ('thriller', 'science-fiction', 'novel');
 
+CREATE TYPE some_record as (
+  id integer,
+  name text
+);
+
 CREATE TABLE notifications (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users,

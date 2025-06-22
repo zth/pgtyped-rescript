@@ -86,9 +86,6 @@ module SendNotifications: {
   }
 }
 
-@gentype
-@deprecated("Use 'SendNotifications.many' directly instead")
-let sendNotifications = (params, ~client) => SendNotifications.many(client, params)
 
 
 /** 'GetNotifications' parameters type */
@@ -173,9 +170,6 @@ module GetNotifications: {
   }
 }
 
-@gentype
-@deprecated("Use 'GetNotifications.many' directly instead")
-let getNotifications = (params, ~client) => GetNotifications.many(client, params)
 
 
 /** 'ThresholdFrogs' parameters type */
@@ -256,9 +250,5 @@ module ThresholdFrogs: {
     let _ = await query(params, ~client)
   }
 }
-
-@gentype
-@deprecated("Use 'ThresholdFrogs.many' directly instead")
-let thresholdFrogs = (params, ~client) => ThresholdFrogs.many(client, params)
 
 

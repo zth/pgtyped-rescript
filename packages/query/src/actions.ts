@@ -175,6 +175,23 @@ export interface IQueryTypes {
     nullable?: boolean;
     comment?: string;
     checkValues?: ConstraintValue[];
+    defaultValue?: string;
+  }>;
+  inputTypes?: Record<string, IInputTypes>;
+}
+
+export interface IInputTypes {
+  tableName: string;
+  assignedIndex: number;
+  multi: boolean;
+  stringify: boolean;
+  fields: Array<{
+    columnName: string;
+    type: MappableType;
+    optional?: boolean;
+    comment?: string;
+    checkValues?: ConstraintValue[];
+    defaultValue?: string;
   }>;
 }
 
@@ -517,6 +534,12 @@ interface ColumnComment {
   comment: string;
 }
 
+interface ColumnDefault {
+  tableOID: number;
+  columnAttrNumber: number;
+  defaultValue: string | null;
+}
+
 async function getComments(
   fields: TypeField[],
   queue: AsyncQueue,
@@ -542,6 +565,38 @@ async function getComments(
     tableOID: Number(row[0]),
     columnAttrNumber: Number(row[1]),
     comment: row[2],
+  }));
+}
+
+async function getDefaults(
+  fields: TypeField[],
+  queue: AsyncQueue,
+): Promise<ColumnDefault[]> {
+  const columnFields = fields.filter((f) => f.columnAttrNumber > 0);
+  if (columnFields.length === 0) {
+    return [];
+  }
+
+  const tableOids = Array.from(
+    new Set(columnFields.map((f) => f.tableOID)),
+  ).join(',');
+
+  const defaultRows = await runQuery(
+    `SELECT
+      attrelid, attnum, atthasdef, 
+      CASE WHEN atthasdef THEN pg_get_expr(adbin, attrelid) ELSE NULL END as default_value
+     FROM pg_attribute a
+     LEFT JOIN pg_attrdef ad ON a.attrelid = ad.adrelid AND a.attnum = ad.adnum
+     WHERE a.attrelid IN (${tableOids}) 
+       AND a.attnum > 0 
+       AND NOT a.attisdropped;`,
+    queue,
+  );
+
+  return defaultRows.map((row) => ({
+    tableOID: Number(row[0]),
+    columnAttrNumber: Number(row[1]),
+    defaultValue: row[3],
   }));
 }
 
@@ -668,6 +723,54 @@ export function getAliasedLiterals(
   return map;
 }
 
+async function extraParameterInfo(query: Statement[]) {
+  const paramsInfo = new Map<
+    number,
+    {
+      recordName: string;
+      assignedIndex: number;
+      multi: boolean;
+      stringify: boolean;
+    }
+  >();
+
+  const visitor = astVisitor((v) => ({
+    call: async (c) => {
+      if (
+        c.function.name === 'json_populate_recordset' ||
+        c.function.name === 'jsonb_populate_recordset' ||
+        c.function.name === 'json_populate_record' ||
+        c.function.name === 'jsonb_populate_record'
+      ) {
+        const [arg1, arg2] = c.args;
+        if (
+          arg1.type === 'cast' &&
+          arg1.operand.type === 'null' &&
+          'name' in arg1.to &&
+          arg2.type === 'parameter' &&
+          'name' in arg2
+        ) {
+          const assignedIndex = parseInt(arg2.name.slice(1), 10);
+          const name = arg1.to.name;
+          paramsInfo.set(assignedIndex, {
+            recordName: name,
+            assignedIndex,
+            multi:
+              c.function.name === 'json_populate_recordset' ||
+              c.function.name === 'jsonb_populate_recordset',
+            stringify: true,
+          });
+        }
+      }
+
+      v.super().call(c);
+    },
+  }));
+
+  visitor.statement(query[0]);
+  return paramsInfo;
+}
+
 export async function getTypes(
   queryData: InterpolatedQuery,
   queue: AsyncQueue,
@@ -688,6 +791,7 @@ export async function getTypes(
   const typeMap = reduceTypeRows(typeRows);
   const parsedQuery = parse(queryData.query);
   const aliasedLiterals = getAliasedLiterals(parsedQuery);
+  const paramsInfo = await extraParameterInfo(parsedQuery);
 
   const attrMatcher = ({
     tableOID,
@@ -754,12 +858,165 @@ export async function getTypes(
       }
     });
 
+  const inputTypes: Record<string, IInputTypes> = {};
+
+  if (paramsInfo.size > 0) {
+    for (const [_, { recordName, assignedIndex, multi }] of paramsInfo) {
+      const paramTypeInfo = await getInputType(
+        recordName,
+        assignedIndex,
+        queue,
+      );
+      if ('errorCode' in paramTypeInfo) {
+        // Ignore errors for now
+      } else {
+        inputTypes[assignedIndex] = { ...paramTypeInfo, multi };
+      }
+    }
+  }
+
+  const processedMapping = queryData.mapping.map((param) => {
+    if (
+      'assignedIndex' in param &&
+      !Array.isArray(param.assignedIndex) &&
+      paramsInfo.has(param.assignedIndex)
+    ) {
+      const paramInfo = paramsInfo.get(param.assignedIndex)!;
+
+      return {
+        type: 'inputTypeReference' as const,
+        tableName: paramInfo.recordName,
+        assignedIndex: param.assignedIndex,
+        name: param.name,
+      };
+    }
+    return param;
+  });
+
   const paramMetadata = {
     params: params.map(({ oid }) => typeMap[oid]),
-    mapping: queryData.mapping,
+    mapping: processedMapping,
   };
 
-  return { paramMetadata, returnTypes };
+  return { paramMetadata, returnTypes, inputTypes };
+}
+
+export async function getInputType(
+  tableName: string,
+  assignedIndex: number,
+  queue: AsyncQueue,
+): Promise<IInputTypes | IParseError> {
+  try {
+    // First, get the table OID
+    const tableOidRows = await runQuery(
+      `SELECT oid FROM pg_class WHERE relname = '${tableName}' AND relkind = 'r';`,
+      queue,
+    );
+
+    if (tableOidRows.length === 0) {
+      return {
+        errorCode: 'TABLE_NOT_FOUND',
+        message: `Table '${tableName}' not found`,
+      };
+    }
+
+    const tableOID = Number(tableOidRows[0][0]);
+
+    // Get all columns for the table
+    const columnRows = await runQuery(
+      `SELECT 
+        attrelid as table_oid,
+        attnum as column_attr_number, 
+        atttypid as type_oid,
+        attname as name,
+        attnotnull,
+        atthasdef
+       FROM pg_attribute 
+       WHERE attrelid = ${tableOID}
+         AND attnum > 0 
+         AND NOT attisdropped
+       ORDER BY attnum;`,
+      queue,
+    );
+
+    if (columnRows.length === 0) {
+      return {
+        errorCode: 'NO_COLUMNS_FOUND',
+        message: `No columns found for table '${tableName}'`,
+      };
+    }
+
+    // Create TypeField-like objects for compatibility with existing functions
+    const fields = columnRows.map((row) => ({
+      name: row[3], // attname
+      tableOID: Number(row[0]), // attrelid
+      columnAttrNumber: Number(row[1]), // attnum
+      typeOID: Number(row[2]), // atttypid
+      typeSize: 0, // not needed for input types
+      typeModifier: 0, // not needed for input types
+      formatCode: 0, // not needed for input types
+    }));
+
+    // Get type information
+    const returnTypesOIDs = fields.map((f) => f.typeOID);
+    const typeRows = await runTypesCatalogQuery(returnTypesOIDs, queue);
+    const commentRows = await getComments(fields, queue);
+    const checkRows = await getCheckConstraints(fields, queue);
+    const defaultRows = await getDefaults(fields, queue);
+    const typeMap = reduceTypeRows(typeRows);
+
+    const getAttid = (col: Pick<TypeField, 'tableOID' | 'columnAttrNumber'>) =>
+      `${col.tableOID}:${col.columnAttrNumber}`;
+
+    // Create maps for lookups
+    const commentMap: { [attid: string]: string | undefined } = {};
+    for (const c of commentRows) {
+      commentMap[`${c.tableOID}:${c.columnAttrNumber}`] = c.comment;
+    }
+    const checkMap: { [attid: string]: ConstraintValue[] } = {};
+    for (const chk of checkRows) {
+      checkMap[`${chk.tableOID}:${chk.columnAttrNumber}`] = chk.values;
+    }
+    const defaultMap: { [attid: string]: ColumnDefault } = {};
+    for (const def of defaultRows) {
+      defaultMap[`${def.tableOID}:${def.columnAttrNumber}`] = def;
+    }
+
+    // Build input types - key difference: optionality based on NOT NULL + defaults
+    const inputTypes = fields.map((f, index) => {
+      const hasDefault = !!defaultMap[getAttid(f)]?.defaultValue;
+      const isNotNull = columnRows[index][4] === 't'; // attnotnull
+
+      return {
+        columnName: f.name,
+        type: typeMap[f.typeOID],
+        // Column is optional if it has a default OR allows NULL
+        optional: hasDefault || !isNotNull,
+        ...(commentMap[getAttid(f)]
+          ? { comment: commentMap[getAttid(f)] }
+          : {}),
+        ...(checkMap[getAttid(f)]
+          ? { checkValues: checkMap[getAttid(f)] }
+          : {}),
+        ...(defaultMap[getAttid(f)]?.defaultValue
+          ? { defaultValue: defaultMap[getAttid(f)].defaultValue! }
+          : {}),
+      };
+    });
+
+    return {
+      tableName,
+      assignedIndex,
+      multi: false,
+      fields: inputTypes,
+      stringify: true,
+    };
+  } catch (error) {
+    return {
+      errorCode: 'QUERY_ERROR',
+      message: `Error querying table '${tableName}': ${(error as any).message}`,
+    };
+  }
 }
 
 function toRescriptName(name: string): string {

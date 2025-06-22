@@ -68,8 +68,6 @@ export const SendNotifications_expectOne: (_1:PgTyped_Pg_Client_t, _2:sendNotifi
 /** Executes the query, but ignores whatever is returned by it. */
 export const SendNotifications_execute: (_1:PgTyped_Pg_Client_t, _2:sendNotificationsParams) => Promise<void> = notifications__sqlJS.SendNotifications.execute as any;
 
-export const sendNotifications: (params:sendNotificationsParams, client:PgTyped_Pg_Client_t) => Promise<sendNotificationsResult[]> = notifications__sqlJS.sendNotifications as any;
-
 /** Returns an array of all matched results. */
 export const GetNotifications_many: (_1:PgTyped_Pg_Client_t, _2:getNotificationsParams) => Promise<getNotificationsResult[]> = notifications__sqlJS.GetNotifications.many as any;
 
@@ -82,8 +80,6 @@ export const GetNotifications_expectOne: (_1:PgTyped_Pg_Client_t, _2:getNotifica
 /** Executes the query, but ignores whatever is returned by it. */
 export const GetNotifications_execute: (_1:PgTyped_Pg_Client_t, _2:getNotificationsParams) => Promise<void> = notifications__sqlJS.GetNotifications.execute as any;
 
-export const getNotifications: (params:getNotificationsParams, client:PgTyped_Pg_Client_t) => Promise<getNotificationsResult[]> = notifications__sqlJS.getNotifications as any;
-
 /** Returns an array of all matched results. */
 export const ThresholdFrogs_many: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsParams) => Promise<thresholdFrogsResult[]> = notifications__sqlJS.ThresholdFrogs.many as any;
 
@@ -95,8 +91,6 @@ export const ThresholdFrogs_expectOne: (_1:PgTyped_Pg_Client_t, _2:thresholdFrog
 
 /** Executes the query, but ignores whatever is returned by it. */
 export const ThresholdFrogs_execute: (_1:PgTyped_Pg_Client_t, _2:thresholdFrogsParams) => Promise<void> = notifications__sqlJS.ThresholdFrogs.execute as any;
-
-export const thresholdFrogs: (params:thresholdFrogsParams, client:PgTyped_Pg_Client_t) => Promise<thresholdFrogsResult[]> = notifications__sqlJS.thresholdFrogs as any;
 
 export const ThresholdFrogs: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */

@@ -47,8 +47,6 @@ export const Keywords_expectOne: (_1:PgTyped_Pg_Client_t, _2:keywordsParams, err
 /** Executes the query, but ignores whatever is returned by it. */
 export const Keywords_execute: (_1:PgTyped_Pg_Client_t, _2:keywordsParams) => Promise<void> = Keywords__sqlJS.Keywords.execute as any;
 
-export const keywords: (params:keywordsParams, client:PgTyped_Pg_Client_t) => Promise<keywordsResult[]> = Keywords__sqlJS.keywords as any;
-
 export const Keywords: {
   /** Returns exactly 1 result. Raises `Exn.t` (with an optionally provided `errorMessage`) if more or less than exactly 1 result is returned. */
   expectOne: (_1:PgTyped_Pg_Client_t, _2:keywordsParams, errorMessage:(undefined | string)) => Promise<keywordsResult>; 

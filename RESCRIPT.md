@@ -170,6 +170,75 @@ let books = await client->GetBooksByStatus.many({
 
 This feature works seamlessly with both separate SQL files and SQL-in-ReScript modes.
 
+## JSON Population Functions
+
+`pgtyped-rescript` provides support for PostgreSQL's JSON population functions, enabling type-safe conversion between JSON data and database records.
+
+### Supported Functions
+
+- **`json_populate_record`** - Converts a JSON object to a PostgreSQL record
+- **`json_populate_recordset`** - Converts a JSON array to a set of PostgreSQL records
+- **`jsonb_populate_record`** - Binary JSON variant of `json_populate_record`
+- **`jsonb_populate_recordset`** - Binary JSON variant of `json_populate_recordset`
+- **`json_to_record`** - Converts JSON to a record with explicit column definitions
+- **`jsonb_to_recordset`** - Converts JSONB array to records with explicit column definitions
+
+### Usage Examples
+
+**Bulk insert with `json_populate_recordset`:**
+
+```sql
+/* @name bulkInsertBooks */
+INSERT INTO books (name, author_id, categories, rank)
+SELECT
+  event.name,
+  event.author_id,
+  event.categories,
+  event.rank
+FROM json_populate_recordset(null::books, :books!) as event
+RETURNING *;
+```
+
+**Update single record with `json_populate_record`:**
+
+```sql
+/* @name updateBookFromJson */
+UPDATE books
+SET (name, author_id, categories, rank) = (
+  SELECT
+    r.name,
+    r.author_id,
+    r.categories,
+    r.rank
+  FROM json_populate_record(null::books, :bookData!) as r
+)
+WHERE id = :bookId!
+RETURNING *;
+```
+
+**Example:**
+
+```rescript
+let bulkInsert = %sql.many(`
+  INSERT INTO books (name, author_id, categories, rank)
+  SELECT
+    event.name,
+    event.author_id,
+    event.categories,
+    event.rank
+  FROM json_populate_recordset(null::books, :books!) as event
+  RETURNING *
+`)
+
+// Usage with full type safety
+let newBooks = await client->bulkInsert({
+  books: [
+    {name: "Book 1", author_id: 1, categories: ["fiction"], rank: 1},
+    {name: "Book 2", author_id: 2, categories: ["sci-fi"], rank: 2}
+  ]
+})
+```
+
 ## Literal Type Inference
 
 `pgtyped-rescript` automatically infers specific polyvariant types for literal values in your SQL queries, providing enhanced type safety and better development experience.

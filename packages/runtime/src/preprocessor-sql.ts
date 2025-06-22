@@ -1,4 +1,9 @@
-import { assert, SQLQueryIR, TransformType } from '@pgtyped/parser';
+import {
+  assert,
+  SQLQueryIR,
+  TransformType,
+  InputParamTransform,
+} from '@pgtyped/parser';
 import {
   InterpolatedQuery,
   NestedParameters,
@@ -10,6 +15,18 @@ import {
   replaceIntervals,
   Scalar,
 } from './preprocessor.js';
+
+function transformInputParam(
+  val: Scalar,
+  inputTypeTransform: InputParamTransform | undefined,
+) {
+  switch (inputTypeTransform?.type) {
+    case 'stringify':
+      return JSON.stringify(val);
+    default:
+      return val;
+  }
+}
 
 /* Processes query AST formed by new parser from pure SQL files */
 export const processSQLQueryIR = (
@@ -145,9 +162,15 @@ export const processSQLQueryIR = (
 
     // Handle scalar transform
     const assignedIndex = i++;
+    const inputTypeTransform =
+      queryIR.inputParamTransforms?.[assignedIndex.toString()];
+
     if (passedParams) {
       const paramValue = passedParams[usedParam.name] as Scalar;
-      bindings.push(paramValue);
+
+      // Transforms are only applied to scalars, because the intention is to remove
+      // the other transforms above.
+      bindings.push(transformInputParam(paramValue, inputTypeTransform));
     } else {
       paramMapping.push({
         name: usedParam.name,
