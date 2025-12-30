@@ -3,7 +3,6 @@
 import { startup } from 'pgtyped-rescript-query';
 import { AsyncQueue } from '@pgtyped/wire';
 import chokidar from 'chokidar';
-import { globSync } from 'glob';
 import nun from 'nunjucks';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -16,6 +15,19 @@ import WorkerPool from 'piscina';
 // tslint:disable:no-console
 
 nun.configure({ autoescape: false });
+
+/** Uses chokidar to collect files matching a glob pattern */
+function getMatchedFiles(pattern: string): Promise<string[]> {
+  return new Promise((resolve) => {
+    const files: string[] = [];
+    const watcher = chokidar.watch(pattern, { persistent: false });
+    watcher.on('add', (filePath) => files.push(filePath));
+    watcher.on('ready', () => {
+      watcher.close();
+      resolve(files);
+    });
+  });
+}
 
 interface TransformJob {
   files: string[];
@@ -113,10 +125,10 @@ async function main(
         .on('change', cb);
     } else {
       /**
-       * If the user didn't provide the -f paramter, we're using the list of files we got from glob.
-       * If he did, we're using glob file list to detect if his provided file should be used with this transform.
+       * If the user didn't provide the -f parameter, we're using the list of files we got from chokidar.
+       * If he did, we're using the file list to detect if his provided file should be used with this transform.
        */
-      let fileList = globSync(pattern);
+      let fileList = await getMatchedFiles(pattern);
       if (fileOverride) {
         fileList = fileList.includes(fileOverride) ? [fileOverride] : [];
         if (fileList.length > 0) {
