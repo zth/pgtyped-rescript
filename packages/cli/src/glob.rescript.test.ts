@@ -1,7 +1,21 @@
+import chokidar from 'chokidar';
 import { globSync } from 'glob';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+
+/** Uses chokidar to collect files matching a glob pattern (same as CLI) */
+function getMatchedFiles(pattern: string): Promise<string[]> {
+  return new Promise((resolve) => {
+    const files: string[] = [];
+    const watcher = chokidar.watch(pattern, { persistent: false });
+    watcher.on('add', (filePath) => files.push(filePath));
+    watcher.on('ready', () => {
+      watcher.close();
+      resolve(files);
+    });
+  });
+}
 
 describe('srcDir glob pattern matching', () => {
   let testDir: string;
@@ -36,106 +50,83 @@ describe('srcDir glob pattern matching', () => {
     fs.rmSync(testDir, { recursive: true, force: true });
   });
 
-  test('working srcDir pattern finds SQL files', () => {
+  test('working srcDir pattern finds SQL files', async () => {
     // This is the correct way to specify srcDir
     const srcDirPattern = path.join(testDir, 'src');
     const include = '**/*.sql';
     const pattern = `${srcDirPattern}/**/${include}`;
 
-    const files = globSync(pattern);
+    const files = await getMatchedFiles(pattern);
     expect(files.length).toBe(1);
     expect(files[0]).toContain('users.sql');
   });
 
-  test('problematic srcDir with parentheses syntax finds NO files', () => {
-    // This is the pattern reported by the user - using parentheses for alternation
-    // This does NOT work because (src|__tests__) is not valid glob syntax
+  test('parentheses syntax works with chokidar (extglob)', async () => {
+    // Chokidar (via picomatch) supports extglob patterns like (src|__tests__)
+    // This pattern means "src OR __tests__"
     const srcDirPattern = `${testDir}/(src|__tests__)`;
     const include = '**/*.sql';
     const pattern = `${srcDirPattern}/**/${include}`;
 
-    const files = globSync(pattern);
-    // This will find 0 files because (src|__tests__) is not valid glob
-    expect(files.length).toBe(0);
+    const files = await getMatchedFiles(pattern);
+    // Chokidar finds files in both directories
+    expect(files.length).toBe(2);
   });
 
-  test('correct brace syntax for multiple directories finds files', () => {
-    // This is the correct glob syntax for matching multiple directories
+  test('brace syntax also works for multiple directories', async () => {
+    // Both brace syntax {a,b} and extglob (a|b) work with chokidar
     const srcDirPattern = `${testDir}/{src,__tests__}`;
     const include = '**/*.sql';
     const pattern = `${srcDirPattern}/**/${include}`;
 
-    const files = globSync(pattern);
-    // Should find both files
+    const files = await getMatchedFiles(pattern);
     expect(files.length).toBe(2);
   });
 
-  test('srcDir with embedded wildcards causes pattern issues', () => {
+  test('srcDir with embedded wildcards still works', async () => {
     // The user's config had srcDir: "./(src|__tests__)/**/*"
-    // Even with correct brace syntax, having **/* in srcDir is problematic
-    const srcDirWithWildcard = `${testDir}/{src,__tests__}/**/*`;
+    // Even with **/* in srcDir, chokidar handles it
+    const srcDirWithWildcard = `${testDir}/(src|__tests__)/**/*`;
     const include = '**/*.sql';
     const pattern = `${srcDirWithWildcard}/**/${include}`;
 
-    // Pattern becomes: {src,__tests__}/**/*/**/**/*.sql
-    // This works but is redundant and confusing
-    const files = globSync(pattern);
-    // May still work, but the pattern is unnecessarily complex
-    expect(files.length).toBeGreaterThanOrEqual(0);
+    // Pattern becomes complex but chokidar handles it
+    const files = await getMatchedFiles(pattern);
+    expect(files.length).toBe(2);
   });
 
-  test('srcDir should NOT contain ** wildcards', () => {
-    // Best practice: srcDir should be a simple directory path, not a glob pattern
-    // The transform.include already handles the file matching
-
-    // CORRECT:
-    const correctSrcDir = `${testDir}/src`;
-    const correctPattern = `${correctSrcDir}/**/${'**/*.sql'}`;
-    const correctFiles = globSync(correctPattern);
-    expect(correctFiles.length).toBe(1);
-
-    // INCORRECT (but still works with proper brace syntax):
-    const redundantSrcDir = `${testDir}/src/**/*`;
-    const redundantPattern = `${redundantSrcDir}/**/${'**/*.sql'}`;
-    const redundantFiles = globSync(redundantPattern);
-    // This still works but is overly complex
-    expect(redundantFiles.length).toBeGreaterThanOrEqual(0);
-  });
-
-  describe('demonstrates the silent failure issue', () => {
-    test('invalid srcDir pattern silently returns empty array', () => {
-      // This is the exact issue: with an invalid srcDir pattern,
-      // glob returns an empty array without any error
-      const invalidSrcDir = `${testDir}/(src|__tests__)/**/*`;
-      const include = '**/*.sql';
-      const pattern = `${invalidSrcDir}/**/${include}`;
-
-      // glob silently returns empty array - no error thrown
-      expect(() => {
-        const files = globSync(pattern);
-        expect(files).toEqual([]);
-      }).not.toThrow();
-
-      // The CLI would then process 0 files and exit successfully
-      // without any warning that the pattern didn't match anything
-    });
-
-    test('CLI should warn when no files are matched', () => {
-      // This test documents the expected behavior:
-      // When srcDir pattern matches 0 files, the CLI should warn the user
-      const emptyDir = path.join(testDir, 'empty');
-      fs.mkdirSync(emptyDir, { recursive: true });
-
-      const srcDirPattern = emptyDir;
+  describe('glob vs chokidar behavior difference', () => {
+    test('glob does NOT support parentheses extglob syntax', () => {
+      // This documents why we switched from glob to chokidar
+      const srcDirPattern = `${testDir}/(src|__tests__)`;
       const include = '**/*.sql';
       const pattern = `${srcDirPattern}/**/${include}`;
 
+      // glob treats (src|__tests__) as a literal directory name
       const files = globSync(pattern);
       expect(files.length).toBe(0);
-
-      // TODO: The CLI currently doesn't warn about this.
-      // It should output something like:
-      // "Warning: No files matched pattern: /path/to/empty/**/**/*.sql"
     });
+
+    test('chokidar DOES support parentheses extglob syntax', async () => {
+      const srcDirPattern = `${testDir}/(src|__tests__)`;
+      const include = '**/*.sql';
+      const pattern = `${srcDirPattern}/**/${include}`;
+
+      // chokidar interprets (src|__tests__) as "src OR __tests__"
+      const files = await getMatchedFiles(pattern);
+      expect(files.length).toBe(2);
+    });
+  });
+
+  test('empty directory returns empty array without error', async () => {
+    const emptyDir = path.join(testDir, 'empty');
+    fs.mkdirSync(emptyDir, { recursive: true });
+
+    const srcDirPattern = emptyDir;
+    const include = '**/*.sql';
+    const pattern = `${srcDirPattern}/**/${include}`;
+
+    const files = await getMatchedFiles(pattern);
+    expect(files.length).toBe(0);
   });
 });
