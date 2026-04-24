@@ -5,7 +5,7 @@
 
 const Dump__sqlJS = require('./Dump__sql.js');
 
-import type {Pg_Client_t as PgTyped_Pg_Client_t} from './PgTyped.gen';
+import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/PgTyped.gen';
 
 export type arrayJSON_t = unknown[];
 

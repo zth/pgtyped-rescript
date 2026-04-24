@@ -5,7 +5,7 @@
 
 const Misc__sqlJS = require('./Misc__sql.js');
 
-import type {Pg_Client_t as PgTyped_Pg_Client_t} from './PgTyped.gen';
+import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/PgTyped.gen';
 
 /** 'Literals' parameters type */
 export type literalsParams = void;
