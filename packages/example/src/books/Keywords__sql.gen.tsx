@@ -5,7 +5,7 @@
 
 const Keywords__sqlJS = require('./Keywords__sql.js');
 
-import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/PgTyped.gen';
+import type {Pg_Client_t as PgTyped_Pg_Client_t} from './PgTyped.gen';
 
 /** 'Keywords' parameters type */
 export type keywordsParams = void;

@@ -5,17 +5,15 @@
 
 const notifications__sqlJS = require('./notifications__sql.js');
 
-import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/PgTyped.gen';
+import type {Pg_Client_t as PgTyped_Pg_Client_t} from './PgTyped.gen';
 
-import type {dateOrString as PgTyped_dateOrString} from 'pgtyped-rescript/src/res/PgTyped.gen';
-
-import type {t as JSON_t} from './JSON.gen';
+import type {dateOrString as PgTyped_dateOrString} from './PgTyped.gen';
 
 export type notification_type = "deadline" | "notification" | "reminder";
 
 export type sendNotificationsParams_notifications = {
   readonly user_id: number; 
-  readonly payload: JSON_t; 
+  readonly payload: unknown; 
   readonly type: notification_type
 };
 
@@ -35,7 +33,7 @@ export type getNotificationsParams = { readonly date: PgTyped_dateOrString; read
 export type getNotificationsResult = {
   readonly created_at: string; 
   readonly id: number; 
-  readonly payload: JSON_t; 
+  readonly payload: unknown; 
   readonly type: notification_type; 
   readonly user_id: (undefined | number)
 };
@@ -48,7 +46,7 @@ export type thresholdFrogsParams = { readonly numFrogs: number };
 
 /** 'ThresholdFrogs' return type */
 export type thresholdFrogsResult = {
-  readonly payload: JSON_t; 
+  readonly payload: unknown; 
   readonly type: notification_type; 
   readonly user_name: string
 };

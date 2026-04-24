@@ -5,11 +5,9 @@
 
 const Dump__sqlJS = require('./Dump__sql.js');
 
-import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/PgTyped.gen';
+import type {Pg_Client_t as PgTyped_Pg_Client_t} from './PgTyped.gen';
 
-import type {t as JSON_t} from './JSON.gen';
-
-export type arrayJSON_t = JSON_t[];
+export type arrayJSON_t = unknown[];
 
 /** 'Dump' parameters type */
 export type dumpParams = void;
@@ -33,7 +31,7 @@ export type dumpResult = {
   readonly id: number; 
   readonly is_featured: (undefined | boolean); 
   readonly isbn: (undefined | string); 
-  readonly json_test: (undefined | JSON_t); 
+  readonly json_test: (undefined | unknown); 
   readonly language: (undefined | (
     "en"
   | "de"

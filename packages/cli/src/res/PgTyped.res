@@ -13,7 +13,7 @@ module Pg = {
       rows: array<'row>,
       fields: array<fieldInfo>,
       command: string,
-      rowCount: Js.Null.t<float>,
+      rowCount: Null.t<float>,
     }
   }
 
@@ -128,7 +128,7 @@ module IR = {
     queryName: option<string>,
     statement: string,
     usedParamSet: dict<bool>,
-    params: array<Js.Json.t>, // This can be more thoroughly typed if wanted
+    params: array<JSON.t>, // This can be more thoroughly typed if wanted
   }
 }
 
