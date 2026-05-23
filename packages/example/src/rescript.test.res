@@ -48,24 +48,60 @@ open Jest
 
 external env: {..} = "process.env"
 
+let dbHost = env["PGHOST"]->Option.getOr("127.0.0.1")
+let dbUser = env["PGUSER"]->Option.getOr("postgres")
+let dbPassword = env["PGPASSWORD"]->Option.getOr("password")
+let dbDatabase = env["PGDATABASE"]->Option.getOr("postgres")
+let dbPort = env["PGPORT"]->Option.flatMap(port => Int.fromString(port))->Option.getOr(5432)
+
 let dbConfig = {
-  Pg.Client.host: env["PGHOST"]->Option.getOr("127.0.0.1"),
-  user: env["PGUSER"]->Option.getOr("postgres"),
-  password: env["PGPASSWORD"]->Option.getOr("password"),
-  database: env["PGDATABASE"]->Option.getOr("postgres"),
-  port: env["PGPORT"]->Option.flatMap(port => Int.fromString(port))->Option.getOr(5432),
+  Pg.Client.host: dbHost,
+  user: dbUser,
+  password: dbPassword,
+  database: dbDatabase,
+  port: dbPort,
+}
+
+let poolConfig = {
+  Pg.Pool.host: dbHost,
+  user: dbUser,
+  password: dbPassword,
+  database: dbDatabase,
+  port: dbPort,
 }
 
 let client = ref(None)
 let getClient = () => client.contents->Option.getOrThrow
+let pool = ref(None)
+let getPool = () =>
+  switch pool.contents {
+  | Some(pool) => pool
+  | None => panic("Expected the PostgreSQL pool to be initialized")
+  }
+
+type bookCount = {book_count: string}
+
+let countBooksWithClient: Pg.Client.t => promise<string> = async client => {
+  let result: Pg.PgResult.t<bookCount> = await client->Pg.Client.query(
+    "SELECT count(*) as book_count FROM books",
+  )
+
+  switch result.rows {
+  | [{book_count}] => book_count
+  | _ => panic("Expected a single book count row")
+  }
+}
 
 beforeAll(async () => {
   let dbClient = Pg.Client.make(Config(dbConfig))
   client := Some(dbClient)
   await dbClient->Pg.Client.connect
+
+  pool := Some(Pg.Pool.make(Config(poolConfig)))
 })
 
 afterAll(async () => {
+  await getPool()->Pg.Pool.end
   await getClient()->Pg.Client.end
 })
 
@@ -80,6 +116,54 @@ afterEachAsync(async () => {
 module Comments = Comments__sql
 module Books = Books__sql
 module Notifications = Notifications__sql
+
+testAsync("client transaction rolls back when the callback raises", async () => {
+  let transactionClient = await getPool()->Pg.Pool.connect
+
+  try {
+    let beforeCount = await transactionClient->countBooksWithClient
+    let failed = switch await transactionClient->Pg.Client.transaction(async client => {
+      await client->Books.InsertBook.execute({
+        author_id: 1,
+        name: "Rolled back client transaction",
+        rank: 1,
+      })
+      panic("Stop client transaction")
+    }) {
+    | exception JsExn(_) => true
+    | _ => false
+    }
+    let afterCount = await transactionClient->countBooksWithClient
+
+    expect(failed)->Expect.toBe(true)
+    expect(afterCount)->Expect.toBe(beforeCount)
+    transactionClient->Pg.Client.release
+  } catch {
+  | exn =>
+    transactionClient->Pg.Client.release
+    throw(exn)
+  }
+})
+
+testAsync("pool transaction releases the client and rolls back when the callback raises", async () => {
+  let beforeCount = await getClient()->countBooksWithClient
+  let failed = switch await getPool()->Pg.Pool.transaction(async client => {
+    await client->Books.InsertBook.execute({
+      author_id: 1,
+      name: "Rolled back pool transaction",
+      rank: 1,
+    })
+    panic("Stop pool transaction")
+  }) {
+  | exception JsExn(_) => true
+  | _ => false
+  }
+  let afterCount = await getClient()->countBooksWithClient
+
+  expect(failed)->Expect.toBe(true)
+  expect(afterCount)->Expect.toBe(beforeCount)
+  expect(getPool()->Pg.Pool.idleCount)->Expect.toBe(1)
+})
 
 testAsync("select query with unicode characters", async () => {
   let result = await getClient()->Books.FindBookUnicode.many()
