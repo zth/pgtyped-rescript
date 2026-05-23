@@ -85,6 +85,8 @@ let main = async () => {
   Js.log2("Book name:", books[0].name)
   await client->Pg.Client.end
 }
+
+main()->Promise.done
 ```
 
 ### Resources
