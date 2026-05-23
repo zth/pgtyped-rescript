@@ -57,7 +57,7 @@ let dbConfig = {
 }
 
 let client = ref(None)
-let getClient = () => client.contents->Option.getExn
+let getClient = () => client.contents->Option.getOrThrow
 
 beforeAll(async () => {
   let dbClient = Pg.Client.make(Config(dbConfig))
@@ -213,7 +213,7 @@ testAsync("insert query with an enum field", async () => {
       {
         user_id: 2,
         payload: {
-          open Js.Json
+          open JSON
           Object(Dict.fromArray([("num_frogs", Number(82.))]))
         },
         type_: #reminder,
@@ -256,7 +256,7 @@ testAsync("`expectOne` works in fail case", async () => {
   let result = switch await getClient()->Books.GetBooksByAuthorName.expectOne({
     authorName: "Bertolt Brecht",
   }) {
-  | exception Exn.Error(_) => true
+  | exception JsExn(_) => true
   | _ => false
   }
 

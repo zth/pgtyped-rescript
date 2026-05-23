@@ -7,11 +7,9 @@ const Json__sqlJS = require('./Json__sql.js');
 
 import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/PgTyped.gen';
 
-import type {t as JSON_t} from './JSON.gen';
-
 export type category = "novel" | "science-fiction" | "thriller";
 
-export type arrayJSON_t = JSON_t[];
+export type arrayJSON_t = unknown[];
 
 export type categoryArray = category[];
 
@@ -19,13 +17,13 @@ export type categoryArray = category[];
 export type jsonParams = void;
 
 /** 'Json' return type */
-export type jsonResult = { readonly json_object: (undefined | JSON_t) };
+export type jsonResult = { readonly json_object: (undefined | unknown) };
 
 /** 'Json' query type */
 export type jsonQuery = { readonly params: jsonParams; readonly result: jsonResult };
 
 /** 'JsonExtract' parameters type */
-export type jsonExtractParams = { readonly jsonData: JSON_t };
+export type jsonExtractParams = { readonly jsonData: unknown };
 
 /** 'JsonExtract' return type */
 export type jsonExtractResult = { readonly user_id: (undefined | string); readonly user_name: (undefined | string) };
@@ -37,7 +35,7 @@ export type jsonExtractQuery = { readonly params: jsonExtractParams; readonly re
 export type jsonUnnestCastParams = { readonly jsonData: arrayJSON_t };
 
 /** 'JsonUnnestCast' return type */
-export type jsonUnnestCastResult = { readonly json_arr: (undefined | JSON_t) };
+export type jsonUnnestCastResult = { readonly json_arr: (undefined | unknown) };
 
 /** 'JsonUnnestCast' query type */
 export type jsonUnnestCastQuery = { readonly params: jsonUnnestCastParams; readonly result: jsonUnnestCastResult };
@@ -89,7 +87,7 @@ export type jsonPopulateRecordsetResult = {
 export type jsonPopulateRecordsetQuery = { readonly params: jsonPopulateRecordsetParams; readonly result: jsonPopulateRecordsetResult };
 
 /** 'JsonPopulateRecordsetJsonCast' parameters type */
-export type jsonPopulateRecordsetJsonCastParams = { readonly books: JSON_t };
+export type jsonPopulateRecordsetJsonCastParams = { readonly books: unknown };
 
 /** 'JsonPopulateRecordsetJsonCast' return type */
 export type jsonPopulateRecordsetJsonCastResult = {

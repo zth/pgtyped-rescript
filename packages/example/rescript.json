@@ -9,8 +9,7 @@
       "in-source": true
     },
     "suffix": ".js",
-    "bs-dependencies": ["@rescript/core", "pgtyped-rescript"],
-    "bsc-flags": ["-open RescriptCore"],
+    "dependencies": ["pgtyped-rescript"],
     "ppx-flags": ["rescript-embed-lang/ppx"],
     "gentypeconfig": {}
   }

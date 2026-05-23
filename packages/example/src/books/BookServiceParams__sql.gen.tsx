@@ -7,14 +7,12 @@ const BookServiceParams__sqlJS = require('./BookServiceParams__sql.js');
 
 import type {Pg_Client_t as PgTyped_Pg_Client_t} from 'pgtyped-rescript/src/res/PgTyped.gen';
 
-import type {t as JSON_t} from './JSON.gen';
-
 export type notification_type = "deadline" | "notification" | "reminder";
 
 export type query1Params_notification = {
-  readonly payload?: JSON_t; 
+  readonly payload?: unknown; 
   readonly user_id?: number; 
-  readonly type: (undefined | notification_type)
+  readonly type?: notification_type
 };
 
 /** 'Query1' parameters type */
