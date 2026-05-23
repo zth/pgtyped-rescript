@@ -1,3 +1,4 @@
+import { execFileSync } from 'child_process';
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -15,8 +16,21 @@ type PgTypedBindings = {
   };
 };
 
+const currentDir = dirname(fileURLToPath(import.meta.url));
+const packageDir = join(currentDir, '..');
+
+const buildPgTypedBindings = () => {
+  execFileSync('npx', ['rescript', 'clean'], {
+    cwd: packageDir,
+    stdio: 'inherit',
+  });
+  execFileSync('npx', ['rescript'], {
+    cwd: packageDir,
+    stdio: 'inherit',
+  });
+};
+
 const loadPgTypedBindings = () => {
-  const currentDir = dirname(fileURLToPath(import.meta.url));
   const source = readFileSync(join(currentDir, 'res/PgTyped.js'), 'utf8');
 
   class Pool {
@@ -42,6 +56,10 @@ const loadPgTypedBindings = () => {
 
   return context.exports as PgTypedBindings;
 };
+
+beforeAll(() => {
+  buildPgTypedBindings();
+});
 
 test('Pool.make wraps connection strings in a pool config object', () => {
   const pgTyped = loadPgTypedBindings();
