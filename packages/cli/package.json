@@ -12,7 +12,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/adelsz/pgtyped.git"
+    "url": "git+https://github.com/zth/pgtyped-rescript.git"
   },
   "files": [
     "rescript.json",
@@ -22,7 +22,7 @@
   "engines": {
     "node": ">=14.16"
   },
-  "homepage": "https://github.com/adelsz/pgtyped",
+  "homepage": "https://github.com/zth/pgtyped-rescript",
   "publishConfig": {
     "access": "public"
   },
