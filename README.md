@@ -51,7 +51,7 @@ PgTyped parses the SQL file, extracting all queries and generating strictly type
 
 ```rescript
 type findBookByIdParams = {
-  bookId: option<int>,
+  bookId?: int,
 }
 
 type findBookByIdResult = {
@@ -81,7 +81,7 @@ let client = Pg.Client.make(Config({
 
 let main = async () => {
   await client->Pg.Client.connect
-  let books = await Books__sql.FindBookById.many(client, {bookId: Some(5)})
+  let books = await Books__sql.FindBookById.many(client, {bookId: 5})
   Js.log2("Book name:", books[0].name)
   await client->Pg.Client.end
 }
