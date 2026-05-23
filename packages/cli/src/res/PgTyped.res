@@ -154,11 +154,11 @@ module Pg = {
       let client = await pool->connect
       try {
         let result = await client->Client.transaction(callback)
-        await client->Client.release
+        client->Client.release
         result
       } catch {
       | exn =>
-        await client->Client.release
+        client->Client.release
         throw(exn)
       }
     }

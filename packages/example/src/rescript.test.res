@@ -47,7 +47,6 @@ module Jest = {
 open Jest
 
 external env: {..} = "process.env"
-@val external encodeURIComponent: string => string = "encodeURIComponent"
 
 let dbHost = env["PGHOST"]->Option.getOr("127.0.0.1")
 let dbUser = env["PGUSER"]->Option.getOr("postgres")
@@ -57,6 +56,14 @@ let dbPort = env["PGPORT"]->Option.flatMap(port => Int.fromString(port))->Option
 
 let dbConfig = {
   Pg.Client.host: dbHost,
+  user: dbUser,
+  password: dbPassword,
+  database: dbDatabase,
+  port: dbPort,
+}
+
+let poolConfig = {
+  Pg.Pool.host: dbHost,
   user: dbUser,
   password: dbPassword,
   database: dbDatabase,
@@ -90,20 +97,7 @@ beforeAll(async () => {
   client := Some(dbClient)
   await dbClient->Pg.Client.connect
 
-  let connectionString =
-    env["DATABASE_URL"]->Option.getOr(
-      "postgres://" ++
-      dbUser->encodeURIComponent ++
-      ":" ++
-      dbPassword->encodeURIComponent ++
-      "@" ++
-      dbHost ++
-      ":" ++
-      dbPort->Int.toString ++
-      "/" ++
-      dbDatabase->encodeURIComponent,
-    )
-  pool := Some(Pg.Pool.make(ConnectionString(connectionString)))
+  pool := Some(Pg.Pool.make(Config(poolConfig)))
 })
 
 afterAll(async () => {
@@ -143,10 +137,10 @@ testAsync("client transaction rolls back when the callback raises", async () => 
 
     expect(failed)->Expect.toBe(true)
     expect(afterCount)->Expect.toBe(beforeCount)
-    await transactionClient->Pg.Client.release
+    transactionClient->Pg.Client.release
   } catch {
   | exn =>
-    await transactionClient->Pg.Client.release
+    transactionClient->Pg.Client.release
     throw(exn)
   }
 })
