@@ -1,0 +1,131 @@
+name: Release
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/release.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'packages/**'
+  workflow_dispatch:
+  push:
+    tags:
+      - '[0-9]*.[0-9]*.[0-9]*'
+      - 'v[0-9]*.[0-9]*.[0-9]*'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  checks:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+
+      - name: Validate release tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          cli_version="$(node -p "require('./packages/cli/package.json').version")"
+
+          if [ "$tag" != "$cli_version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match pgtyped-rescript version $cli_version"
+            exit 1
+          fi
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_VERSION: '20'
+
+  dry-run:
+    name: Publish dry run
+    needs: checks
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Dry-run publish packages
+        run: |
+          set -euo pipefail
+
+          for package_dir in \
+            packages/wire \
+            packages/parser \
+            packages/runtime \
+            packages/query \
+            packages/cli
+          do
+            package_name="$(node -p "require('./${package_dir}/package.json').name")"
+            package_version="$(node -p "require('./${package_dir}/package.json').version")"
+
+            echo "Dry-running ${package_name}@${package_version}"
+            npm publish "./${package_dir}" --access public --dry-run
+          done
+
+  publish:
+    name: Publish to npm
+    needs: checks
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Publish packages with npm trusted publishing
+        run: |
+          set -euo pipefail
+
+          for package_dir in \
+            packages/wire \
+            packages/parser \
+            packages/runtime \
+            packages/query \
+            packages/cli
+          do
+            package_name="$(node -p "require('./${package_dir}/package.json').name")"
+            package_version="$(node -p "require('./${package_dir}/package.json').version")"
+
+            if npm view "${package_name}@${package_version}" version >/dev/null 2>&1; then
+              echo "${package_name}@${package_version} is already published; skipping"
+              continue
+            fi
+
+            echo "Publishing ${package_name}@${package_version}"
+            npm publish "./${package_dir}" --access public --provenance
+          done
