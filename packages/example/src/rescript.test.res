@@ -47,6 +47,7 @@ module Jest = {
 open Jest
 
 external env: {..} = "process.env"
+@val external encodeURIComponent: string => string = "encodeURIComponent"
 
 let dbHost = env["PGHOST"]->Option.getOr("127.0.0.1")
 let dbUser = env["PGUSER"]->Option.getOr("postgres")
@@ -92,15 +93,15 @@ beforeAll(async () => {
   let connectionString =
     env["DATABASE_URL"]->Option.getOr(
       "postgres://" ++
-      dbUser ++
+      dbUser->encodeURIComponent ++
       ":" ++
-      dbPassword ++
+      dbPassword->encodeURIComponent ++
       "@" ++
       dbHost ++
       ":" ++
       dbPort->Int.toString ++
       "/" ++
-      dbDatabase,
+      dbDatabase->encodeURIComponent,
     )
   pool := Some(Pg.Pool.make(ConnectionString(connectionString)))
 })
