@@ -30,8 +30,8 @@ Visit our documentation page at [https://pgtyped.dev/](https://pgtyped.dev/)
 
 ### Getting started
 
-1. `npm install -D pgtyped-rescript rescript`
-2. `npm install pgtyped-rescript-runtime pgtyped-rescript-query`
+1. `npm install pgtyped-rescript pgtyped-rescript-runtime pgtyped-rescript-query`
+2. `npm install -D rescript`
 3. Create a PgTyped `config.json` file.
 4. Run `npx pgtyped-rescript -w -c config.json` to start PgTyped in watch mode.
 
