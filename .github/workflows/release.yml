@@ -111,6 +111,12 @@ jobs:
             package_version="$(node -p "require('./${package_dir}/package.json').version")"
 
             echo "Dry-running ${package_name}@${package_version}"
+            if npm view "${package_name}@${package_version}" version >/dev/null 2>&1; then
+              echo "${package_name}@${package_version} is already published; validating package contents only"
+              npm pack "./${package_dir}" --dry-run
+              continue
+            fi
+
             npm publish "./${package_dir}" --access public --dry-run
           done
 
