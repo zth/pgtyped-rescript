@@ -74,6 +74,19 @@ module Pg = {
     @send
     external query: (t, string, ~values: array<pgValue>=?) => promise<PgResult.t<'result>> = "query"
 
+    let transaction: (t, t => promise<'result>) => promise<'result> = async (client, callback) => {
+      let _ = await client->query("BEGIN")
+      try {
+        let result = await callback(client)
+        let _ = await client->query("COMMIT")
+        result
+      } catch {
+      | exn =>
+        let _ = await client->query("ROLLBACK")
+        throw(exn)
+      }
+    }
+
     // TODO: Events
   }
 
@@ -114,6 +127,22 @@ module Pg = {
     external query: (t, string, ~values: array<pgValue>=?) => promise<PgResult.t<'result>> = "query"
     @send external connect: t => promise<Client.t> = "connect"
     @send external end: t => promise<unit> = "end"
+
+    let transaction: (t, Client.t => promise<'result>) => promise<'result> = async (
+      pool,
+      callback,
+    ) => {
+      let client = await pool->connect
+      try {
+        let result = await client->Client.transaction(callback)
+        await client->Client.release
+        result
+      } catch {
+      | exn =>
+        await client->Client.release
+        throw(exn)
+      }
+    }
 
     @get external totalCount: t => int = "totalCount"
     @get external idleCount: t => int = "idleCount"

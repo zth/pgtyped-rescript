@@ -84,6 +84,43 @@ let main = async () => {
 main()->Promise.done
 ```
 
+## Transactions
+
+`pgtyped-rescript` includes small helpers for running generated queries inside a
+PostgreSQL transaction. Use `Pg.Client.transaction` when you already have a
+checked-out client:
+
+```rescript
+let result = await client->Pg.Client.transaction(async client => {
+  await client->Books.InsertBook.execute({
+    author_id: 1,
+    name: "The Left Hand of Darkness",
+    rank: 1,
+  })
+
+  await client->Books.GetBooks.many()
+})
+```
+
+The helper sends `BEGIN`, runs the callback, commits if it succeeds, and rolls
+back if the callback raises.
+
+When you work from a pool, use `Pg.Pool.transaction`. It checks out a client,
+runs the transaction, and releases the client whether the callback succeeds or
+raises:
+
+```rescript
+let result = await pool->Pg.Pool.transaction(async client => {
+  await client->Books.InsertBook.execute({
+    author_id: 1,
+    name: "The Dispossessed",
+    rank: 1,
+  })
+
+  await client->Books.GetBooks.many()
+})
+```
+
 ## SQL-in-ReScript
 
 Optionally, you can write SQL directly in your ReScript code and have a seamless, fully typed experience. The above example but with SQL-in-ReScript:
