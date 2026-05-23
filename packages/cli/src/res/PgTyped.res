@@ -48,7 +48,7 @@ module Pg = {
     @module("pg") @new external make: pgConfig => t = "Client"
     @send external connect: t => promise<unit> = "connect"
     @send external end: t => promise<unit> = "end"
-    @send external release: t => promise<unit> = "release"
+    @send external release: t => unit = "release"
 
     /** Bind when needed. */
     type typeParsers
@@ -81,12 +81,25 @@ module Pg = {
     type t
 
     type config = {
-      /** all valid client config options are also valid here
-   in addition here are the pool specific configuration parameters:
- 
-   number of milliseconds to wait before timing out when connecting a new client
-   by default this is 0 which means no timeout*/
+      /** default process.env.PGUSER || process.env.USER*/ user?: string,
+      /**default process.env.PGPASSWORD*/ password?: string,
+      /** default process.env.PGHOST*/ host?: string,
+      /** default process.env.PGPORT*/ port?: int,
+      /** default process.env.PGDATABASE || user*/ database?: string,
+      /** e.g. postgres://user:password@host:5432/database*/ connectionString?: string,
+      /** passed directly to node.TLSSocket, supports all tls.connect options*/ ssl?: unknown,
+      /** custom type parsers*/ types?: unknown,
+      /** number of milliseconds before a statement in query will time out, default is no timeout*/
+      statement_timeout?: float,
+      /** number of milliseconds before a query call will timeout, default is no timeout*/
+      query_timeout?: float,
+      /** number of milliseconds a query is allowed to be en lock state before it's cancelled due to lock timeout*/
+      lock_timeout?: float,
+      /** The name of the application that created this Client instance*/ application_name?: string,
+      /** number of milliseconds to wait for connection, default is no timeout*/
       connectionTimeoutMillis?: float,
+      /** number of milliseconds before terminating any session with an open idle transaction, default is no timeout*/
+      idle_in_transaction_session_timeout?: float,
       /** number of milliseconds a client must sit idle in the pool and not be checked out
  before it is disconnected from the backend and discarded
    default is 10000 (10 seconds) - set to 0 to disable auto-disconnection of idle clients*/
@@ -108,7 +121,13 @@ module Pg = {
     @unboxed
     type pgConfig = Config(config) | ConnectionString(string)
 
-    @module("pg") @new external make: pgConfig => t = "Pool"
+    @module("pg") @new external makeWithConfig: config => t = "Pool"
+
+    let make = config =>
+      switch config {
+      | Config(config) => makeWithConfig(config)
+      | ConnectionString(connectionString) => makeWithConfig({connectionString: connectionString})
+      }
 
     @send
     external query: (t, string, ~values: array<pgValue>=?) => promise<PgResult.t<'result>> = "query"
