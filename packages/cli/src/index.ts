@@ -8,6 +8,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { debug } from './util.js';
 import { parseConfig, ParsedConfig, TransformConfig } from './config.js';
+import { getMatchedFiles } from './glob.js';
 import path from 'path';
 
 import WorkerPool from 'piscina';
@@ -15,19 +16,6 @@ import WorkerPool from 'piscina';
 // tslint:disable:no-console
 
 nun.configure({ autoescape: false });
-
-/** Uses chokidar to collect files matching a glob pattern */
-function getMatchedFiles(pattern: string): Promise<string[]> {
-  return new Promise((resolve) => {
-    const files: string[] = [];
-    const watcher = chokidar.watch(pattern, { persistent: false });
-    watcher.on('add', (filePath) => files.push(filePath));
-    watcher.on('ready', () => {
-      watcher.close();
-      resolve(files);
-    });
-  });
-}
 
 interface TransformJob {
   files: string[];

@@ -1,20 +1,7 @@
-import chokidar from 'chokidar';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-
-/** Uses chokidar to collect files matching a glob pattern (same as CLI) */
-function getMatchedFiles(pattern: string): Promise<string[]> {
-  return new Promise((resolve) => {
-    const files: string[] = [];
-    const watcher = chokidar.watch(pattern, { persistent: false });
-    watcher.on('add', (filePath) => files.push(filePath));
-    watcher.on('ready', () => {
-      watcher.close();
-      resolve(files);
-    });
-  });
-}
+import { getMatchedFiles } from './glob.js';
 
 describe('srcDir glob pattern matching', () => {
   let testDir: string;
