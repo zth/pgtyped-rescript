@@ -1,6 +1,6 @@
-## @pgtyped/query
+## pgtyped-rescript-query
 
 This package provides protocol utilities for PgTyped queries.
 
-This package is part of the pgtyped project.  
-Refer to [README](https://github.com/adelsz/pgtyped) for details.
+This package is part of the ReScript fork of PgTyped.
+Refer to the root [README](../../README.md) for details.

@@ -1,10 +1,10 @@
-## @pgtyped/runtime
+## pgtyped-rescript-runtime
 
-This package provides the `sql` tagged template.  
+This package provides the `sql` tagged template.
 The `sql` tagged template requires a generic parameter: `<TQueryType>`.
 For each query PgTyped generates an interface that can be used in this parameter to type your query.
 
-To run a query defined with the `sql` tagged template, call the `sql.run` method.  
+To run a query defined with the `sql` tagged template, call the `sql.run` method.
 The `sql.run` method automatically enforces correct input `TParams` and output `TResult` types.
 
 ```js
@@ -24,5 +24,5 @@ interface IDatabaseConnection {
 
 This is usually the `client` object created with [node-postgres](https://github.com/brianc/node-postgres), but can be any other connection of your choice.
 
-This package is part of the pgtyped project.  
-Refer to [README](https://github.com/adelsz/pgtyped) for details.
+This package is part of the ReScript fork of PgTyped.
+Refer to the root [README](../../README.md) for details.

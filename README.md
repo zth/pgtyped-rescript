@@ -30,10 +30,10 @@ Visit our documentation page at [https://pgtyped.dev/](https://pgtyped.dev/)
 
 ### Getting started
 
-1. `npm install -D @pgtyped/cli typescript` (typescript is a required peer dependency for pgtyped)
-2. `npm install @pgtyped/runtime` (`@pgtyped/runtime` is the only required runtime dependency of pgtyped)
+1. `npm install -D pgtyped-rescript rescript`
+2. `npm install pgtyped-rescript-runtime pgtyped-rescript-query`
 3. Create a PgTyped `config.json` file.
-4. Run `npx pgtyped -w -c config.json` to start PgTyped in watch mode.
+4. Run `npx pgtyped-rescript -w -c config.json` to start PgTyped in watch mode.
 
 More info on getting started can be found in the [Getting Started](https://pgtyped.dev/docs/getting-started) page.
 You can also refer to the [example app](./packages/example/README.md) for a preconfigured example.
@@ -47,63 +47,44 @@ Lets save some queries in `books.sql`:
 SELECT * FROM books WHERE id = :bookId;
 ```
 
-PgTyped parses the SQL file, extracting all queries and generating strictly typed TS queries in `books.queries.ts`:
+PgTyped parses the SQL file, extracting all queries and generating strictly typed ReScript bindings in `books__sql.res`:
 
-```ts
-/** Types generated for queries found in "books.sql" */
-
-//...
-
-/** 'FindBookById' parameters type */
-export interface IFindBookByIdParams {
-  bookId: number | null;
+```rescript
+type findBookByIdParams = {
+  bookId: option<int>,
 }
 
-/** 'FindBookById' return type */
-export interface IFindBookByIdResult {
-  id: number;
-  rank: number | null;
-  name: string | null;
-  author_id: number | null;
+type findBookByIdResult = {
+  id: int,
+  rank: option<int>,
+  name: option<string>,
+  author_id: option<int>,
 }
 
-/**
- * Query generated from SQL:
- * SELECT * FROM books WHERE id = :bookId
- */
-export const findBookById = new PreparedQuery<
-  IFindBookByIdParams,
-  IFindBookByIdResult
->(...);
+module FindBookById = {
+  let many: (PgTyped.Pg.Client.t, findBookByIdParams) => promise<array<findBookByIdResult>>
+}
 ```
 
-Query `findBookById` is now statically typed, with types inferred from the PostgreSQL schema.  
+Query `FindBookById.many` is now statically typed, with types inferred from the PostgreSQL schema.
 This generated query can be imported and executed as follows:
 
-```ts
-import { Client } from 'pg';
-import { findBookById } from './books.queries';
+```rescript
+open PgTyped
 
-export const client = new Client({
-  host: 'localhost',
-  user: 'test',
-  password: 'example',
-  database: 'test',
-});
+let client = Pg.Client.make(Config({
+  host: "localhost",
+  user: "test",
+  password: "example",
+  database: "test",
+}))
 
-async function main() {
-  await client.connect();
-  const books = await findBookById.run(
-    {
-      bookId: 5,
-    },
-    client,
-  );
-  console.log(`Book name: ${books[0].name}`);
-  await client.end();
+let main = async () => {
+  await client->Pg.Client.connect
+  let books = await Books__sql.FindBookById.many(client, {bookId: Some(5)})
+  Js.log2("Book name:", books[0].name)
+  await client->Pg.Client.end
 }
-
-main();
 ```
 
 ### Resources
@@ -111,8 +92,6 @@ main();
 1. [Configuring pgTyped](https://pgtyped.dev/docs/cli)
 2. [Writing queries in SQL files](https://pgtyped.dev/docs/sql-file-intro)
 3. [Advanced queries and parameter expansions in SQL files](https://pgtyped.dev/docs/sql-file)
-4. [Writing queries in TS files](https://pgtyped.dev/docs/ts-file-intro)
-5. [Advanced queries and parameter expansions in TS files](https://pgtyped.dev/docs/ts-file)
 
 ### Project state:
 

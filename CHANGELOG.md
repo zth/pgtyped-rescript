@@ -1,11 +1,19 @@
 # main
 
+# 3.0.0
+
+- BREAKING: Require ReScript `>=12.0.0`.
+- BREAKING: Remove the dependency on `@rescript/core`.
+- BREAKING: Remove the dependency on `@rescript/tools`; the CLI now uses the ReScript compiler toolchain from the installed `rescript` package.
+- Fix `Pg.Pool.make(ConnectionString(...))` so it creates a pool with `{connectionString}` instead of passing a raw string to `pg.Pool`.
+- Fix `Pg.Client.release` binding to return `unit`, matching `node-postgres`.
+- Use `chokidar` for build-mode file matching so glob-style `srcDir` patterns are handled consistently with watch mode.
 - Make sure `JSON.t` is properly stringified so JSON arrays can be passed to params expecting `JSON.t` without them being confused for regular Postgres arrays.
 - Auto-escape all ReScript keywords in generated record field names.
 - Add automatic parsing of PostgreSQL check constraints to generate ReScript polyvariant types for enumeration-style constraints. Supports both `column IN (value1, value2, ...)` and `column = ANY (ARRAY[value1, value2, ...])` patterns with string and integer values.
-- Add top-level literal inference for SELECT queries. When a query returns literal values with aliases (e.g., `SELECT 'success' as status, 42 as code`), PgTyped now automatically infers specific polyvariant types like `[#"success"]` and `[#42]` instead of generic `string` and `int` types. This provides better type safety and autocompletion. Also works with UNION queries where literals are consistent across all branches.
+- Add top-level literal inference for SELECT queries. When a query returns literal values with aliases (e.g. `SELECT 'success' as status, 42 as code`), PgTyped now automatically infers specific polyvariant types like `[#"success"]` and `[#42]` instead of generic `string` and `int` types. This provides better type safety and autocompletion. Also works with UNION queries where literals are consistent across all branches.
 - Add support for PostgreSQL JSON population functions (`json_populate_record`, `json_populate_recordset`, `jsonb_populate_record`, `jsonb_populate_recordset`, `json_to_record`, `jsonb_to_recordset`). This supports efficient bulk operations.
-- Remove dependency on `@rescript/core` since it's not really used.
+- Use the `queryConfig` API in `pgtyped-rescript-runtime`.
 
 # 2.6.0
 
