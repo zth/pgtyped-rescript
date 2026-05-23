@@ -1,7 +1,7 @@
-## @pgtyped/cli
+## pgtyped-rescript
 
-This package provides the `pgtyped` CLI.  
-The `pgtyped` CLI can work in build and watch mode.
+This package provides the `pgtyped-rescript` CLI.
+The `pgtyped-rescript` CLI can work in build and watch mode.
 
 ### Flags:
 
@@ -13,7 +13,7 @@ The CLI supports two flags:
 Running the CLI:
 
 ```
-npx pgtyped -w -c config.json
+npx pgtyped-rescript -w -c config.json
 ```
 
 ### Env variables:
@@ -35,17 +35,17 @@ Config file format (`config.json`):
 ```js
 {
   // You can specify as many transforms as you want
-  // Only TS and SQL files (modes) are supported at the moment
+  // ReScript and SQL files are supported.
   "transforms": [
     {
       "mode": "sql", // SQL mode
       "include": "**/*.sql", // SQL files pattern to scan for queries
-      "emitTemplate": "{{dir}}/{{name}}.queries.ts" // File name template to save generated files
+      "emitTemplate": "{{dir}}/{{name}}__queries.res" // File name template to save generated files
     },
     {
-      "mode": "ts", // TS mode
-      "include": "**/action.ts", // TS file pattern to scan for queries
-      "emitTemplate": "{{dir}}/{{name}}.types.ts" // File name template to save generated files
+      "mode": "res", // ReScript mode
+      "include": "**/*.res", // ReScript files pattern to scan for embedded SQL
+      "emitTemplate": "{{dir}}/{{name}}__sql.res" // File name template to save generated files
     }
   ],
   "srcDir": "./src/", // Directory to scan or watch for query files
@@ -62,9 +62,9 @@ Config file format (`config.json`):
 
 ### Generated files
 
-By default, PgTyped saves generated files in the same folder as the source files it parses.  
-This behavior can be customized using the `emitTemplate` config parameter.  
-In that template, four parameters are available for interpolation: `root`, `dir`, `base`, `name` and `ext`.  
+By default, PgTyped saves generated files in the same folder as the source files it parses.
+This behavior can be customized using the `emitTemplate` config parameter.
+In that template, four parameters are available for interpolation: `root`, `dir`, `base`, `name` and `ext`.
 For example, when parsing source/query file `/home/user/dir/file.sql`, these parameters are assigned the following values:
 
 ```
@@ -79,5 +79,5 @@ For example, when parsing source/query file `/home/user/dir/file.sql`, these par
 
 ---
 
-This package is part of the PgTyped project.  
-Refer to root [README](https://github.com/adelsz/pgtyped) for details.
+This package is part of the ReScript fork of PgTyped.
+Refer to the root [README](../../README.md) for details.
