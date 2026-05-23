@@ -161,6 +161,7 @@ jobs:
       - name: Publish packages with npm trusted publishing
         run: |
           set -euo pipefail
+          release_version="${GITHUB_REF_NAME#v}"
 
           for package_dir in \
             packages/wire \
@@ -171,6 +172,11 @@ jobs:
           do
             package_name="$(node -p "require('./${package_dir}/package.json').name")"
             package_version="$(node -p "require('./${package_dir}/package.json').version")"
+
+            if [ "$package_version" != "$release_version" ]; then
+              echo "Skipping ${package_name}@${package_version}; tag ${GITHUB_REF_NAME} releases ${release_version}"
+              continue
+            fi
 
             if npm view "${package_name}@${package_version}" version >/dev/null 2>&1; then
               echo "${package_name}@${package_version} is already published; skipping"
