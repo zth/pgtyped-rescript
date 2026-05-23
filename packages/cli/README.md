@@ -45,7 +45,7 @@ Config file format (`config.json`):
     {
       "mode": "res", // ReScript mode
       "include": "**/*.res", // ReScript files pattern to scan for embedded SQL
-      "emitTemplate": "{{dir}}/{{name}}__sql.res" // File name template to save generated files
+      "emitTemplate": "{{dir}}/{{name}}__res.res" // File name template to save generated files
     }
   ],
   "srcDir": "./src/", // Directory to scan or watch for query files
