@@ -1,8 +1,15 @@
 import { parseSQLFile } from '@pgtyped/parser';
 import { SQLParseResult } from '@pgtyped/parser/lib/loader/sql';
 import cp from 'child_process';
-// @ts-ignore
-import { getBinaryPath } from '@rescript/tools/npm/getBinaryPath.js';
+import { createRequire } from 'module';
+import path from 'path';
+
+const require = createRequire(import.meta.url);
+
+function getRescriptToolsPath(): string {
+  const packageJsonPath = require.resolve('rescript/package.json');
+  return path.join(path.dirname(packageJsonPath), 'cli', 'rescript-tools.js');
+}
 
 export function parseCode(
   fileContent: string,
@@ -15,10 +22,9 @@ export function parseCode(
     };
   }
 
-  // Replace with more robust @rescript/tools CLI usage when that package ships linuxarm64 binary.
   const content: Array<{ contents: string }> = JSON.parse(
     cp
-      .execFileSync(getBinaryPath(), [
+      .execFileSync(getRescriptToolsPath(), [
         'extract-embedded',
         ['sql', 'sql.one', 'sql.expectOne', 'sql.many', 'sql.execute'].join(
           ',',
