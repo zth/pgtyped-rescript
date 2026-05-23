@@ -24,8 +24,8 @@
   "dependencies": {
     "expect": "29.6.2",
     "pg": "8.11.2",
-    "pgtyped-rescript": "^2.4.0",
-    "pgtyped-rescript-query": "^2.3.0",
+    "pgtyped-rescript": "^3.0.0",
+    "pgtyped-rescript-query": "^3.0.0",
     "rescript": "12.2.0",
     "rescript-embed-lang": "^0.5.5",
     "typescript": "4.9.4"

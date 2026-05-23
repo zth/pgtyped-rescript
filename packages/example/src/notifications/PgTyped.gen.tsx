@@ -1,1 +1,1 @@
-export type {Pg_Client_t, dateOrString} from '../PgTyped.gen';
+export type { Pg_Client_t, dateOrString } from '../PgTyped.gen';
