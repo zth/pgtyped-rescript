@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]*.[0-9]*.[0-9]*'
+      - 'v[0-9]*.[0-9]*.[0-9]*'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+
+      - name: Validate tag
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          cli_version="$(node -p "require('./packages/cli/package.json').version")"
+          if [ "$tag" != "$cli_version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match pgtyped-rescript version $cli_version"
+            exit 1
+          fi
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_VERSION: '20'
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          for package_dir in \
+            packages/wire \
+            packages/parser \
+            packages/runtime \
+            packages/query \
+            packages/cli
+          do
+            package_name="$(node -p "require('./${package_dir}/package.json').name")"
+            package_version="$(node -p "require('./${package_dir}/package.json').version")"
+
+            if npm view "${package_name}@${package_version}" version >/dev/null 2>&1; then
+              echo "${package_name}@${package_version} is already published; skipping"
+              continue
+            fi
+
+            echo "Publishing ${package_name}@${package_version}"
+            npm publish "./${package_dir}" --access public --provenance
+          done
