@@ -723,6 +723,18 @@ export function getAliasedLiterals(
   return map;
 }
 
+export function parseQueryForAnalysis(query: string): Statement[] | null {
+  try {
+    return parse(query);
+  } catch (err) {
+    debugQuery(
+      'Skipping AST-based query analysis because pgsql-ast-parser failed: %o',
+      err,
+    );
+    return null;
+  }
+}
+
 async function extraParameterInfo(query: Statement[]) {
   const paramsInfo = new Map<
     number,
@@ -789,9 +801,13 @@ export async function getTypes(
   const commentRows = await getComments(fields, queue);
   const checkRows = await getCheckConstraints(fields, queue);
   const typeMap = reduceTypeRows(typeRows);
-  const parsedQuery = parse(queryData.query);
-  const aliasedLiterals = getAliasedLiterals(parsedQuery);
-  const paramsInfo = await extraParameterInfo(parsedQuery);
+  const parsedQuery = parseQueryForAnalysis(queryData.query);
+  const aliasedLiterals =
+    parsedQuery == null
+      ? new Map<string, ConstraintValue[]>()
+      : getAliasedLiterals(parsedQuery);
+  const paramsInfo =
+    parsedQuery == null ? new Map() : await extraParameterInfo(parsedQuery);
 
   const attrMatcher = ({
     tableOID,

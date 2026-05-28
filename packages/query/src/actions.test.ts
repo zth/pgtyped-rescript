@@ -1,4 +1,8 @@
-import { generateHash, reduceTypeRows } from './actions.js';
+import {
+  generateHash,
+  parseQueryForAnalysis,
+  reduceTypeRows,
+} from './actions.js';
 
 test('test postgres md5 hash generation', () => {
   const salt = [0x81, 0xcc, 0x95, 0x8b];
@@ -194,4 +198,11 @@ test('reduce type rows to MappableTypes', () => {
       },
     ]),
   ).toMatchSnapshot();
+});
+
+test('query analysis gracefully degrades for unsupported PostgreSQL syntax', () => {
+  expect(
+    parseQueryForAnalysis('with a as materialized (select 1) select * from a'),
+  ).toBeNull();
+  expect(parseQueryForAnalysis('select from')).toBeNull();
 });

@@ -1,5 +1,7 @@
 # main
 
+- Gracefully skip optional AST-based query analysis when `pgsql-ast-parser` cannot parse valid PostgreSQL syntax, so generation can continue with database-derived types.
+
 # 3.0.0
 
 - BREAKING: Require ReScript `>=12.0.0`.
