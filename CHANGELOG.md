@@ -1,4 +1,4 @@
-# main
+# 3.0.1
 
 - Gracefully skip optional AST-based query analysis when `pgsql-ast-parser` cannot parse valid PostgreSQL syntax, so generation can continue with database-derived types.
 
