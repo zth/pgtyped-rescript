@@ -1,3 +1,8 @@
+# Unreleased
+
+- Add `pgtyped-rescript diagnose` for inspecting named SQL queries with `describe`, `explain`, and `explain analyze`, including support for parameter JSON, parameter files, processed SQL output, query listing, JSON output, and statement timeouts.
+- Reduce default CLI generation output to only recompiled files, errors, and concise unchanged-run summaries; pass `--verbose` to restore detailed per-file processing and skipped-file output.
+
 # 3.0.1
 
 - Gracefully skip optional AST-based query analysis when `pgsql-ast-parser` cannot parse valid PostgreSQL syntax, so generation can continue with database-derived types.

@@ -10,6 +10,11 @@ import { debug } from './util.js';
 import { parseConfig, ParsedConfig, TransformConfig } from './config.js';
 import { getMatchedFiles } from './glob.js';
 import path from 'path';
+import {
+  DiagnosticsFormat,
+  DiagnosticsMode,
+  runDiagnostics,
+} from './diagnostics.js';
 
 import WorkerPool from 'piscina';
 
@@ -25,18 +30,40 @@ interface TransformJob {
 class FileProcessor {
   private readonly pool: WorkerPool;
   public readonly workQueue: Promise<unknown>[] = [];
+  private processedCount = 0;
+  private skippedCount = 0;
+  private recompiledCount = 0;
+  private errorCount = 0;
 
-  constructor(private readonly config: ParsedConfig) {
+  constructor(
+    private readonly config: ParsedConfig,
+    private readonly verboseOutput: boolean,
+  ) {
     this.pool = new WorkerPool({
       filename: new URL('./worker.js', import.meta.url).href,
       maxThreads: 8,
       workerData: config,
     });
-    console.log(`Using a pool of ${this.pool.threads.length} threads.`);
+    if (this.verboseOutput) {
+      console.log(`Using a pool of ${this.pool.threads.length} threads.`);
+    }
   }
 
   public async shutdown() {
     await this.pool.destroy();
+  }
+
+  public printSummary() {
+    if (this.verboseOutput) {
+      console.log(
+        `Summary: ${this.recompiledCount} recompiled, ${this.skippedCount} unchanged, ${this.errorCount} errors, ${this.processedCount} processed.`,
+      );
+      return;
+    }
+
+    if (this.recompiledCount === 0 && this.errorCount === 0) {
+      console.log('No files recompiled.');
+    }
   }
 
   public push(job: TransformJob) {
@@ -44,16 +71,23 @@ class FileProcessor {
       ...job.files.map(async (fileName) => {
         try {
           fileName = path.relative(process.cwd(), fileName);
-          console.log(`Processing ${fileName}`);
+          this.processedCount += 1;
+          if (this.verboseOutput) {
+            console.log(`Processing ${fileName}`);
+          }
           const result = await this.pool.run({
             fileName,
             transform: job.transform,
           });
           if (result.skipped) {
-            console.log(
-              `Skipped ${fileName}: no changes or no queries detected`,
-            );
+            this.skippedCount += 1;
+            if (this.verboseOutput) {
+              console.log(
+                `Skipped ${fileName}: no changes or no queries detected`,
+              );
+            }
           } else {
+            this.recompiledCount += 1;
             console.log(
               `Saved ${result.typeDecsLength} query types from ${fileName} to ${result.relativePath}`,
             );
@@ -66,11 +100,13 @@ class FileProcessor {
               return;
             }
 
-            console.log(
+            this.errorCount += 1;
+            console.error(
               `Error processing file: ${err.stack || JSON.stringify(err)}`,
             );
           } else {
-            console.log(`Error processing file: ${JSON.stringify(err)}`);
+            this.errorCount += 1;
+            console.error(`Error processing file: ${JSON.stringify(err)}`);
           }
           if (this.config.failOnError) {
             await this.pool.destroy();
@@ -88,6 +124,7 @@ async function main(
   isWatchMode: boolean,
   // tslint:disable-next-line:no-shadowed-variable
   fileOverride?: string,
+  verboseOutput = false,
 ) {
   const config = await cfg;
   const connection = new AsyncQueue();
@@ -96,7 +133,7 @@ async function main(
 
   debug('connected to database %o', config.db.dbName);
 
-  const fileProcessor = new FileProcessor(config);
+  const fileProcessor = new FileProcessor(config, verboseOutput);
   let fileOverrideUsed = false;
   for (const transform of config.transforms) {
     const pattern = `${config.srcDir}/**/${transform.include}`;
@@ -138,12 +175,64 @@ async function main(
   }
   if (!isWatchMode) {
     await Promise.all(fileProcessor.workQueue);
+    fileProcessor.printSummary();
     await fileProcessor.shutdown();
     process.exit(0);
   }
 }
 
 const args = yargs(hideBin(process.argv))
+  .scriptName('pgtyped-rescript')
+  .usage('$0 -c config.json [options]')
+  .command(
+    'diagnose <sqlFile>',
+    'Run diagnostics for a named SQL query',
+    (cmd) =>
+      cmd
+        .positional('sqlFile', {
+          type: 'string',
+          description: 'SQL file containing the query',
+          demandOption: true,
+        })
+        .option('query', {
+          alias: 'q',
+          type: 'string',
+          description: 'Named query to diagnose',
+        })
+        .option('mode', {
+          alias: 'm',
+          choices: ['describe', 'explain', 'analyze'] as const,
+          default: 'explain' as const,
+          description: 'Diagnostic mode to run',
+        })
+        .option('params', {
+          alias: 'p',
+          type: 'string',
+          description: 'JSON object with query parameters',
+        })
+        .option('params-file', {
+          type: 'string',
+          description: 'Path to a JSON file with query parameters',
+        })
+        .option('format', {
+          choices: ['text', 'table', 'json'] as const,
+          default: 'text' as const,
+          description: 'Output format for diagnostics',
+        })
+        .option('list', {
+          type: 'boolean',
+          description: 'List query names in the SQL file',
+        })
+        .option('sql', {
+          type: 'boolean',
+          description: 'Print the processed SQL without running diagnostics',
+        })
+        .option('timeout', {
+          type: 'string',
+          description:
+            'Statement timeout for explain analyze, such as 500ms, 5s, or 1min',
+        }),
+  )
   .version()
   .env()
   .options({
@@ -151,7 +240,6 @@ const args = yargs(hideBin(process.argv))
       alias: 'c',
       type: 'string',
       description: 'Config file path',
-      demandOption: true,
     },
     watch: {
       alias: 'w',
@@ -168,6 +256,11 @@ const args = yargs(hideBin(process.argv))
       conflicts: 'watch',
       description: 'File path (process single file, incompatible with --watch)',
     },
+    verbose: {
+      alias: 'v',
+      type: 'boolean',
+      description: 'Show detailed processing output',
+    },
   })
   .epilogue('For more information, find our manual at https://pgtyped.dev/')
   .parseSync();
@@ -177,9 +270,13 @@ const {
   file: fileOverride,
   config: configPath,
   uri: connectionUri,
+  verbose,
 } = args;
+const command = args._[0];
+const needsConfig =
+  command !== 'diagnose' || (!(args.list as boolean) && !(args.sql as boolean));
 
-if (typeof configPath !== 'string') {
+if (needsConfig && typeof configPath !== 'string') {
   console.log('Config file required. See help -h for details.\nExiting.');
   process.exit(0);
 }
@@ -190,14 +287,39 @@ if (isWatchMode && fileOverride) {
 }
 
 try {
-  chokidar.watch(configPath).on('change', () => {
-    console.log('Config file changed. Exiting.');
-    process.exit();
-  });
-  const config = parseConfig(configPath, connectionUri);
-  main(config, isWatchMode || false, fileOverride).catch((e) =>
-    debug('error in main: %o', e.message),
-  );
+  const config =
+    typeof configPath === 'string'
+      ? parseConfig(configPath, connectionUri)
+      : undefined;
+  if (command === 'diagnose') {
+    runDiagnostics(config, {
+      file: args.sqlFile as string,
+      queryName: args.query as string | undefined,
+      params: args.params as string | undefined,
+      paramsFile: args.paramsFile as string | undefined,
+      mode: args.mode as DiagnosticsMode,
+      format: args.format as DiagnosticsFormat,
+      list: args.list as boolean | undefined,
+      sql: args.sql as boolean | undefined,
+      timeout: args.timeout as string | undefined,
+    }).catch((e) => {
+      console.error((e as Error).message);
+      process.exitCode = 1;
+    });
+  } else {
+    if (!config || typeof configPath !== 'string') {
+      console.log('Config file required. See help -h for details.\nExiting.');
+      process.exit(0);
+    }
+
+    chokidar.watch(configPath).on('change', () => {
+      console.log('Config file changed. Exiting.');
+      process.exit();
+    });
+    main(config, isWatchMode || false, fileOverride, verbose || false).catch(
+      (e) => debug('error in main: %o', e.message),
+    );
+  }
 } catch (e) {
   console.error('Failed to parse config file:');
   console.error((e as any).message);
